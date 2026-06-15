@@ -1,4 +1,4 @@
-# RigLogic 4
+# OpenRigLogic
 
 ## Overview
 

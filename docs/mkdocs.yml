@@ -1,0 +1,109 @@
+site_name: OpenRigLogic
+site_url: https://epicgames.github.io/OpenRigLogic/
+docs_dir: wiki
+theme:
+  name: readthedocs
+
+exclude_docs: _Sidebar.md
+
+nav:
+  - Home: index.md
+  - Release Notes: release_notes.md
+  - API Reference:
+    - Overview: api/index.md
+    - arrayview:
+      - Overview: api/arrayview/index.md
+      - ArrayView: api/arrayview/ArrayView.md
+      - StringView: api/arrayview/StringView.md
+    - dna:
+      - Overview: api/dna/index.md
+      - BinaryStreamReader: api/dna/BinaryStreamReader.md
+      - BinaryStreamWriter: api/dna/BinaryStreamWriter.md
+      - Configuration: api/dna/Configuration.md
+      - JSONStreamReader: api/dna/JSONStreamReader.md
+      - JSONStreamWriter: api/dna/JSONStreamWriter.md
+      - Reader: api/dna/Reader.md
+      - StreamReader: api/dna/StreamReader.md
+      - StreamWriter: api/dna/StreamWriter.md
+      - Writer: api/dna/Writer.md
+      - layers:
+        - BehaviorReader: api/dna/layers/BehaviorReader.md
+        - BehaviorWriter: api/dna/layers/BehaviorWriter.md
+        - DefinitionReader: api/dna/layers/DefinitionReader.md
+        - DefinitionWriter: api/dna/layers/DefinitionWriter.md
+        - Descriptor: api/dna/layers/Descriptor.md
+        - DescriptorReader: api/dna/layers/DescriptorReader.md
+        - DescriptorWriter: api/dna/layers/DescriptorWriter.md
+        - Geometry: api/dna/layers/Geometry.md
+        - GeometryReader: api/dna/layers/GeometryReader.md
+        - GeometryWriter: api/dna/layers/GeometryWriter.md
+        - HeaderReader: api/dna/layers/HeaderReader.md
+        - HeaderWriter: api/dna/layers/HeaderWriter.md
+        - JointBehaviorMetadata: api/dna/layers/JointBehaviorMetadata.md
+        - JointBehaviorMetadataReader: api/dna/layers/JointBehaviorMetadataReader.md
+        - JointBehaviorMetadataWriter: api/dna/layers/JointBehaviorMetadataWriter.md
+        - MachineLearnedBehavior: api/dna/layers/MachineLearnedBehavior.md
+        - MachineLearnedBehaviorExt: api/dna/layers/MachineLearnedBehaviorExt.md
+        - MachineLearnedBehaviorExtReader: api/dna/layers/MachineLearnedBehaviorExtReader.md
+        - MachineLearnedBehaviorExtWriter: api/dna/layers/MachineLearnedBehaviorExtWriter.md
+        - MachineLearnedBehaviorReader: api/dna/layers/MachineLearnedBehaviorReader.md
+        - MachineLearnedBehaviorWriter: api/dna/layers/MachineLearnedBehaviorWriter.md
+        - RBFBehavior: api/dna/layers/RBFBehavior.md
+        - RBFBehaviorReader: api/dna/layers/RBFBehaviorReader.md
+        - RBFBehaviorWriter: api/dna/layers/RBFBehaviorWriter.md
+        - Twist: api/dna/layers/Twist.md
+        - TwistSwingBehaviorReader: api/dna/layers/TwistSwingBehaviorReader.md
+        - TwistSwingBehaviorWriter: api/dna/layers/TwistSwingBehaviorWriter.md
+      - types:
+        - Vector3: api/dna/types/Vector3.md
+      - version:
+        - VersionInfo: api/dna/version/VersionInfo.md
+    - pma:
+      - Overview: api/pma/index.md
+      - MemoryResource: api/pma/MemoryResource.md
+      - PolyAllocator: api/pma/PolyAllocator.md
+      - ScopedPtr: api/pma/ScopedPtr.md
+      - TypeDefs: api/pma/TypeDefs.md
+      - resources:
+        - AlignedMemoryResource: api/pma/resources/AlignedMemoryResource.md
+        - ArenaMemoryResource: api/pma/resources/ArenaMemoryResource.md
+        - DefaultMemoryResource: api/pma/resources/DefaultMemoryResource.md
+      - utils:
+        - ManagedInstance: api/pma/utils/ManagedInstance.md
+    - riglogic:
+      - Overview: api/riglogic/index.md
+      - Configuration: api/riglogic/riglogic/Configuration.md
+      - RigInstance: api/riglogic/riglogic/RigInstance.md
+      - RigLogic: api/riglogic/riglogic/RigLogic.md
+      - Stats: api/riglogic/riglogic/Stats.md
+      - types:
+        - Aliases: api/riglogic/types/Aliases.md
+      - version:
+        - VersionInfo: api/riglogic/version/VersionInfo.md
+    - status:
+      - Overview: api/status/index.md
+      - Provider: api/status/Provider.md
+      - Status: api/status/Status.md
+      - StatusCode: api/status/StatusCode.md
+    - tdm:
+      - Overview: api/tdm/index.md
+      - Ang: api/tdm/Ang.md
+      - Computations: api/tdm/Computations.md
+      - CoordSys: api/tdm/CoordSys.md
+      - Mat: api/tdm/Mat.md
+      - Quat: api/tdm/Quat.md
+      - Transforms: api/tdm/Transforms.md
+      - Types: api/tdm/Types.md
+      - Vec: api/tdm/Vec.md
+    - trio:
+      - Overview: api/trio/index.md
+      - Concepts: api/trio/Concepts.md
+      - Stream: api/trio/Stream.md
+      - streams:
+        - FileStream: api/trio/streams/FileStream.md
+        - MemoryMappedFileStream: api/trio/streams/MemoryMappedFileStream.md
+        - MemoryStream: api/trio/streams/MemoryStream.md
+      - types:
+        - Parameters: api/trio/types/Parameters.md
+      - utils:
+        - StreamScope: api/trio/utils/StreamScope.md

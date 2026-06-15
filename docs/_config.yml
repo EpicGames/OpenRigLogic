@@ -1,0 +1,9 @@
+title: OpenRigLogic
+theme: jekyll-theme-cayman
+exclude:
+  - design
+defaults:
+  - scope:
+      path: ""
+    values:
+      render_with_liquid: false
