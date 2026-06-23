@@ -137,14 +137,9 @@ TEST(TestTransforms, RotateByXYZAnglesVector) {
 
 TEST(TestTransforms, RotateByXYZAnglesNegativeDirection) {
     using namespace tdm::ang_literals;
-    constexpr tdm::rot_sign rot_sign_negative{tdm::rot_dir::negative, tdm::rot_dir::negative, tdm::rot_dir::negative};
+    constexpr tdm::rot_sign negative_signs{tdm::rot_dir::negative, tdm::rot_dir::negative, tdm::rot_dir::negative};
     auto m = tdm::mat4<float>::identity();
-    m = tdm::rotate<float>(m,
-                           tdm::frad{45.0_fdeg},
-                           tdm::frad{0.0_fdeg},
-                           tdm::frad{30.0_fdeg},
-                           tdm::rot_seq::xyz,
-                           rot_sign_negative);
+    m = tdm::rotate<float>(m, tdm::frad{45.0_fdeg}, tdm::frad{0.0_fdeg}, tdm::frad{30.0_fdeg}, tdm::rot_seq::xyz, negative_signs);
     tdm::mat4<float> expected{0.8660254f,
                               -0.5f,
                               0.0f,

@@ -53,6 +53,11 @@ private:
                                           RotationSequence srcRotationSequence,
                                           const RotationSign& srcRotationSigns,
                                           FaceWindingOrder srcFaceWindingOrder);
+    void convertTwistAxes(DNA& dna,
+                          const CoordinateSystem& srcCoordinateSystem,
+                          RotationSequence srcRotationSequence,
+                          const RotationSign& srcRotationSigns,
+                          FaceWindingOrder srcFaceWindingOrder);
     void convertFaceWinding(DNA& dna,
                             const CoordinateSystem& srcCoordinateSystem,
                             RotationSequence srcRotationSequence,

@@ -475,6 +475,7 @@ set(TESTS
     tests/tdmtests/TestComputations.cpp
     tests/tdmtests/TestCoordSys.cpp
     tests/tdmtests/TestMat.cpp
+    tests/tdmtests/TestMatEulerConverter.cpp
     tests/tdmtests/TestQuat.cpp
     tests/tdmtests/TestTransforms.cpp
     tests/tdmtests/TestVec.cpp

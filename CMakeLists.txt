@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 ################################################
 # Project setup
 set(RL riglogic4)
-set(RL_VERSION 13.2.5)
+set(RL_VERSION 13.2.7)
 # Prevent in-source-tree builds
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 # Create compilation database
@@ -587,6 +587,7 @@ if(RL_BUILD_BENCHMARKS)
         set(RL_BENCHMARK_RUNNER rlbenchmarks)
         set(GOOGLEBENCHMARK_VERSION v1.8.3)
         add_subdirectory(benchmarks)
+        set(RL_BENCHMARK_TARGETS ${RL_BENCHMARK_RUNNER} benchmark)
         target_compile_options(${RL_BENCHMARK_RUNNER} PRIVATE "${CXX_FLAGS}")
         include(SupportedCompileOptions)
         target_supported_compile_options(${RL_BENCHMARK_RUNNER} PRIVATE "${CXX_EXTRA_FLAGS}")
@@ -607,7 +608,7 @@ endif()
 
 # Enable sanitizers (if command line parameter is present)
 include(Sanitizers)
-sanitize_targets(${RL} ${RL_TEST_TARGETS} ${RL_BENCHMARK_RUNNER} ${RL_EXAMPLES})
+sanitize_targets(${RL} ${RL_TEST_TARGETS} ${RL_BENCHMARK_TARGETS} ${RL_EXAMPLES})
 
 # Add targets for running clang-tidy, cppcheck, ...
 include(Analysis)

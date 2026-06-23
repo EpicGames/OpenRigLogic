@@ -200,7 +200,7 @@ struct mat_to_euler<T, rot_seq::xyz> {
             }
         } else {
             // Gimbal lock: sy == 1, means sin(y) = -1, y = -90 degrees
-            result[0] = rad<T>{-std::atan2(-m(2, 1), m(1, 1))};
+            result[0] = rad<T>{std::atan2(-m(2, 1), m(1, 1))};
             result[1] = rad<T>{static_cast<T>(-0.5) * static_cast<T>(pi())};
             result[2] = rad<T>{static_cast<T>(0)};
         }
@@ -227,13 +227,13 @@ struct mat_to_euler<T, rot_seq::xzy> {
                 result[2] = rad<T>{std::asin(sz)};
             } else {
                 // Gimbal lock: sz == -1, z = -90 degrees
-                result[0] = rad<T>{std::atan2(m(2, 0), m(2, 2))};
+                result[0] = rad<T>{-std::atan2(m(2, 0), m(2, 2))};
                 result[1] = rad<T>{static_cast<T>(0)};
                 result[2] = rad<T>{static_cast<T>(-0.5) * static_cast<T>(pi())};
             }
         } else {
             // Gimbal lock: sz == 1, z = 90 degrees
-            result[0] = rad<T>{-std::atan2(m(2, 0), m(2, 2))};
+            result[0] = rad<T>{std::atan2(m(2, 0), m(2, 2))};
             result[1] = rad<T>{static_cast<T>(0)};
             result[2] = rad<T>{static_cast<T>(0.5) * static_cast<T>(pi())};
         }
@@ -302,7 +302,7 @@ struct mat_to_euler<T, rot_seq::yzx> {
         } else {
             // Gimbal lock: sz == 1, z = -90 degrees
             result[0] = rad<T>{static_cast<T>(0)};
-            result[1] = rad<T>{-std::atan2(-m(0, 2), m(2, 2))};
+            result[1] = rad<T>{std::atan2(-m(0, 2), m(2, 2))};
             result[2] = rad<T>{static_cast<T>(-0.5) * static_cast<T>(pi())};
         }
 
@@ -330,13 +330,13 @@ struct mat_to_euler<T, rot_seq::zxy> {
                 // Gimbal lock: sx == -1, x = 90 degrees
                 result[0] = rad<T>{static_cast<T>(0.5) * static_cast<T>(pi())};
                 result[1] = rad<T>{static_cast<T>(0)};
-                result[2] = rad<T>{std::atan2(-m(0, 2), m(0, 0))};
+                result[2] = rad<T>{-std::atan2(-m(0, 2), m(0, 0))};
             }
         } else {
             // Gimbal lock: sx == 1, x = -90 degrees
             result[0] = rad<T>{static_cast<T>(-0.5) * static_cast<T>(pi())};
             result[1] = rad<T>{static_cast<T>(0)};
-            result[2] = rad<T>{-std::atan2(-m(0, 2), m(0, 0))};
+            result[2] = rad<T>{std::atan2(-m(0, 2), m(0, 0))};
         }
 
         result[0].value *= static_cast<T>(signs.x);

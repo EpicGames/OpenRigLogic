@@ -1051,6 +1051,155 @@ TYPED_TEST(StreamReadWriteMultipleIntegrationTest, ReadWriteTwoDNAsToSameStream)
     ASSERT_EQ(copiedCloneBytes, copiedCloneRewrittenBytes);
 }
 
+TEST(StreamReadWriteIntegrationTest, RawCopyPreservesDataAfterCoordinateSystemTransformOfV21) {
+    const auto bytes = RawV21::getBytes();
+    auto source = pma::makeScoped<trio::MemoryStream>();
+    source->write(bytes.data(), bytes.size());
+    source->seek(0);
+
+    // The v2.1 fixture uses (right, up, front); requesting a different destination coordinate
+    // system triggers the conversion, which also upgrades the in-memory file version to v2.8.
+    dna::Configuration config;
+    config.coordinateSystemTransformPolicy = CoordinateSystemTransformPolicy::Transform;
+    config.coordinateSystem = {Direction::left, Direction::front, Direction::up};
+    auto sourceReader = pma::makeScoped<BinaryStreamReader>(source.get(), config);
+    sourceReader->read();
+    ASSERT_TRUE(dna::Status::isOk());
+
+    auto clone = pma::makeScoped<trio::MemoryStream>();
+    auto cloneWriter = pma::makeScoped<BinaryStreamWriter>(clone.get());
+    // The BinaryStreamReader overload of setFrom performs a raw-copy, which serializes only
+    // indexed layers (v2.1 sources carry no index in-file, so the entries must be synthesized)
+    cloneWriter->setFrom(sourceReader.get(), DataLayer::All, UnknownLayerPolicy::Preserve);
+    cloneWriter->write();
+    ASSERT_TRUE(dna::Status::isOk());
+
+    clone->seek(0ul);
+    auto cloneReader = pma::makeScoped<BinaryStreamReader>(clone.get());
+    cloneReader->read();
+    ASSERT_TRUE(dna::Status::isOk());
+
+    const auto coordinateSystem = cloneReader->getCoordinateSystem();
+    ASSERT_EQ(coordinateSystem.x, Direction::left);
+    ASSERT_EQ(coordinateSystem.y, Direction::front);
+    ASSERT_EQ(coordinateSystem.z, Direction::up);
+
+    ASSERT_NE(cloneReader->getJointCount(), 0u);
+    ASSERT_EQ(cloneReader->getJointCount(), sourceReader->getJointCount());
+    for (std::uint16_t ji = {}; ji < cloneReader->getJointCount(); ++ji) {
+        ASSERT_EQ(cloneReader->getNeutralJointTranslation(ji), sourceReader->getNeutralJointTranslation(ji));
+    }
+
+    ASSERT_NE(cloneReader->getMeshCount(), 0u);
+    ASSERT_EQ(cloneReader->getMeshCount(), sourceReader->getMeshCount());
+    for (std::uint16_t mi = {}; mi < cloneReader->getMeshCount(); ++mi) {
+        ASSERT_NE(cloneReader->getVertexPositionCount(mi), 0u);
+        ASSERT_EQ(cloneReader->getVertexPositionCount(mi), sourceReader->getVertexPositionCount(mi));
+    }
+}
+
+TEST(StreamReadWriteIntegrationTest, CoordinateSystemTransformRemapsTwistAxes) {
+    const auto bytes = RawV24::getBytes();
+    auto source = pma::makeScoped<trio::MemoryStream>();
+    source->write(bytes.data(), bytes.size());
+    source->seek(0);
+
+    // The v2.4 fixture uses (right, up, front); the destination cycles all three axis labels
+    // (X -> Z, Y -> X, Z -> Y) while keeping handedness, so every stored twist axis label
+    // must follow the relabeling of the joint-local frames.
+    dna::Configuration config;
+    config.coordinateSystemTransformPolicy = CoordinateSystemTransformPolicy::Transform;
+    config.coordinateSystem = {Direction::up, Direction::front, Direction::right};
+    auto reader = pma::makeScoped<BinaryStreamReader>(source.get(), config);
+    reader->read();
+    ASSERT_TRUE(dna::Status::isOk());
+
+    // Twist setup source axes are {X, Y, Z} -> {Z, X, Y} under the relabeling.
+    ASSERT_EQ(reader->getTwistCount(), 3u);
+    ASSERT_EQ(reader->getTwistSetupTwistAxis(0), TwistAxis::Z);
+    ASSERT_EQ(reader->getTwistSetupTwistAxis(1), TwistAxis::X);
+    ASSERT_EQ(reader->getTwistSetupTwistAxis(2), TwistAxis::Y);
+
+    // Swing setup source axes are {X, Y, Z} -> {Z, X, Y} under the relabeling.
+    ASSERT_EQ(reader->getSwingCount(), 3u);
+    ASSERT_EQ(reader->getSwingSetupTwistAxis(0), TwistAxis::Z);
+    ASSERT_EQ(reader->getSwingSetupTwistAxis(1), TwistAxis::X);
+    ASSERT_EQ(reader->getSwingSetupTwistAxis(2), TwistAxis::Y);
+
+    // RBF solver source axes are {X, Y, X} (not {X, Y, Z} like the setups above), so the third
+    // solver maps X -> Z, giving {Z, X, Z}.
+    ASSERT_EQ(reader->getRBFSolverCount(), 3u);
+    ASSERT_EQ(reader->getRBFSolverTwistAxis(0), TwistAxis::Z);
+    ASSERT_EQ(reader->getRBFSolverTwistAxis(1), TwistAxis::X);
+    ASSERT_EQ(reader->getRBFSolverTwistAxis(2), TwistAxis::Z);
+}
+
+TEST(StreamReadWriteIntegrationTest, CoordinateSystemTransformPreservesRBFQuaternionHemisphere) {
+    auto stream = pma::makeScoped<trio::MemoryStream>();
+    auto writer = pma::makeScoped<BinaryStreamWriter>(stream.get());
+    writer->setCoordinateSystem({Direction::left, Direction::front, Direction::up});
+    writer->setRBFSolverName(0, "solver");
+    const float rawControlValues[] = {
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,  // Identity
+        0.0f,
+        0.0f,
+        0.0f,
+        -1.0f,  // Negative identity: same rotation, opposite hemisphere
+        0.70710678f,
+        0.0f,
+        0.0f,
+        0.70710678f,  // +90 degree twist about X
+        0.0f,
+        0.86602540f,
+        0.0f,
+        -0.5f  // 240 degrees about Y, stored on the negative hemisphere
+    };
+    writer->setRBFSolverRawControlValues(0, rawControlValues, 16u);
+    writer->write();
+    ASSERT_TRUE(dna::Status::isOk());
+
+    stream->seek(0);
+    // (left, front, up) -> (left, back, up) is a handedness-flipping sign change of the Y
+    // component, under which quaternion imaginary parts map as v -> det(C) * (v * C) =
+    // (-vx, vy, -vz), with w untouched. The quaternion hemisphere must survive: half-rotation
+    // RBF solvers encode driver rotations beyond 180 degrees purely in the sign of the pose
+    // quaternion, which an euler-angle roundtrip would silently canonicalize away.
+    dna::Configuration config;
+    config.coordinateSystemTransformPolicy = CoordinateSystemTransformPolicy::Transform;
+    config.coordinateSystem = {Direction::left, Direction::back, Direction::up};
+    auto reader = pma::makeScoped<BinaryStreamReader>(stream.get(), config);
+    reader->read();
+    ASSERT_TRUE(dna::Status::isOk());
+
+    ASSERT_EQ(reader->getRBFSolverCount(), 1u);
+    const auto converted = reader->getRBFSolverRawControlValues(0);
+    ASSERT_EQ(converted.size(), 16u);
+    const float expected[] = {
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,  // Identity
+        0.0f,
+        0.0f,
+        0.0f,
+        -1.0f,  // Hemisphere must survive the conversion
+        -0.70710678f,
+        0.0f,
+        0.0f,
+        0.70710678f,  // Twist sense flips with handedness
+        0.0f,
+        0.86602540f,
+        0.0f,
+        -0.5f  // Imaginary Y and hemisphere both preserved
+    };
+    for (std::size_t i = {}; i < converted.size(); ++i) {
+        ASSERT_NEAR(converted[i], expected[i], 0.0001f) << "quaternion component " << i;
+    }
+}
+
 TEST(StreamReadWriteMultipleIntegrationTest, DNAv25LayerIsBackFilledFromv24) {
     const auto bytes = RawV24::getBytes();
     auto source = pma::makeScoped<trio::MemoryStream>();

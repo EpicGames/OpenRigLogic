@@ -4,8 +4,18 @@
 
 #include "dna/Configuration.h"
 #include "dna/DNA.h"
+#include "dna/layers/Twist.h"
 #include "dna/utils/Extd.h"
 #include "dna/utils/Macros.h"
+
+#ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable : 4365 4987)
+#endif
+#include <cmath>
+#ifdef _MSC_VER
+    #pragma warning(pop)
+#endif
 
 namespace dna {
 
@@ -339,30 +349,68 @@ void CoordinateSystemConverter::convertRBFSolverRawControlValues(DNA& dna,
                                                                  RotationSequence srcRotationSequence,
                                                                  const RotationSign& srcRotationSigns,
                                                                  FaceWindingOrder srcFaceWindingOrder) {
+    UNUSED(srcRotationSequence);
+    UNUSED(srcRotationSigns);
     UNUSED(srcFaceWindingOrder);
     const tdm::fmat3 changeOfBasis = tdm::change_of_basis<float>(srcCoordinateSystem, dstCoordinateSystem);
+    // Conjugate the pose quaternions directly: q' = (det(C) * (v * C), w).
+    // Quaternions carry no rotation sequence or sign convention, so no euler roundtrip is needed or allowed:
+    // extracting euler angles destroys the q vs -q distinction that "half rotation" RBF solvers rely on to track driver rotations
+    // beyond 180 degrees.
+    const float chirality = tdm::determinant(changeOfBasis);
     for (std::size_t solverIndex = {}; solverIndex < dna.rbfBehavior.solvers.size(); ++solverIndex) {
         auto& rawControlValues = dna.rbfBehavior.solvers[solverIndex].rawControlValues;
         if (rawControlValues.size() % 4ul == 0ul) {
             for (std::size_t offset = {}; offset < rawControlValues.size(); offset += 4ul) {
-                const tdm::fquat srcPoseRotation{rawControlValues[offset + 0ul],
-                                                 rawControlValues[offset + 1ul],
-                                                 rawControlValues[offset + 2ul],
-                                                 rawControlValues[offset + 3ul]};
-                const tdm::frad3 srcPoseRotationEuler = srcPoseRotation.euler(srcRotationSequence, srcRotationSigns);
-                const tdm::frad3 dstPoseRotationEuler = tdm::convert_rotation(srcPoseRotationEuler,
-                                                                              changeOfBasis,
-                                                                              srcRotationSequence,
-                                                                              srcRotationSigns,
-                                                                              dstRotationSequence,
-                                                                              dstRotationSigns);
-                const tdm::fquat dstPoseRotation{dstPoseRotationEuler, dstRotationSequence, dstRotationSigns};
-                rawControlValues[offset + 0] = dstPoseRotation.x;
-                rawControlValues[offset + 1] = dstPoseRotation.y;
-                rawControlValues[offset + 2] = dstPoseRotation.z;
-                rawControlValues[offset + 3] = dstPoseRotation.w;
+                const tdm::fvec3 srcImaginary{rawControlValues[offset + 0ul],
+                                              rawControlValues[offset + 1ul],
+                                              rawControlValues[offset + 2ul]};
+                const tdm::fvec3 dstImaginary = tdm::convert_direction(srcImaginary, changeOfBasis, false) * chirality;
+                rawControlValues[offset + 0] = dstImaginary[0];
+                rawControlValues[offset + 1] = dstImaginary[1];
+                rawControlValues[offset + 2] = dstImaginary[2];
             }
         }
+    }
+}
+
+void CoordinateSystemConverter::convertTwistAxes(DNA& dna,
+                                                 const CoordinateSystem& srcCoordinateSystem,
+                                                 RotationSequence srcRotationSequence,
+                                                 const RotationSign& srcRotationSigns,
+                                                 FaceWindingOrder srcFaceWindingOrder) {
+    UNUSED(srcRotationSequence);
+    UNUSED(srcRotationSigns);
+    UNUSED(srcFaceWindingOrder);
+
+    const tdm::fmat3 changeOfBasis = tdm::change_of_basis<float>(srcCoordinateSystem, dstCoordinateSystem);
+
+    auto remapTwistAxis = [&changeOfBasis](TwistAxis srcTwistAxis) {
+        if (srcTwistAxis > TwistAxis::Z) {
+            return srcTwistAxis;
+        }
+        tdm::fvec3 srcAxis{};
+        srcAxis[static_cast<tdm::dim_t>(srcTwistAxis)] = 1.0f;
+        const tdm::fvec3 dstAxis = tdm::convert_direction(srcAxis, changeOfBasis, false);
+        tdm::dim_t dominant = {};
+        for (tdm::dim_t ci = 1u; ci < 3u; ++ci) {
+            if (std::fabs(dstAxis[ci]) > std::fabs(dstAxis[dominant])) {
+                dominant = ci;
+            }
+        }
+        return static_cast<TwistAxis>(dominant);
+    };
+
+    for (auto& solver : dna.rbfBehavior.solvers) {
+        solver.twistAxis = static_cast<std::uint16_t>(remapTwistAxis(static_cast<TwistAxis>(solver.twistAxis)));
+    }
+
+    for (auto& twist : dna.twistSwingBehavior.twists) {
+        twist.twistAxis = static_cast<std::uint16_t>(remapTwistAxis(static_cast<TwistAxis>(twist.twistAxis)));
+    }
+
+    for (auto& swing : dna.twistSwingBehavior.swings) {
+        swing.twistAxis = static_cast<std::uint16_t>(remapTwistAxis(static_cast<TwistAxis>(swing.twistAxis)));
     }
 }
 
@@ -414,6 +462,7 @@ void CoordinateSystemConverter::convert(DNA& dna) {
     convertVertexNormals(dna, srcCoordinateSystem, srcRotationSequence, srcRotationSigns, srcFaceWindingOrder);
     convertBlendShapeDeltas(dna, srcCoordinateSystem, srcRotationSequence, srcRotationSigns, srcFaceWindingOrder);
     convertRBFSolverRawControlValues(dna, srcCoordinateSystem, srcRotationSequence, srcRotationSigns, srcFaceWindingOrder);
+    convertTwistAxes(dna, srcCoordinateSystem, srcRotationSequence, srcRotationSigns, srcFaceWindingOrder);
     convertFaceWinding(dna, srcCoordinateSystem, srcRotationSequence, srcRotationSigns, srcFaceWindingOrder);
 
     dna.descriptor.coordinateSystem.xAxis = static_cast<std::uint16_t>(dstCoordinateSystem.x);
@@ -422,6 +471,17 @@ void CoordinateSystemConverter::convert(DNA& dna) {
     dna.descriptorExt.rotationSequence = dstRotationSequence;
     dna.descriptorExt.rotationSign = dstRotationSigns;
     dna.descriptorExt.faceWindingOrder = dstFaceWindingOrder;
+
+    // The v2.1 monolithic format carries no layer index, but always contains these four
+    // sections. As the version upgrade below switches the DNA to the layered format, which
+    // writes only indexed layers when format upgrades are disallowed (e.g. during raw-copy),
+    // index them explicitly so they don't get silently dropped.
+    if (dna.version.matches(FileVersion::v21)) {
+        dna.ensureLayerIndexed(dna.descriptor.layerId(), dna.descriptor.layerVersion());
+        dna.ensureLayerIndexed(dna.definition.layerId(), dna.definition.layerVersion());
+        dna.ensureLayerIndexed(dna.behavior.layerId(), dna.behavior.layerVersion());
+        dna.ensureLayerIndexed(dna.geometry.layerId(), dna.geometry.layerVersion());
+    }
 
     // The faceWindingOrder field was added in v28; any DNA written by this converter must be
     // at least v28 so that the updated winding convention is serialized.
@@ -432,6 +492,11 @@ void CoordinateSystemConverter::convert(DNA& dna) {
         // faceWindingOrder field on DescriptorExt.
         dna.version.version = minDNAVersion;
     }
+
+    // The converted rotation and winding conventions are stored in the DescriptorExt layer,
+    // which sources older than v2.7 don't have in their layer index. Index it explicitly, so
+    // serialization with UpgradeFormatPolicy::Disallowed (e.g. during raw-copy) preserves it.
+    dna.ensureLayerIndexed(dna.descriptorExt.layerId(), dna.descriptorExt.layerVersion());
 }
 
 }  // namespace dna

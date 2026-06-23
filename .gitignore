@@ -38,3 +38,4 @@
 /.vs
 /.vscode
 /.cache
+/.clang-format-tool

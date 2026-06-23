@@ -1918,6 +1918,12 @@ struct DNA {
         }
     }
 
+    void ensureLayerIndexed(std::uint32_t layerId, std::uint32_t layerVersion) {
+        if (indexTable.get(layerId, layerVersion) == nullptr) {
+            indexTable.create(layerId, layerVersion);
+        }
+    }
+
     void postLoadActions() {
         if (rbfBehaviorExt.poses.empty() && !rbfBehavior.poses.empty()) {
             rbfBehaviorExt.poses.resize(rbfBehavior.poses.size(), RawRBFPoseExt{memRes});
