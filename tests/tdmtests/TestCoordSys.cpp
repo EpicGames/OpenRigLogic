@@ -397,7 +397,7 @@ TEST(TestCoordSys, MayaToUE_Scale) {
     // Maya: X=left, Y=up, Z=front -> UE: X=front, Y=right, Z=up
     // Maya (mx, my, mz) -> UE (mz, mx, my) for scale (absolute values)
     const tdm::fvec3 maya_scale{1.0f, 2.0f, 3.0f};
-    const auto ue_scale = tdm::convert_scale(maya_scale, maya_cs, ue_cs);
+    const auto ue_scale = tdm::convert_scale(maya_scale, maya_cs, ue_cs, tdm::sign_policy::discard);
 
     ASSERT_NEAR(ue_scale[0], 3.0f, 0.001f);  // mz
     ASSERT_NEAR(ue_scale[1], 1.0f, 0.001f);  // mx
@@ -407,11 +407,35 @@ TEST(TestCoordSys, MayaToUE_Scale) {
 TEST(TestCoordSys, UEToMaya_Scale) {
     // UE (ux, uy, uz) -> Maya (uy, uz, ux) for scale (absolute values)
     const tdm::fvec3 ue_scale{1.0f, 3.0f, 2.0f};
-    const auto maya_scale = tdm::convert_scale(ue_scale, ue_cs, maya_cs);
+    const auto maya_scale = tdm::convert_scale(ue_scale, ue_cs, maya_cs, tdm::sign_policy::discard);
 
     ASSERT_NEAR(maya_scale[0], 3.0f, 0.001f);  // uy
     ASSERT_NEAR(maya_scale[1], 2.0f, 0.001f);  // uz
     ASSERT_NEAR(maya_scale[2], 1.0f, 0.001f);  // ux
+}
+
+TEST(TestCoordSys, ScaleSignPolicy) {
+    // A signed scale delta (offset from neutral, so components may be negative) under an
+    // axis-permuting, handedness-flipping conversion. sign_policy::preserve keeps each
+    // component's sign and only permutes the axes; sign_policy::discard collapses to magnitudes.
+    const tdm::fvec3 maya_delta{-0.5f, 0.5f, -0.25f};  // Maya (mx, my, mz) -> UE (mz, mx, my)
+
+    const auto preserved = tdm::convert_scale(maya_delta, maya_cs, ue_cs, tdm::sign_policy::preserve);
+    ASSERT_NEAR(preserved[0], -0.25f, 0.001f);  // mz
+    ASSERT_NEAR(preserved[1], -0.5f, 0.001f);   // mx
+    ASSERT_NEAR(preserved[2], 0.5f, 0.001f);    // my
+
+    const auto discarded = tdm::convert_scale(maya_delta, maya_cs, ue_cs, tdm::sign_policy::discard);
+    ASSERT_NEAR(discarded[0], 0.25f, 0.001f);
+    ASSERT_NEAR(discarded[1], 0.5f, 0.001f);
+    ASSERT_NEAR(discarded[2], 0.5f, 0.001f);
+
+    // preserve is invertible: converting back recovers the original signed delta exactly, which is
+    // exactly what discard cannot do once a component has gone negative.
+    const auto round_tripped = tdm::convert_scale(preserved, ue_cs, maya_cs, tdm::sign_policy::preserve);
+    ASSERT_NEAR(round_tripped[0], -0.5f, 0.001f);
+    ASSERT_NEAR(round_tripped[1], 0.5f, 0.001f);
+    ASSERT_NEAR(round_tripped[2], -0.25f, 0.001f);
 }
 
 TEST(TestCoordSys, MayaToUE_Direction) {
@@ -492,10 +516,10 @@ TEST(TestCoordSys, BlenderToMaya_Rotation) {
 
 TEST(TestCoordSys, MayaToBlender_Scale) {
     const tdm::fvec3 maya_scale{1.5f, 2.0f, 0.5f};
-    const auto blender_scale = tdm::convert_scale(maya_scale, maya_cs, blender_cs);
+    const auto blender_scale = tdm::convert_scale(maya_scale, maya_cs, blender_cs, tdm::sign_policy::discard);
 
     // Round-trip
-    const auto back_to_maya = tdm::convert_scale(blender_scale, blender_cs, maya_cs);
+    const auto back_to_maya = tdm::convert_scale(blender_scale, blender_cs, maya_cs, tdm::sign_policy::discard);
     ASSERT_NEAR(back_to_maya[0], maya_scale[0], 0.001f);
     ASSERT_NEAR(back_to_maya[1], maya_scale[1], 0.001f);
     ASSERT_NEAR(back_to_maya[2], maya_scale[2], 0.001f);
@@ -503,10 +527,10 @@ TEST(TestCoordSys, MayaToBlender_Scale) {
 
 TEST(TestCoordSys, BlenderToMaya_Scale) {
     const tdm::fvec3 blender_scale{2.0f, 1.5f, 3.0f};
-    const auto maya_scale = tdm::convert_scale(blender_scale, blender_cs, maya_cs);
+    const auto maya_scale = tdm::convert_scale(blender_scale, blender_cs, maya_cs, tdm::sign_policy::discard);
 
     // Round-trip
-    const auto back_to_blender = tdm::convert_scale(maya_scale, maya_cs, blender_cs);
+    const auto back_to_blender = tdm::convert_scale(maya_scale, maya_cs, blender_cs, tdm::sign_policy::discard);
     ASSERT_NEAR(back_to_blender[0], blender_scale[0], 0.001f);
     ASSERT_NEAR(back_to_blender[1], blender_scale[1], 0.001f);
     ASSERT_NEAR(back_to_blender[2], blender_scale[2], 0.001f);
@@ -594,10 +618,10 @@ TEST(TestCoordSys, HoudiniToMaya_Rotation) {
 
 TEST(TestCoordSys, MayaToHoudini_Scale) {
     const tdm::fvec3 maya_scale{1.0f, 2.5f, 0.75f};
-    const auto houdini_scale = tdm::convert_scale(maya_scale, maya_cs, houdini_cs);
+    const auto houdini_scale = tdm::convert_scale(maya_scale, maya_cs, houdini_cs, tdm::sign_policy::discard);
 
     // Round-trip
-    const auto back_to_maya = tdm::convert_scale(houdini_scale, houdini_cs, maya_cs);
+    const auto back_to_maya = tdm::convert_scale(houdini_scale, houdini_cs, maya_cs, tdm::sign_policy::discard);
     ASSERT_NEAR(back_to_maya[0], maya_scale[0], 0.001f);
     ASSERT_NEAR(back_to_maya[1], maya_scale[1], 0.001f);
     ASSERT_NEAR(back_to_maya[2], maya_scale[2], 0.001f);
@@ -605,10 +629,10 @@ TEST(TestCoordSys, MayaToHoudini_Scale) {
 
 TEST(TestCoordSys, HoudiniToMaya_Scale) {
     const tdm::fvec3 houdini_scale{3.0f, 1.0f, 2.0f};
-    const auto maya_scale = tdm::convert_scale(houdini_scale, houdini_cs, maya_cs);
+    const auto maya_scale = tdm::convert_scale(houdini_scale, houdini_cs, maya_cs, tdm::sign_policy::discard);
 
     // Round-trip
-    const auto back_to_houdini = tdm::convert_scale(maya_scale, maya_cs, houdini_cs);
+    const auto back_to_houdini = tdm::convert_scale(maya_scale, maya_cs, houdini_cs, tdm::sign_policy::discard);
     ASSERT_NEAR(back_to_houdini[0], houdini_scale[0], 0.001f);
     ASSERT_NEAR(back_to_houdini[1], houdini_scale[1], 0.001f);
     ASSERT_NEAR(back_to_houdini[2], houdini_scale[2], 0.001f);

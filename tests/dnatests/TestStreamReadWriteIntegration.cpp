@@ -27,6 +27,8 @@
     #pragma warning(disable : 4503)
 #endif
 
+#include <array>
+
 namespace dna {
 
 template<class TAPICopyParameters>
@@ -1197,6 +1199,861 @@ TEST(StreamReadWriteIntegrationTest, CoordinateSystemTransformPreservesRBFQuater
     };
     for (std::size_t i = {}; i < converted.size(); ++i) {
         ASSERT_NEAR(converted[i], expected[i], 0.0001f) << "quaternion component " << i;
+    }
+}
+
+namespace {
+
+// Authors a minimal (left, up, front) DNA with one joint group carrying joint 1's scale.x/y/z
+// deltas (output indices 15/16/17) at a single input control, so coordinate-system conversion of
+// scale deltas can be exercised in isolation.
+static pma::ScopedPtr<trio::MemoryStream> authorScaleDeltaDNA(float sx, float sy, float sz) {
+    auto stream = pma::makeScoped<trio::MemoryStream>();
+    auto writer = pma::makeScoped<BinaryStreamWriter>(stream.get());
+    writer->setLODCount(1u);
+    writer->setJointName(0u, "root");
+    writer->setJointName(1u, "joint1");
+    const dna::Vector3 neutral[] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+    writer->setNeutralJointTranslations(neutral, 2u);
+    writer->setNeutralJointRotations(neutral, 2u);
+    writer->setJointRowCount(static_cast<std::uint16_t>(2u * 9u));
+    writer->setJointColumnCount(1u);
+    const std::uint16_t inputIndices[] = {0u};
+    const std::uint16_t outputIndices[] = {15u, 16u, 17u};  // joint 1: scale x, y, z
+    const float values[] = {sx, sy, sz};
+    const std::uint16_t lods[] = {3u};
+    writer->setJointGroupInputIndices(0u, inputIndices, 1u);
+    writer->setJointGroupOutputIndices(0u, outputIndices, 3u);
+    writer->setJointGroupValues(0u, values, 3u);
+    writer->setJointGroupLODs(0u, lods, 1u);
+    writer->setCoordinateSystem({Direction::left, Direction::up, Direction::front});
+    writer->write();
+    stream->seek(0);
+    return stream;
+}
+
+// Reads joint 1's converted scale x/y/z (output indices 15/16/17) at input 0 from the single
+// joint group, after applying the requested coordinate-system transform on load.
+static std::array<float, 3> readConvertedScale(trio::BoundedIOStream* source, CoordinateSystem target) {
+    source->seek(0);
+    dna::Configuration config;
+    config.coordinateSystemTransformPolicy = CoordinateSystemTransformPolicy::Transform;
+    config.coordinateSystem = target;
+    auto reader = pma::makeScoped<BinaryStreamReader>(source, config);
+    reader->read();
+    const auto outputIndices = reader->getJointGroupOutputIndices(0u);
+    const auto inputIndices = reader->getJointGroupInputIndices(0u);
+    const auto values = reader->getJointGroupValues(0u);
+    const auto colCount = inputIndices.size();
+    std::array<float, 3> scale{};
+    for (std::size_t row = {}; row < outputIndices.size(); ++row) {
+        const std::uint16_t attr = static_cast<std::uint16_t>(outputIndices[row] % 9u);
+        if (attr >= 6u && attr <= 8u) {
+            scale[attr - 6u] = values[row * colCount];  // input 0 is the only column
+        }
+    }
+    return scale;
+}
+
+// Converts the DNA from its current coordinate system to `target` and persists the result to a new
+// stream, so conversions can be chained hop by hop.
+static pma::ScopedPtr<trio::MemoryStream> convertScaleDNA(trio::BoundedIOStream* source, CoordinateSystem target) {
+    source->seek(0);
+    dna::Configuration config;
+    config.coordinateSystemTransformPolicy = CoordinateSystemTransformPolicy::Transform;
+    config.coordinateSystem = target;
+    auto reader = pma::makeScoped<BinaryStreamReader>(source, config);
+    reader->read();
+    auto out = pma::makeScoped<trio::MemoryStream>();
+    auto writer = pma::makeScoped<BinaryStreamWriter>(out.get());
+    writer->setFrom(reader.get());
+    writer->write();
+    out->seek(0);
+    return out;
+}
+
+// A full destination frame the converter can be driven to: coordinate system, rotation sequence,
+// rotation sign convention and face winding order (every knob a conversion can change at once).
+struct ConversionTarget {
+    CoordinateSystem coordinateSystem;
+    RotationSequence rotationSequence;
+    RotationSign rotationSign;
+    FaceWindingOrder faceWindingOrder;
+};
+
+// The canonical frame/conventions the full fixture below is authored in, and which a round trip
+// must recover exactly.
+const ConversionTarget kOrigin{{Direction::left, Direction::up, Direction::front},
+                               RotationSequence::xyz,
+                               {RotationDirection::positive, RotationDirection::positive, RotationDirection::positive},
+                               FaceWindingOrder::ccw};
+
+// Neutral joint transforms for root + two joints. Translations mix signs and a zero; rotation
+// middle (y) angles are kept away from +-90 so euler extraction stays unambiguous across hops.
+const std::array<Vector3, 3> kNeutralTranslations{{{0.0f, 0.0f, 0.0f}, {1.5f, -2.5f, 3.0f}, {-4.0f, 5.5f, -6.0f}}};
+const std::array<Vector3, 3> kNeutralRotations{{{0.0f, 0.0f, 0.0f}, {10.0f, -20.0f, 30.0f}, {-15.0f, 25.0f, -35.0f}}};
+
+// One joint group over two input columns carrying the full 9 attributes (translation 0-2, rotation
+// 3-5, scale 6-8) for joint 1 (outputs 9-17) and joint 2 (outputs 18-26). Values mix signs and
+// zeros; no whole row/column is zero, so defragmentation preserves the layout. Rotation deltas are
+// kept small (|y| < 90) so they survive euler round-tripping.
+const std::uint16_t kJointGroupInputIndices[] = {0u, 1u};
+const std::uint16_t kJointGroupOutputIndices[] =
+    {9u, 10u, 11u, 12u, 13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u, 22u, 23u, 24u, 25u, 26u};
+const float kJointGroupValues[] = {
+    // joint 1: translation, rotation (deg), scale -- each row is {column 0, column 1}
+    0.5f,
+    -1.1f,
+    -0.7f,
+    1.3f,
+    0.9f,
+    -1.5f,
+    8.0f,
+    -6.0f,
+    -12.0f,
+    10.0f,
+    16.0f,
+    -14.0f,
+    0.2f,
+    -0.6f,
+    -0.3f,
+    0.7f,
+    0.4f,
+    -0.8f,
+    // joint 2 (two intentional zeros, in different columns than their row's other value)
+    2.0f,
+    -0.4f,
+    -2.2f,
+    0.6f,
+    0.0f,
+    -0.25f,
+    5.0f,
+    -7.0f,
+    -9.0f,
+    13.0f,
+    11.0f,
+    -4.0f,
+    1.2f,
+    -0.9f,
+    -1.4f,
+    0.5f,
+    0.0f,
+    -0.35f};
+const std::uint16_t kJointGroupLODs[] = {18u};
+
+// Geometry: positions mix sign/zero/small/large; normals are deliberately non-unit so the round
+// trip proves the conversion neither renormalizes nor drops sign.
+const std::array<Position, 5> kVertexPositions{
+    {{0.0f, 0.0f, 0.0f}, {1.0f, -2.0f, 3.0f}, {-4.0f, 5.0f, -6.0f}, {0.001f, -0.002f, 0.003f}, {100.0f, -200.0f, 50.0f}}};
+const std::array<Normal, 5> kVertexNormals{{{1.0f, 0.0f, 0.0f},
+                                            {0.0f, -1.0f, 0.0f},
+                                            {0.0f, 0.0f, 1.0f},
+                                            {0.5f, -0.35f, 0.79f},  // distinct per-axis magnitudes so an axis swap is detectable
+                                            {-2.0f, 3.0f, -1.0f}}};
+const std::array<VertexLayout, 4> kVertexLayouts{{{0u, 0u, 0u}, {1u, 0u, 1u}, {2u, 0u, 2u}, {3u, 0u, 3u}}};
+const TextureCoordinate kTextureCoordinates[] = {{0.0f, 0.0f}};
+// A triangle and a quad; a winding flip reverses the stored layout-index order, so distinct
+// non-palindromic sequences make an unrecovered flip detectable.
+const std::uint32_t kFace0[] = {0u, 1u, 2u};
+const std::uint32_t kFace1[] = {0u, 1u, 2u, 3u};
+
+// Blend shape target deltas (mixed signs and a zero component).
+const std::array<Delta, 3> kBlendShapeDeltas{{{0.3f, -0.4f, 0.5f}, {-0.6f, 0.7f, -0.8f}, {0.0f, -1.1f, 1.2f}}};
+const std::uint32_t kBlendShapeVertexIndices[] = {0u, 1u, 2u};
+
+// RBF pose quaternions: one on each hemisphere (positive-w twist about X, negative-w rotation about
+// Y) so the sign/hemisphere-preserving conjugation is exercised.
+const float kRBFRawControlValues[] = {0.70710678f, 0.0f, 0.0f, 0.70710678f, 0.0f, 0.86602540f, 0.0f, -0.5f};
+
+// Authors a DNA in the canonical origin frame that populates every field the coordinate-system
+// converter touches, so a round trip can assert exact recovery of all of them at once.
+static pma::ScopedPtr<trio::MemoryStream> authorFullDNA() {
+    auto stream = pma::makeScoped<trio::MemoryStream>();
+    auto writer = pma::makeScoped<BinaryStreamWriter>(stream.get());
+
+    writer->setLODCount(1u);
+
+    writer->setCoordinateSystem(kOrigin.coordinateSystem);
+    writer->setRotationUnit(RotationUnit::degrees);
+    writer->setRotationSequence(kOrigin.rotationSequence);
+    writer->setRotationSign(kOrigin.rotationSign);
+    writer->setFaceWindingOrder(kOrigin.faceWindingOrder);
+
+    writer->setJointName(0u, "root");
+    writer->setJointName(1u, "jointA");
+    writer->setJointName(2u, "jointB");
+    const std::uint16_t hierarchy[] = {0u, 0u, 0u};
+    writer->setJointHierarchy(hierarchy, 3u);
+    writer->setNeutralJointTranslations(kNeutralTranslations.data(), 3u);
+    writer->setNeutralJointRotations(kNeutralRotations.data(), 3u);
+    writer->setBlendShapeChannelName(0u, "blendShape");
+
+    writer->setJointRowCount(static_cast<std::uint16_t>(3u * 9u));
+    writer->setJointColumnCount(2u);
+    writer->setJointGroupInputIndices(0u, kJointGroupInputIndices, 2u);
+    writer->setJointGroupOutputIndices(0u, kJointGroupOutputIndices, 18u);
+    writer->setJointGroupValues(0u, kJointGroupValues, 36u);
+    writer->setJointGroupLODs(0u, kJointGroupLODs, 1u);
+
+    writer->setVertexPositions(0u, kVertexPositions.data(), 5u);
+    writer->setVertexNormals(0u, kVertexNormals.data(), 5u);
+    writer->setVertexTextureCoordinates(0u, kTextureCoordinates, 1u);
+    writer->setVertexLayouts(0u, kVertexLayouts.data(), 4u);
+    writer->setFaceVertexLayoutIndices(0u, 0u, kFace0, 3u);
+    writer->setFaceVertexLayoutIndices(0u, 1u, kFace1, 4u);
+    writer->setBlendShapeChannelIndex(0u, 0u, 0u);
+    writer->setBlendShapeTargetVertexIndices(0u, 0u, kBlendShapeVertexIndices, 3u);
+    writer->setBlendShapeTargetDeltas(0u, 0u, kBlendShapeDeltas.data(), 3u);
+
+    writer->setRBFSolverName(0u, "solver");
+    writer->setRBFSolverRawControlValues(0u, kRBFRawControlValues, 8u);
+    writer->setRBFSolverTwistAxis(0u, TwistAxis::X);
+
+    // Twist and swing setups exercise every twist axis label; the remaining fields are filled
+    // minimally so each entry is well formed.
+    const std::uint16_t twistInput[] = {0u};
+    const std::uint16_t twistOutput[] = {1u};
+    const float twistBlend[] = {1.0f};
+    const TwistAxis axes[] = {TwistAxis::X, TwistAxis::Y, TwistAxis::Z};
+    for (std::uint16_t i = {}; i < 3u; ++i) {
+        writer->setTwistSetupTwistAxis(i, axes[i]);
+        writer->setTwistInputControlIndices(i, twistInput, 1u);
+        writer->setTwistOutputJointIndices(i, twistOutput, 1u);
+        writer->setTwistBlendWeights(i, twistBlend, 1u);
+        writer->setSwingSetupTwistAxis(i, axes[i]);
+        writer->setSwingInputControlIndices(i, twistInput, 1u);
+        writer->setSwingOutputJointIndices(i, twistOutput, 1u);
+        writer->setSwingBlendWeights(i, twistBlend, 1u);
+    }
+
+    writer->write();
+    stream->seek(0);
+    return stream;
+}
+
+// Reads the DNA under a full conversion to `target` (coordinate system, rotation sequence, rotation
+// sign and winding order) and persists the converted result, so conversions can be chained hop by
+// hop.
+static pma::ScopedPtr<trio::MemoryStream> convertFullDNA(trio::BoundedIOStream* source, const ConversionTarget& target) {
+    source->seek(0);
+    dna::Configuration config;
+    config.coordinateSystemTransformPolicy = CoordinateSystemTransformPolicy::Transform;
+    config.coordinateSystem = target.coordinateSystem;
+    config.rotationSequence = target.rotationSequence;
+    config.rotationSign = target.rotationSign;
+    config.faceWindingOrder = target.faceWindingOrder;
+    auto reader = pma::makeScoped<BinaryStreamReader>(source, config);
+    reader->read();
+    auto out = pma::makeScoped<trio::MemoryStream>();
+    auto writer = pma::makeScoped<BinaryStreamWriter>(out.get());
+    writer->setFrom(reader.get());
+    writer->write();
+    out->seek(0);
+    return out;
+}
+
+}  // namespace
+
+// A pure axis-direction flip (left/up/front -> left/down/front, i.e. up -> down) must NOT change a
+// scale delta: scale is a per-axis magnitude and is invariant to axis direction. The signs --
+// including negative deltas -- must be preserved exactly (the previous abs()-based conversion
+// wrongly flipped negatives, e.g. -0.7 -> +0.7).
+TEST(StreamReadWriteIntegrationTest, CoordinateSystemTransformPreservesScaleDeltaUnderAxisFlip) {
+    auto source = authorScaleDeltaDNA(-0.7f, 0.5f, -0.25f);
+    const std::array<float, 3> ldf = readConvertedScale(source.get(), {Direction::left, Direction::down, Direction::front});
+    ASSERT_NEAR(ldf[0], -0.7f, 1e-5f);
+    ASSERT_NEAR(ldf[1], 0.5f, 1e-5f);
+    ASSERT_NEAR(ldf[2], -0.25f, 1e-5f);
+}
+
+// Sign and value must survive a round trip back to the original space across many different
+// coordinate-system pairings (flips, axis swaps, handedness flips, full permutations) and several
+// sign patterns -- not just the one combination above.
+TEST(StreamReadWriteIntegrationTest, CoordinateSystemTransformRoundTripPreservesScaleDeltasAcrossCombinations) {
+    using D = Direction;
+    const CoordinateSystem luf{D::left, D::up, D::front};
+    const std::array<CoordinateSystem, 6> intermediates{
+        CoordinateSystem{D::left, D::down, D::front},  // up -> down flip
+        CoordinateSystem{D::right, D::up, D::front},   // left -> right (handedness flip)
+        CoordinateSystem{D::left, D::front, D::up},    // y <-> z swap
+        CoordinateSystem{D::right, D::back, D::up},    // permutation + flips
+        CoordinateSystem{D::back, D::down, D::left},   // full 3-axis permutation + flips
+        CoordinateSystem{D::up, D::front, D::left}     // full 3-axis permutation
+    };
+    const std::array<std::array<float, 3>, 4> deltas{{
+        {{-0.7f, 0.5f, -0.25f}},      // mixed signs
+        {{-1.0f, -0.5f, -0.9f}},      // all negative
+        {{0.8f, -0.4f, 0.6f}},        // mixed signs, no zeros
+        {{-0.001f, 0.002f, -0.013f}}  // small magnitudes (the subtle facial-corrective range)
+    }};
+    for (const auto& d : deltas) {
+        for (const CoordinateSystem& mid : intermediates) {
+            auto source = authorScaleDeltaDNA(d[0], d[1], d[2]);
+            auto inMid = convertScaleDNA(source.get(), mid);
+            const std::array<float, 3> back = readConvertedScale(inMid.get(), luf);
+            const int mx = static_cast<int>(mid.x);
+            const int my = static_cast<int>(mid.y);
+            const int mz = static_cast<int>(mid.z);
+            for (std::size_t a = {}; a < 3u; ++a) {
+                ASSERT_NEAR(back[a], d[a], 1e-5f) << "mid (" << mx << "," << my << "," << mz << ") axis " << a;
+            }
+        }
+    }
+}
+
+// A chain of conversions through several coordinate systems, rotation sequences, rotation sign
+// conventions and winding orders -- then back to the origin frame -- must recover every field the
+// converter touches exactly: neutral joint translations and rotations; joint-group translation,
+// rotation and scale deltas; vertex positions and (non-unit) normals; blend shape deltas; RBF pose
+// quaternions (hemisphere included); solver/twist/swing twist axes; and face winding. Positive,
+// negative, zero and non-unit inputs are all exercised, and no sign, hemisphere or drift error may
+// accumulate across the hops.
+TEST(StreamReadWriteIntegrationTest, CoordinateSystemTransformMultiHopRoundTripPreservesAllData) {
+    using D = Direction;
+    using RS = RotationSequence;
+    using RD = RotationDirection;
+    // Each intermediate frame changes handedness, axis order, rotation sequence, rotation sign and
+    // winding order; the last hop returns to the frame the fixture was authored in.
+    // The five intermediate sequences plus the origin cover all six rotation sequences (xyz, xzy,
+    // yxz, yzx, zxy, zyx) and six of the eight sign conventions.
+    const std::array<ConversionTarget, 6> hops{
+        {{{D::right, D::up, D::front}, RS::zyx, {RD::positive, RD::negative, RD::positive}, FaceWindingOrder::cw},
+         {{D::left, D::front, D::up}, RS::yzx, {RD::negative, RD::positive, RD::positive}, FaceWindingOrder::ccw},
+         {{D::back, D::down, D::left}, RS::zxy, {RD::negative, RD::negative, RD::positive}, FaceWindingOrder::cw},
+         {{D::up, D::front, D::left}, RS::xzy, {RD::positive, RD::positive, RD::negative}, FaceWindingOrder::ccw},
+         {{D::down, D::left, D::back}, RS::yxz, {RD::negative, RD::negative, RD::negative}, FaceWindingOrder::cw},
+         kOrigin}};
+
+    auto cur = authorFullDNA();
+    for (const ConversionTarget& hop : hops) {
+        cur = convertFullDNA(cur.get(), hop);
+    }
+
+    cur->seek(0);
+    auto reader = pma::makeScoped<BinaryStreamReader>(cur.get());
+    reader->read();
+    ASSERT_TRUE(dna::Status::isOk());
+
+    // Positions, scale, quaternions and normals convert by signed permutation (no trig), so they
+    // recover to within float noise. Rotations traverse euler<->matrix extraction at every hop, so
+    // they carry a slightly looser tolerance -- still tight enough to catch any sign/sequence error.
+    constexpr float exactTol = 1e-4f;
+    constexpr float rotTol = 5e-3f;
+
+    // Descriptor conventions.
+    const auto cs = reader->getCoordinateSystem();
+    ASSERT_EQ(cs.x, kOrigin.coordinateSystem.x);
+    ASSERT_EQ(cs.y, kOrigin.coordinateSystem.y);
+    ASSERT_EQ(cs.z, kOrigin.coordinateSystem.z);
+    ASSERT_EQ(reader->getRotationSequence(), kOrigin.rotationSequence);
+    const auto sign = reader->getRotationSign();
+    ASSERT_EQ(sign.x, kOrigin.rotationSign.x);
+    ASSERT_EQ(sign.y, kOrigin.rotationSign.y);
+    ASSERT_EQ(sign.z, kOrigin.rotationSign.z);
+    ASSERT_EQ(reader->getFaceWindingOrder(), kOrigin.faceWindingOrder);
+
+    // Neutral joint translations (exact) and rotations (near-exact).
+    ASSERT_EQ(reader->getJointCount(), 3u);
+    for (std::uint16_t ji = {}; ji < 3u; ++ji) {
+        const auto t = reader->getNeutralJointTranslation(ji);
+        ASSERT_NEAR(t.x, kNeutralTranslations[ji].x, exactTol) << "joint " << ji << " translation x";
+        ASSERT_NEAR(t.y, kNeutralTranslations[ji].y, exactTol) << "joint " << ji << " translation y";
+        ASSERT_NEAR(t.z, kNeutralTranslations[ji].z, exactTol) << "joint " << ji << " translation z";
+        const auto r = reader->getNeutralJointRotation(ji);
+        ASSERT_NEAR(r.x, kNeutralRotations[ji].x, rotTol) << "joint " << ji << " rotation x";
+        ASSERT_NEAR(r.y, kNeutralRotations[ji].y, rotTol) << "joint " << ji << " rotation y";
+        ASSERT_NEAR(r.z, kNeutralRotations[ji].z, rotTol) << "joint " << ji << " rotation z";
+    }
+
+    // Joint-group deltas: translation (attrs 0-2), rotation (3-5), scale (6-8) per joint, per column.
+    const auto outputIndices = reader->getJointGroupOutputIndices(0u);
+    const auto inputIndices = reader->getJointGroupInputIndices(0u);
+    const auto values = reader->getJointGroupValues(0u);
+    ASSERT_EQ(inputIndices.size(), 2u);
+    ASSERT_EQ(outputIndices.size(), 18u);
+    const auto colCount = inputIndices.size();
+    for (std::size_t row = {}; row < outputIndices.size(); ++row) {
+        ASSERT_EQ(outputIndices[row], kJointGroupOutputIndices[row]) << "output index row " << row;
+        const std::uint16_t attr = static_cast<std::uint16_t>(outputIndices[row] % 9u);
+        const float tol = (attr >= 3u && attr <= 5u) ? rotTol : exactTol;
+        for (std::size_t col = {}; col < colCount; ++col) {
+            ASSERT_NEAR(values[row * colCount + col], kJointGroupValues[row * colCount + col], tol)
+                << "joint-group row " << row << " col " << col;
+        }
+    }
+
+    // Vertex positions (exact) and normals (near-exact, no renormalization).
+    ASSERT_EQ(reader->getVertexPositionCount(0u), 5u);
+    for (std::uint32_t vi = {}; vi < 5u; ++vi) {
+        const auto p = reader->getVertexPosition(0u, vi);
+        ASSERT_NEAR(p.x, kVertexPositions[vi].x, exactTol) << "vertex " << vi << " x";
+        ASSERT_NEAR(p.y, kVertexPositions[vi].y, exactTol) << "vertex " << vi << " y";
+        ASSERT_NEAR(p.z, kVertexPositions[vi].z, exactTol) << "vertex " << vi << " z";
+    }
+    ASSERT_EQ(reader->getVertexNormalCount(0u), 5u);
+    for (std::uint32_t ni = {}; ni < 5u; ++ni) {
+        const auto nrm = reader->getVertexNormal(0u, ni);
+        ASSERT_NEAR(nrm.x, kVertexNormals[ni].x, exactTol) << "normal " << ni << " x";
+        ASSERT_NEAR(nrm.y, kVertexNormals[ni].y, exactTol) << "normal " << ni << " y";
+        ASSERT_NEAR(nrm.z, kVertexNormals[ni].z, exactTol) << "normal " << ni << " z";
+    }
+
+    // Blend shape target deltas (exact).
+    ASSERT_EQ(reader->getBlendShapeTargetDeltaCount(0u, 0u), 3u);
+    for (std::uint32_t di = {}; di < 3u; ++di) {
+        const auto delta = reader->getBlendShapeTargetDelta(0u, 0u, di);
+        ASSERT_NEAR(delta.x, kBlendShapeDeltas[di].x, exactTol) << "blend shape delta " << di << " x";
+        ASSERT_NEAR(delta.y, kBlendShapeDeltas[di].y, exactTol) << "blend shape delta " << di << " y";
+        ASSERT_NEAR(delta.z, kBlendShapeDeltas[di].z, exactTol) << "blend shape delta " << di << " z";
+    }
+
+    // RBF pose quaternions: imaginary parts and hemisphere (sign of w) recovered exactly.
+    ASSERT_EQ(reader->getRBFSolverCount(), 1u);
+    const auto rbf = reader->getRBFSolverRawControlValues(0u);
+    ASSERT_EQ(rbf.size(), 8u);
+    for (std::size_t i = {}; i < rbf.size(); ++i) {
+        ASSERT_NEAR(rbf[i], kRBFRawControlValues[i], exactTol) << "quaternion component " << i;
+    }
+
+    // Twist axis labels on the solver, twist setups and swing setups.
+    ASSERT_EQ(reader->getRBFSolverTwistAxis(0u), TwistAxis::X);
+    ASSERT_EQ(reader->getTwistCount(), 3u);
+    ASSERT_EQ(reader->getTwistSetupTwistAxis(0u), TwistAxis::X);
+    ASSERT_EQ(reader->getTwistSetupTwistAxis(1u), TwistAxis::Y);
+    ASSERT_EQ(reader->getTwistSetupTwistAxis(2u), TwistAxis::Z);
+    ASSERT_EQ(reader->getSwingCount(), 3u);
+    ASSERT_EQ(reader->getSwingSetupTwistAxis(0u), TwistAxis::X);
+    ASSERT_EQ(reader->getSwingSetupTwistAxis(1u), TwistAxis::Y);
+    ASSERT_EQ(reader->getSwingSetupTwistAxis(2u), TwistAxis::Z);
+
+    // Face winding: layout-index order restored exactly (each handedness flip reverses it).
+    ASSERT_EQ(reader->getFaceCount(0u), 2u);
+    const auto face0 = reader->getFaceVertexLayoutIndices(0u, 0u);
+    ASSERT_EQ(face0.size(), 3u);
+    for (std::size_t i = {}; i < face0.size(); ++i) {
+        ASSERT_EQ(face0[i], kFace0[i]) << "face 0 index " << i;
+    }
+    const auto face1 = reader->getFaceVertexLayoutIndices(0u, 1u);
+    ASSERT_EQ(face1.size(), 4u);
+    for (std::size_t i = {}; i < face1.size(); ++i) {
+        ASSERT_EQ(face1[i], kFace1[i]) << "face 1 index " << i;
+    }
+}
+
+namespace {
+
+// A single non-trivial intermediate frame for the focused round-trip tests below: it flips
+// handedness and changes axis order, rotation sequence, rotation sign and winding all at once.
+// Swaps the X and Z axes and flips directions on all three, so the focused round-trip tests below
+// exercise genuine axis remapping (not merely a single-axis sign flip) plus a rotation-sequence,
+// rotation-sign and winding change all at once.
+const ConversionTarget kRoundTripTarget{{Direction::back, Direction::down, Direction::left},
+                                        RotationSequence::zyx,
+                                        {RotationDirection::positive, RotationDirection::negative, RotationDirection::positive},
+                                        FaceWindingOrder::cw};
+
+// Authors a minimal single-mesh (left, up, front) DNA with one quad face whose layout indices are a
+// non-palindromic sequence, so a winding flip is detectable as a reversal.
+static pma::ScopedPtr<trio::MemoryStream> authorFaceDNA(FaceWindingOrder srcWinding) {
+    auto stream = pma::makeScoped<trio::MemoryStream>();
+    auto writer = pma::makeScoped<BinaryStreamWriter>(stream.get());
+    writer->setLODCount(1u);
+    writer->setCoordinateSystem({Direction::left, Direction::up, Direction::front});
+    writer->setFaceWindingOrder(srcWinding);
+    const std::array<Position, 4> positions{{{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}}};
+    writer->setVertexPositions(0u, positions.data(), 4u);
+    const std::array<VertexLayout, 4> layouts{{{0u, 0u, 0u}, {1u, 0u, 0u}, {2u, 0u, 0u}, {3u, 0u, 0u}}};
+    writer->setVertexLayouts(0u, layouts.data(), 4u);
+    const std::uint32_t face[] = {0u, 1u, 2u, 3u};
+    writer->setFaceVertexLayoutIndices(0u, 0u, face, 4u);
+    writer->write();
+    stream->seek(0);
+    return stream;
+}
+
+}  // namespace
+
+// The converter must flip face winding exactly when the source winding, reinterpreted in the
+// destination space, disagrees with the requested destination winding: that happens for a
+// handedness-flipping basis (which inverts the meaning of "outward normal") and for an explicit
+// winding-order change, but not for an orientation-preserving axis permutation -- and the two
+// effects cancel when combined. Asserted directly (forward), since a round trip only proves an even
+// number of flips.
+TEST(StreamReadWriteIntegrationTest, CoordinateSystemTransformFaceWindingForward) {
+    using D = Direction;
+    struct Case {
+        CoordinateSystem coordinateSystem;
+        FaceWindingOrder winding;
+        bool reversed;
+        const char* name;
+    };
+    // Source is (left, up, front), ccw. (right, up, front) flips handedness; (up, front, left) is an
+    // orientation-preserving 3-cycle.
+    const std::array<Case, 4> cases{
+        {{{D::right, D::up, D::front}, FaceWindingOrder::ccw, true, "handedness flip, same winding"},
+         {{D::up, D::front, D::left}, FaceWindingOrder::ccw, false, "permutation, same winding"},
+         {{D::up, D::front, D::left}, FaceWindingOrder::cw, true, "permutation, winding change"},
+         {{D::right, D::up, D::front}, FaceWindingOrder::cw, false, "handedness flip, winding change"}}};
+    const std::array<std::uint32_t, 4> original{{0u, 1u, 2u, 3u}};
+    const std::array<std::uint32_t, 4> reversed{{3u, 2u, 1u, 0u}};
+    for (const auto& c : cases) {
+        auto source = authorFaceDNA(FaceWindingOrder::ccw);
+        dna::Configuration config;
+        config.coordinateSystemTransformPolicy = CoordinateSystemTransformPolicy::Transform;
+        config.coordinateSystem = c.coordinateSystem;
+        config.faceWindingOrder = c.winding;
+        auto reader = pma::makeScoped<BinaryStreamReader>(source.get(), config);
+        reader->read();
+        ASSERT_TRUE(dna::Status::isOk()) << c.name;
+        ASSERT_EQ(reader->getFaceWindingOrder(), c.winding) << c.name;
+        const auto face = reader->getFaceVertexLayoutIndices(0u, 0u);
+        ASSERT_EQ(face.size(), 4u) << c.name;
+        const auto& expected = c.reversed ? reversed : original;
+        for (std::size_t i = {}; i < face.size(); ++i) {
+            ASSERT_EQ(face[i], expected[i]) << c.name << " index " << i;
+        }
+    }
+}
+
+// Joint groups carry per-LOD row boundaries. The converter rewrites each joint to a full 9
+// attributes and must recompute those boundaries against the new row layout. With two dense joints
+// and two LODs (LOD1 covers only the first joint), both the boundaries and the values must survive a
+// single conversion and a round trip.
+TEST(StreamReadWriteIntegrationTest, CoordinateSystemTransformMultiLODJointGroups) {
+    // Dense, all non-zero (small, gimbal-safe rotation deltas) so nothing is defragmented away.
+    const std::array<float, 18> values{{
+        0.5f,
+        -0.7f,
+        0.9f,
+        8.0f,
+        -12.0f,
+        16.0f,
+        0.2f,
+        -0.3f,
+        0.4f,  // joint A: t, r (deg), s
+        -1.1f,
+        1.3f,
+        -1.5f,
+        -6.0f,
+        10.0f,
+        -14.0f,
+        -0.6f,
+        0.7f,
+        -0.8f  // joint B: t, r (deg), s
+    }};
+    auto source = pma::makeScoped<trio::MemoryStream>();
+    {
+        auto writer = pma::makeScoped<BinaryStreamWriter>(source.get());
+        writer->setLODCount(2u);
+        writer->setCoordinateSystem(kOrigin.coordinateSystem);
+        writer->setRotationUnit(RotationUnit::degrees);
+        writer->setJointName(0u, "root");
+        writer->setJointName(1u, "jointA");
+        writer->setJointName(2u, "jointB");
+        const std::uint16_t hierarchy[] = {0u, 0u, 0u};
+        writer->setJointHierarchy(hierarchy, 3u);
+        const dna::Vector3 zero[] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+        writer->setNeutralJointTranslations(zero, 3u);
+        writer->setNeutralJointRotations(zero, 3u);
+        writer->setJointRowCount(static_cast<std::uint16_t>(3u * 9u));
+        writer->setJointColumnCount(1u);
+        const std::uint16_t inputIndices[] = {0u};
+        std::array<std::uint16_t, 18> outputIndices{};
+        for (std::uint16_t i = {}; i < 18u; ++i) {
+            outputIndices[i] = static_cast<std::uint16_t>(9u + i);
+        }
+        const std::uint16_t lods[] = {18u, 9u};  // LOD0: both joints; LOD1: joint A only
+        writer->setJointGroupInputIndices(0u, inputIndices, 1u);
+        writer->setJointGroupOutputIndices(0u, outputIndices.data(), 18u);
+        writer->setJointGroupValues(0u, values.data(), 18u);
+        writer->setJointGroupLODs(0u, lods, 2u);
+        writer->write();
+        source->seek(0);
+    }
+
+    // Forward: LOD boundaries preserved through a single conversion.
+    {
+        auto converted = convertFullDNA(source.get(), kRoundTripTarget);
+        converted->seek(0);
+        auto reader = pma::makeScoped<BinaryStreamReader>(converted.get());
+        reader->read();
+        ASSERT_TRUE(dna::Status::isOk());
+        const auto lods = reader->getJointGroupLODs(0u);
+        ASSERT_EQ(lods.size(), 2u);
+        ASSERT_EQ(lods[0], 18u);
+        ASSERT_EQ(lods[1], 9u);
+        ASSERT_EQ(reader->getJointGroupOutputIndices(0u).size(), 18u);
+    }
+    // Round trip: LOD boundaries, output indices and values all recovered.
+    {
+        auto mid = convertFullDNA(source.get(), kRoundTripTarget);
+        auto back = convertFullDNA(mid.get(), kOrigin);
+        back->seek(0);
+        auto reader = pma::makeScoped<BinaryStreamReader>(back.get());
+        reader->read();
+        ASSERT_TRUE(dna::Status::isOk());
+        const auto lods = reader->getJointGroupLODs(0u);
+        ASSERT_EQ(lods.size(), 2u);
+        ASSERT_EQ(lods[0], 18u);
+        ASSERT_EQ(lods[1], 9u);
+        const auto outputIndices = reader->getJointGroupOutputIndices(0u);
+        const auto readValues = reader->getJointGroupValues(0u);
+        ASSERT_EQ(outputIndices.size(), 18u);
+        for (std::size_t row = {}; row < 18u; ++row) {
+            ASSERT_EQ(outputIndices[row], 9u + row) << "row " << row;
+            const std::uint16_t attr = static_cast<std::uint16_t>(outputIndices[row] % 9u);
+            const float tol = (attr >= 3u && attr <= 5u) ? 5e-3f : 1e-4f;
+            ASSERT_NEAR(readValues[row], values[row], tol) << "row " << row;
+        }
+    }
+}
+
+// Multiple joint groups, each with sparse attributes (a joint may carry only some of its 9
+// attributes). The converter expands every joint to a dense 9 attributes, converts, then
+// defragments the all-zero rows away. A round trip must restore each group's exact output-index set
+// and values -- including single-axis translation/rotation deltas that move to a different axis and
+// back.
+TEST(StreamReadWriteIntegrationTest, CoordinateSystemTransformMultipleSparseJointGroups) {
+    auto source = pma::makeScoped<trio::MemoryStream>();
+    {
+        auto writer = pma::makeScoped<BinaryStreamWriter>(source.get());
+        writer->setLODCount(1u);
+        writer->setCoordinateSystem(kOrigin.coordinateSystem);
+        writer->setRotationUnit(RotationUnit::degrees);
+        writer->setJointName(0u, "root");
+        writer->setJointName(1u, "jointA");
+        writer->setJointName(2u, "jointB");
+        writer->setJointName(3u, "jointC");
+        const std::uint16_t hierarchy[] = {0u, 0u, 0u, 0u};
+        writer->setJointHierarchy(hierarchy, 4u);
+        const dna::Vector3 zero[] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+        writer->setNeutralJointTranslations(zero, 4u);
+        writer->setNeutralJointRotations(zero, 4u);
+        writer->setJointRowCount(static_cast<std::uint16_t>(4u * 9u));
+        writer->setJointColumnCount(1u);
+        const std::uint16_t inputIndices[] = {0u};
+        // Group 0: joint A scale only (all three axes), joint B translation only (all three axes).
+        const std::uint16_t out0[] = {15u, 16u, 17u, 18u, 19u, 20u};
+        const float val0[] = {-0.7f, 0.5f, -0.25f, 1.0f, -2.0f, 3.0f};
+        const std::uint16_t lods0[] = {6u};
+        writer->setJointGroupInputIndices(0u, inputIndices, 1u);
+        writer->setJointGroupOutputIndices(0u, out0, 6u);
+        writer->setJointGroupValues(0u, val0, 6u);
+        writer->setJointGroupLODs(0u, lods0, 1u);
+        // Group 1: joint C with only a single-axis translation (tx) and a single-axis rotation (rz).
+        const std::uint16_t out1[] = {27u, 32u};  // joint C: tx (27), rz (32)
+        const float val1[] = {0.9f, 12.0f};
+        const std::uint16_t lods1[] = {2u};
+        writer->setJointGroupInputIndices(1u, inputIndices, 1u);
+        writer->setJointGroupOutputIndices(1u, out1, 2u);
+        writer->setJointGroupValues(1u, val1, 2u);
+        writer->setJointGroupLODs(1u, lods1, 1u);
+        writer->write();
+        source->seek(0);
+    }
+
+    auto mid = convertFullDNA(source.get(), kRoundTripTarget);
+    auto back = convertFullDNA(mid.get(), kOrigin);
+    back->seek(0);
+    auto reader = pma::makeScoped<BinaryStreamReader>(back.get());
+    reader->read();
+    ASSERT_TRUE(dna::Status::isOk());
+    ASSERT_EQ(reader->getJointGroupCount(), 2u);
+
+    const std::array<std::uint16_t, 6> expectedOut0{{15u, 16u, 17u, 18u, 19u, 20u}};
+    const std::array<float, 6> expectedVal0{{-0.7f, 0.5f, -0.25f, 1.0f, -2.0f, 3.0f}};
+    const auto out0Read = reader->getJointGroupOutputIndices(0u);
+    const auto val0Read = reader->getJointGroupValues(0u);
+    ASSERT_EQ(out0Read.size(), 6u);
+    for (std::size_t i = {}; i < 6u; ++i) {
+        ASSERT_EQ(out0Read[i], expectedOut0[i]) << "group 0 row " << i;
+        ASSERT_NEAR(val0Read[i], expectedVal0[i], 1e-4f) << "group 0 row " << i;
+    }
+
+    const std::array<std::uint16_t, 2> expectedOut1{{27u, 32u}};
+    const std::array<float, 2> expectedVal1{{0.9f, 12.0f}};
+    const auto out1Read = reader->getJointGroupOutputIndices(1u);
+    const auto val1Read = reader->getJointGroupValues(1u);
+    ASSERT_EQ(out1Read.size(), 2u);
+    for (std::size_t i = {}; i < 2u; ++i) {
+        ASSERT_EQ(out1Read[i], expectedOut1[i]) << "group 1 row " << i;
+        const float tol = (out1Read[i] % 9u >= 3u && out1Read[i] % 9u <= 5u) ? 5e-3f : 1e-4f;
+        ASSERT_NEAR(val1Read[i], expectedVal1[i], tol) << "group 1 row " << i;
+    }
+}
+
+// Forward (not round-trip) check that joint-group deltas land on the correct destination attribute
+// after an axis permutation -- the correctness property a round trip is structurally blind to (it
+// would pass even if the forward mapping were wrong, as long as it inverted cleanly). Under
+// (left, up, front) -> (up, front, left), an orientation-preserving 3-cycle with no sign flips,
+// every stored component (a, b, c) re-expresses as (b, c, a). Distinct per-axis magnitudes make any
+// mis-mapping visible.
+TEST(StreamReadWriteIntegrationTest, CoordinateSystemTransformJointGroupPermutationForward) {
+    auto source = pma::makeScoped<trio::MemoryStream>();
+    {
+        auto writer = pma::makeScoped<BinaryStreamWriter>(source.get());
+        writer->setLODCount(1u);
+        writer->setCoordinateSystem(kOrigin.coordinateSystem);
+        writer->setRotationUnit(RotationUnit::degrees);
+        writer->setJointName(0u, "root");
+        writer->setJointName(1u, "jointA");
+        const std::uint16_t hierarchy[] = {0u, 0u};
+        writer->setJointHierarchy(hierarchy, 2u);
+        const dna::Vector3 zero[] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+        writer->setNeutralJointTranslations(zero, 2u);
+        writer->setNeutralJointRotations(zero, 2u);
+        writer->setJointRowCount(static_cast<std::uint16_t>(2u * 9u));
+        writer->setJointColumnCount(1u);
+        const std::uint16_t inputIndices[] = {0u};
+        // joint A translation (tx, ty, tz) and scale (sx, sy, sz), all distinct and non-zero.
+        const std::uint16_t outputIndices[] = {9u, 10u, 11u, 15u, 16u, 17u};
+        const float values[] = {1.0f, 2.0f, 3.0f, 0.1f, 0.2f, 0.3f};
+        const std::uint16_t lods[] = {6u};
+        writer->setJointGroupInputIndices(0u, inputIndices, 1u);
+        writer->setJointGroupOutputIndices(0u, outputIndices, 6u);
+        writer->setJointGroupValues(0u, values, 6u);
+        writer->setJointGroupLODs(0u, lods, 1u);
+        writer->write();
+        source->seek(0);
+    }
+
+    dna::Configuration config;
+    config.coordinateSystemTransformPolicy = CoordinateSystemTransformPolicy::Transform;
+    config.coordinateSystem = {Direction::up, Direction::front, Direction::left};  // 3-cycle, no sign flips
+    auto reader = pma::makeScoped<BinaryStreamReader>(source.get(), config);
+    reader->read();
+    ASSERT_TRUE(dna::Status::isOk());
+
+    // (a, b, c) -> (b, c, a) for translation and scale alike: (1,2,3) -> (2,3,1); (0.1,0.2,0.3) ->
+    // (0.2,0.3,0.1). A pure permutation preserves sign, so the values only move axes.
+    const std::array<std::uint16_t, 6> expectedIndices{{9u, 10u, 11u, 15u, 16u, 17u}};
+    const std::array<float, 6> expectedValues{{2.0f, 3.0f, 1.0f, 0.2f, 0.3f, 0.1f}};
+    const auto outIdx = reader->getJointGroupOutputIndices(0u);
+    const auto outVal = reader->getJointGroupValues(0u);
+    ASSERT_EQ(outIdx.size(), 6u);
+    for (std::size_t i = {}; i < 6u; ++i) {
+        ASSERT_EQ(outIdx[i], expectedIndices[i]) << "row " << i;
+        ASSERT_NEAR(outVal[i], expectedValues[i], 1e-5f) << "attribute " << expectedIndices[i];
+    }
+}
+
+// The rotation unit is carried in the descriptor and consumed by the joint-rotation conversion
+// (fromAngles/toAngles). A DNA authored in radians must round-trip its neutral rotations and
+// joint-group rotation deltas as faithfully as a degrees DNA.
+TEST(StreamReadWriteIntegrationTest, CoordinateSystemTransformRoundTripInRadians) {
+    const std::array<dna::Vector3, 3> neutralRotations{{{0.0f, 0.0f, 0.0f},
+                                                        {0.2f, -0.3f, 0.4f},  // radians; middle (y) kept well below pi/2
+                                                        {-0.25f, 0.35f, -0.15f}}};
+    const std::array<float, 3> rotationDelta{{0.1f, -0.15f, 0.2f}};  // joint A rotation delta (rad)
+    auto source = pma::makeScoped<trio::MemoryStream>();
+    {
+        auto writer = pma::makeScoped<BinaryStreamWriter>(source.get());
+        writer->setLODCount(1u);
+        writer->setCoordinateSystem(kOrigin.coordinateSystem);
+        writer->setRotationUnit(RotationUnit::radians);
+        writer->setJointName(0u, "root");
+        writer->setJointName(1u, "jointA");
+        writer->setJointName(2u, "jointB");
+        const std::uint16_t hierarchy[] = {0u, 0u, 0u};
+        writer->setJointHierarchy(hierarchy, 3u);
+        const dna::Vector3 zeroT[] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+        writer->setNeutralJointTranslations(zeroT, 3u);
+        writer->setNeutralJointRotations(neutralRotations.data(), 3u);
+        writer->setJointRowCount(static_cast<std::uint16_t>(3u * 9u));
+        writer->setJointColumnCount(1u);
+        const std::uint16_t inputIndices[] = {0u};
+        const std::uint16_t outputIndices[] = {12u, 13u, 14u};  // joint A rotation x, y, z
+        const std::uint16_t lods[] = {3u};
+        writer->setJointGroupInputIndices(0u, inputIndices, 1u);
+        writer->setJointGroupOutputIndices(0u, outputIndices, 3u);
+        writer->setJointGroupValues(0u, rotationDelta.data(), 3u);
+        writer->setJointGroupLODs(0u, lods, 1u);
+        writer->write();
+        source->seek(0);
+    }
+
+    auto mid = convertFullDNA(source.get(), kRoundTripTarget);
+    auto back = convertFullDNA(mid.get(), kOrigin);
+    back->seek(0);
+    auto reader = pma::makeScoped<BinaryStreamReader>(back.get());
+    reader->read();
+    ASSERT_TRUE(dna::Status::isOk());
+    ASSERT_EQ(reader->getRotationUnit(), RotationUnit::radians);
+
+    constexpr float rotTol = 5e-4f;  // radians
+    for (std::uint16_t ji = {}; ji < 3u; ++ji) {
+        const auto r = reader->getNeutralJointRotation(ji);
+        ASSERT_NEAR(r.x, neutralRotations[ji].x, rotTol) << "joint " << ji << " rotation x";
+        ASSERT_NEAR(r.y, neutralRotations[ji].y, rotTol) << "joint " << ji << " rotation y";
+        ASSERT_NEAR(r.z, neutralRotations[ji].z, rotTol) << "joint " << ji << " rotation z";
+    }
+    const auto values = reader->getJointGroupValues(0u);
+    ASSERT_EQ(values.size(), 3u);
+    for (std::size_t i = {}; i < 3u; ++i) {
+        ASSERT_NEAR(values[i], rotationDelta[i], rotTol) << "rotation delta " << i;
+    }
+}
+
+// Geometry conversion must cover every mesh, not just the first. Two meshes with distinct vertex
+// positions, (non-unit) normals and blend shape deltas must each round-trip exactly.
+TEST(StreamReadWriteIntegrationTest, CoordinateSystemTransformRoundTripMultipleMeshes) {
+    const std::array<std::array<Position, 2>, 2> positions{
+        {{{{1.0f, -2.0f, 3.0f}, {-4.0f, 5.0f, -6.0f}}}, {{{7.0f, -8.0f, 9.0f}, {-0.5f, 0.25f, -0.75f}}}}};
+    const std::array<std::array<Normal, 2>, 2> normals{
+        {{{{1.0f, 0.0f, 0.0f}, {-2.0f, 3.0f, -1.0f}}},  // second is non-unit on purpose
+         {{{0.0f, -1.0f, 0.0f}, {0.5f, -0.5f, 0.70710678f}}}}};
+    const std::array<std::array<Delta, 2>, 2> deltas{
+        {{{{0.3f, -0.4f, 0.5f}, {-0.6f, 0.7f, -0.8f}}}, {{{-0.1f, 0.2f, -0.3f}, {0.9f, -1.0f, 1.1f}}}}};
+    auto source = pma::makeScoped<trio::MemoryStream>();
+    {
+        auto writer = pma::makeScoped<BinaryStreamWriter>(source.get());
+        writer->setLODCount(1u);
+        writer->setCoordinateSystem(kOrigin.coordinateSystem);
+        writer->setMeshName(0u, "mesh0");
+        writer->setMeshName(1u, "mesh1");
+        writer->setLODMeshMapping(0u, 0u);
+        writer->setLODMeshMapping(0u, 1u);
+        writer->setBlendShapeChannelName(0u, "blendShape0");
+        writer->setBlendShapeChannelName(1u, "blendShape1");
+        const std::uint32_t vertexIndices[] = {0u, 1u};
+        for (std::uint16_t mi = {}; mi < 2u; ++mi) {
+            writer->setVertexPositions(mi, positions[mi].data(), 2u);
+            writer->setVertexNormals(mi, normals[mi].data(), 2u);
+            writer->setBlendShapeChannelIndex(mi, 0u, mi);
+            writer->setBlendShapeTargetVertexIndices(mi, 0u, vertexIndices, 2u);
+            writer->setBlendShapeTargetDeltas(mi, 0u, deltas[mi].data(), 2u);
+        }
+        writer->write();
+        source->seek(0);
+    }
+
+    auto mid = convertFullDNA(source.get(), kRoundTripTarget);
+    auto back = convertFullDNA(mid.get(), kOrigin);
+    back->seek(0);
+    auto reader = pma::makeScoped<BinaryStreamReader>(back.get());
+    reader->read();
+    ASSERT_TRUE(dna::Status::isOk());
+    ASSERT_EQ(reader->getMeshCount(), 2u);
+
+    constexpr float tol = 1e-4f;
+    for (std::uint16_t mi = {}; mi < 2u; ++mi) {
+        ASSERT_EQ(reader->getVertexPositionCount(mi), 2u) << "mesh " << mi;
+        ASSERT_EQ(reader->getVertexNormalCount(mi), 2u) << "mesh " << mi;
+        ASSERT_EQ(reader->getBlendShapeTargetDeltaCount(mi, 0u), 2u) << "mesh " << mi;
+        for (std::uint32_t vi = {}; vi < 2u; ++vi) {
+            const auto p = reader->getVertexPosition(mi, vi);
+            ASSERT_NEAR(p.x, positions[mi][vi].x, tol) << "mesh " << mi << " vertex " << vi << " x";
+            ASSERT_NEAR(p.y, positions[mi][vi].y, tol) << "mesh " << mi << " vertex " << vi << " y";
+            ASSERT_NEAR(p.z, positions[mi][vi].z, tol) << "mesh " << mi << " vertex " << vi << " z";
+            const auto n = reader->getVertexNormal(mi, vi);
+            ASSERT_NEAR(n.x, normals[mi][vi].x, tol) << "mesh " << mi << " normal " << vi << " x";
+            ASSERT_NEAR(n.y, normals[mi][vi].y, tol) << "mesh " << mi << " normal " << vi << " y";
+            ASSERT_NEAR(n.z, normals[mi][vi].z, tol) << "mesh " << mi << " normal " << vi << " z";
+            const auto d = reader->getBlendShapeTargetDelta(mi, 0u, vi);
+            ASSERT_NEAR(d.x, deltas[mi][vi].x, tol) << "mesh " << mi << " delta " << vi << " x";
+            ASSERT_NEAR(d.y, deltas[mi][vi].y, tol) << "mesh " << mi << " delta " << vi << " y";
+            ASSERT_NEAR(d.z, deltas[mi][vi].z, tol) << "mesh " << mi << " delta " << vi << " z";
+        }
     }
 }
 

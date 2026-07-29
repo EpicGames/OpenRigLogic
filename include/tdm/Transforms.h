@@ -530,18 +530,35 @@ inline vec3<T> convert_direction(const vec3<T>& dir, const coord_sys& src_cs, co
     return convert_direction(dir, change_of_basis<T>(src_cs, dst_cs), renormalize);
 }
 
+enum class sign_policy {
+    // Treat scale as a directionless per-axis magnitude: discard any sign, so the result is always non-negative.
+    // Correct for absolute scale factors (e.g. a neutral scale of ~1).
+    discard,
+    // Preserve each component's sign: a change of basis only permutes the axes, it must not flip signs.
+    // Correct for signed scale deltas (offsets from a neutral scale, which may be negative).
+    preserve
+};
+
 // Convert a scale vector between coordinate systems.
-// Scale is per-axis and doesn't have direction, so we take absolute values
-// to ignore sign flips from the coordinate system transformation.
+// A change of basis is a signed permutation. For a signed delta the similarity transform of the
+// diagonal scaling cancels the axis-flip signs (they appear squared), leaving only the axis
+// permutation, so sign_policy::preserve permutes by |c| and keeps each component's own sign.
+// sign_policy::discard instead takes absolute values, treating scale as a directionless magnitude.
 template<typename T>
-inline vec3<T> convert_scale(const vec3<T>& scale, const mat3<T>& c) {
+inline vec3<T> convert_scale(const vec3<T>& scale, const mat3<T>& c, sign_policy policy) {
+    if (policy == sign_policy::preserve) {
+        mat3<T> magnitude = c;
+        magnitude.apply(
+            [](vec3<T>& row, dim_t /*unused*/) { row.apply([](T& value, dim_t /*unused*/) { value = std::fabs(value); }); });
+        return scale * magnitude;
+    }
     const vec3<T> result = scale * c;
     return vec3<T>{std::fabs(result[0]), std::fabs(result[1]), std::fabs(result[2])};
 }
 
 template<typename T>
-inline vec3<T> convert_scale(const vec3<T>& scale, const coord_sys& src_cs, const coord_sys& dst_cs) {
-    return convert_scale(scale, change_of_basis<T>(src_cs, dst_cs));
+inline vec3<T> convert_scale(const vec3<T>& scale, const coord_sys& src_cs, const coord_sys& dst_cs, sign_policy policy) {
+    return convert_scale(scale, change_of_basis<T>(src_cs, dst_cs), policy);
 }
 
 template<typename T>

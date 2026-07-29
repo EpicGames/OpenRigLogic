@@ -121,7 +121,9 @@ struct ScaleTransformer {
         for (std::size_t i = {}; i < baseIndices.size(); ++i) {
             const auto baseIndex = baseIndices[i];
             const tdm::fvec3 src{values[baseIndex + 0ul], values[baseIndex + 1ul], values[baseIndex + 2ul]};
-            const tdm::fvec3 dst = tdm::convert_scale(src, changeOfBasis);
+            // These are machine-learned scale deltas (signed offsets from the neutral scale), so
+            // their sign must survive the axis permutation; abs() would corrupt negative deltas.
+            const tdm::fvec3 dst = tdm::convert_scale(src, changeOfBasis, tdm::sign_policy::preserve);
             values[baseIndex + 0ul] = dst[0];
             values[baseIndex + 1ul] = dst[1];
             values[baseIndex + 2ul] = dst[2];

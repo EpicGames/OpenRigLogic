@@ -231,7 +231,9 @@ void CoordinateSystemConverter::convertJointDeltas(DNA& dna,
                                                                      srcRotationSigns,
                                                                      dstRotationSequence,
                                                                      dstRotationSigns);
-                const tdm::fvec3 dstScale = tdm::convert_scale(srcScale, changeOfBasis);
+                // Joint scale deltas are signed offsets from the neutral scale, so their sign must
+                // be preserved through the axis permutation (an abs() would corrupt negatives).
+                const tdm::fvec3 dstScale = tdm::convert_scale(srcScale, changeOfBasis, tdm::sign_policy::preserve);
 
                 newValues[(newRowIndex + 0) * colCount + col] = dstTranslation[0];
                 newValues[(newRowIndex + 1) * colCount + col] = dstTranslation[1];
