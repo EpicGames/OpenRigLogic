@@ -301,11 +301,22 @@ struct MLPOperationSetBuilder {
         OperationSetData data{memRes};
         data.type = OperationSetType::MLP;
 
+        static constexpr std::uint32_t kNoMask = static_cast<std::uint32_t>(-1);
+        // Skipped ops (non-MLP type or layer-less nets) are kept as inert, layer-less placeholder entries so
+        // that op indices remain aligned with the DNA (LOD lists and cross-op dependency indices reference
+        // original op indices, and bufferSizes/outputCounts keep their zeroed slots the same way).
+        // execute() skips layer-less ops, so placeholders contribute nothing at runtime.
+        auto pushPlaceholder = [&data, memRes]() {
+            MLPOperationData placeholder{memRes};
+            placeholder.neuralNet.maskIndex = kNoMask;
+            data.mlpOps.push_back(std::move(placeholder));
+        };
+
         const auto mlOperationCount = reader->getMLOperationCount(mlTypeIndex, mlOperationSetIndex);
         for (std::uint16_t opIdx = {}; opIdx < mlOperationCount; ++opIdx) {
             const auto operationType = reader->getMLOperationType(mlTypeIndex, mlOperationSetIndex, opIdx);
             if (operationType != dna::MachineLearnedBehaviorOperationType::MLP) {
-                // Placeholder: keep bufferSizes/outputCounts at 0 for non-MLP ops.
+                pushPlaceholder();
                 continue;
             }
 
@@ -313,6 +324,7 @@ struct MLPOperationSetBuilder {
             const auto neuralNetIndex = static_cast<std::uint16_t>(params[0]);
             const auto layerCount = reader->getNeuralNetworkLayerCount(neuralNetIndex);
             if (layerCount == 0u) {
+                pushPlaceholder();
                 continue;
             }
 
@@ -372,7 +384,6 @@ struct MLPOperationSetBuilder {
             return data;  // empty sentinel - checked by OperationSetData::empty()
         }
 
-        static constexpr std::uint32_t kNoMask = static_cast<std::uint32_t>(-1);
         for (const auto& op : data.mlpOps) {
             if (op.neuralNet.maskIndex != kNoMask) {
                 data.hasMasks = true;
@@ -537,6 +548,30 @@ MachineLearnedBehaviorEvaluator::Pointer Factory::create(const Configuration& co
                                                                         bufferSizes,
                                                                         outputCounts,
                                                                         memRes));
+            }
+        }
+
+        // A WeightedSum op reads its own outputCount elements from every dependency buffer. If that exceeds a dependency's true
+        // output width, grow the dependency's buffer so the read stays in bounds, and for MLP deps mark the over-read tail.
+        for (std::uint16_t opSetIdx = {}; opSetIdx < mlOperationSetCount; ++opSetIdx) {
+            for (const auto& ws : mlTypeOpSets[opSetIdx].wsOps) {
+                for (const auto& dep : ws.inputDeps) {
+                    assert(dep.opSetIdx < outputCounts[mlTypeIndex].size());
+                    assert(dep.opIdx < outputCounts[mlTypeIndex][dep.opSetIdx].size());
+                    const auto depWidth = outputCounts[mlTypeIndex][dep.opSetIdx][dep.opIdx];
+                    if (ws.outputCount <= depWidth) {
+                        continue;
+                    }
+                    auto& depBufferSize = bufferSizes[mlTypeIndex][dep.opSetIdx][dep.opIdx];
+                    depBufferSize = std::max(depBufferSize, static_cast<std::uint16_t>((ws.outputCount + 1u) & ~1u));
+                    auto& depSetData = mlTypeOpSets[dep.opSetIdx];
+                    if ((depSetData.type == OperationSetType::MLP) && (dep.opIdx < depSetData.mlpOps.size()) &&
+                        !depSetData.mlpOps[dep.opIdx].neuralNet.layers.empty() &&
+                        depSetData.mlpOps[dep.opIdx].outputControlIndices.empty()) {
+                        auto& tailZeroCount = depSetData.mlpOps[dep.opIdx].tailZeroCount;
+                        tailZeroCount = std::max(tailZeroCount, static_cast<std::uint16_t>(ws.outputCount - depWidth));
+                    }
+                }
             }
         }
 

@@ -139,6 +139,16 @@ const Matrix<float> valuesPerLOD = {
 
 CanonicalReader::~CanonicalReader() = default;
 
+MaskedCanonicalReader::~MaskedCanonicalReader() = default;
+
+MixedOpSetReader::~MixedOpSetReader() = default;
+
+WSOverreadReader::~WSOverreadReader() = default;
+
+MaskedWSOverreadReader::~MaskedWSOverreadReader() = default;
+
+LODLimitedMaskedReader::~LODLimitedMaskedReader() = default;
+
 }  // namespace chained
 
 }  // namespace ml
