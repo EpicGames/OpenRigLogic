@@ -93,6 +93,8 @@ struct MLPOperationData {
     Vector<std::uint16_t> outputCounts;        // per-dep output count for the gather phase
     Vector<std::uint16_t> outputCountsPerLOD;  // precomputed from layers.back().weights.rows[lod].size
     Vector<float> defaultValues;
+    // Padding floats a WeightedSum consumer may over-read past this op's outputs; 0 for well-formed DNA.
+    std::uint16_t tailZeroCount;
 
     explicit MLPOperationData(MemoryResource* memRes) :
         neuralNet{memRes},
@@ -101,7 +103,8 @@ struct MLPOperationData {
         outputControlIndices{memRes},
         outputCounts{memRes},
         outputCountsPerLOD{memRes},
-        defaultValues{memRes} {
+        defaultValues{memRes},
+        tailZeroCount{} {
     }
 };
 
@@ -131,7 +134,9 @@ struct OperationSetData {
     }
 
     bool empty() const {
-        return mlpOps.empty() && wsOps.empty();
+        // A set holding only layer-less placeholder MLP ops (kept for op-index alignment) counts as empty.
+        return wsOps.empty() &&
+               std::all_of(mlpOps.begin(), mlpOps.end(), [](const MLPOperationData& op) { return op.neuralNet.layers.empty(); });
     }
 };
 
@@ -180,17 +185,22 @@ struct MLPOperationSet : OperationSet {
                 TF256::prefetchT0(cachedLayerDataPtrs[activeOpIndices[k + 1u]]);
             }
 
-            float* pBuf = workBufferPtrs[opSetWorkBufferOffset + opIdx];
+            if (op.neuralNet.layers.empty()) {
+                continue;
+            }
 
+            float* pBuf = workBufferPtrs[opSetWorkBufferOffset + opIdx];
+            float weight = 1.0f;
             if (hasMasks) {
                 static constexpr std::uint32_t kNoMask = static_cast<std::uint32_t>(-1);
-                const float weight = (op.neuralNet.maskIndex != kNoMask) ? masks[op.neuralNet.maskIndex] : 1.0f;
+                weight = (op.neuralNet.maskIndex != kNoMask) ? masks[op.neuralNet.maskIndex] : 1.0f;
                 if (weight == 0.0f) {
                     if (op.outputControlIndices.empty()) {
                         std::memcpy(pBuf, op.defaultValues.data(), op.defaultValues.size() * sizeof(float));
                     } else {
                         const auto* outIndices = op.outputControlIndices.data();
-                        const auto limit = std::min(op.defaultValues.size(), op.outputControlIndices.size());
+                        const auto outputCount = static_cast<std::size_t>(op.outputCountsPerLOD[lod]);
+                        const auto limit = std::min(outputCount, op.outputControlIndices.size());
                         for (std::size_t i = {}; i < limit; ++i) {
                             pInput[outIndices[i]] = op.defaultValues[i];
                         }
@@ -219,83 +229,90 @@ struct MLPOperationSet : OperationSet {
             }
 
             // evaluate layers
-            const float* result = pBuf;
-            if (!op.neuralNet.layers.empty()) {
-                const auto halfSize = static_cast<std::size_t>(workBufferHalfSizes[opSetWorkBufferOffset + opIdx]);
-                auto buf1 = ArrayView<float>{pBuf, halfSize};
-                auto buf2 = ArrayView<float>{pBuf + halfSize, halfSize};
-                const T* flatPtr = op.neuralNet.flatData.template data<T>();
-                for (const auto& layer : op.neuralNet.layers) {
-                    const T* weights = flatPtr + layer.weightOffset;
-                    const T* biases = flatPtr + layer.biasOffset;
-                    const float* activationParams = layer.activationFunctionParameters.data();
-                    switch (layer.activationFunction) {
-                    case dna::ActivationFunction::linear:
-                        calculateBlock4<T, TF256, TF128, LinearActivationFunction>(weights,
-                                                                                   biases,
-                                                                                   activationParams,
-                                                                                   layer.weights.cols,
-                                                                                   layer.weights.rows[lod],
-                                                                                   buf1,
-                                                                                   buf2);
-                        break;
-                    case dna::ActivationFunction::relu:
-                        calculateBlock4<T, TF256, TF128, ReLUActivationFunction>(weights,
-                                                                                 biases,
-                                                                                 activationParams,
-                                                                                 layer.weights.cols,
-                                                                                 layer.weights.rows[lod],
-                                                                                 buf1,
-                                                                                 buf2);
-                        break;
-                    case dna::ActivationFunction::leakyrelu:
-                        calculateBlock4<T, TF256, TF128, LeakyReLUActivationFunction>(weights,
-                                                                                      biases,
-                                                                                      activationParams,
-                                                                                      layer.weights.cols,
-                                                                                      layer.weights.rows[lod],
-                                                                                      buf1,
-                                                                                      buf2);
-                        break;
-                    case dna::ActivationFunction::tanh:
-                        calculateBlock4<T, TF256, TF128, TanHActivationFunction>(weights,
-                                                                                 biases,
-                                                                                 activationParams,
-                                                                                 layer.weights.cols,
-                                                                                 layer.weights.rows[lod],
-                                                                                 buf1,
-                                                                                 buf2);
-                        break;
-                    case dna::ActivationFunction::sigmoid:
-                        calculateBlock4<T, TF256, TF128, SigmoidActivationFunction>(weights,
-                                                                                    biases,
-                                                                                    activationParams,
-                                                                                    layer.weights.cols,
-                                                                                    layer.weights.rows[lod],
-                                                                                    buf1,
-                                                                                    buf2);
-                        break;
-                    }
-                    std::swap(buf1, buf2);
+            const auto halfSize = static_cast<std::size_t>(workBufferHalfSizes[opSetWorkBufferOffset + opIdx]);
+            auto buf1 = ArrayView<float>{pBuf, halfSize};
+            auto buf2 = ArrayView<float>{pBuf + halfSize, halfSize};
+            const T* flatPtr = op.neuralNet.flatData.template data<T>();
+            for (const auto& layer : op.neuralNet.layers) {
+                const T* weights = flatPtr + layer.weightOffset;
+                const T* biases = flatPtr + layer.biasOffset;
+                const float* activationParams = layer.activationFunctionParameters.data();
+                switch (layer.activationFunction) {
+                case dna::ActivationFunction::linear:
+                    calculateBlock4<T, TF256, TF128, LinearActivationFunction>(weights,
+                                                                               biases,
+                                                                               activationParams,
+                                                                               layer.weights.cols,
+                                                                               layer.weights.rows[lod],
+                                                                               buf1,
+                                                                               buf2);
+                    break;
+                case dna::ActivationFunction::relu:
+                    calculateBlock4<T, TF256, TF128, ReLUActivationFunction>(weights,
+                                                                             biases,
+                                                                             activationParams,
+                                                                             layer.weights.cols,
+                                                                             layer.weights.rows[lod],
+                                                                             buf1,
+                                                                             buf2);
+                    break;
+                case dna::ActivationFunction::leakyrelu:
+                    calculateBlock4<T, TF256, TF128, LeakyReLUActivationFunction>(weights,
+                                                                                  biases,
+                                                                                  activationParams,
+                                                                                  layer.weights.cols,
+                                                                                  layer.weights.rows[lod],
+                                                                                  buf1,
+                                                                                  buf2);
+                    break;
+                case dna::ActivationFunction::tanh:
+                    calculateBlock4<T, TF256, TF128, TanHActivationFunction>(weights,
+                                                                             biases,
+                                                                             activationParams,
+                                                                             layer.weights.cols,
+                                                                             layer.weights.rows[lod],
+                                                                             buf1,
+                                                                             buf2);
+                    break;
+                case dna::ActivationFunction::sigmoid:
+                    calculateBlock4<T, TF256, TF128, SigmoidActivationFunction>(weights,
+                                                                                biases,
+                                                                                activationParams,
+                                                                                layer.weights.cols,
+                                                                                layer.weights.rows[lod],
+                                                                                buf1,
+                                                                                buf2);
+                    break;
                 }
-                result = buf1.data();
+                std::swap(buf1, buf2);
             }
+            const float* result = buf1.data();
 
-            // scatter
+            // scatter: attenuate outputs by the mask weight - on/off for ML joint rigs, fractional
+            // for blend-shape-channel rigs (weight is never 0 here; that path returned earlier).
+            const auto outputCount = static_cast<std::uint32_t>(op.outputCountsPerLOD[lod]);
             if (!op.outputControlIndices.empty()) {
-                const auto outputCount = static_cast<std::uint32_t>(op.outputCountsPerLOD[lod]);
                 const auto outIndicesCount = static_cast<std::uint32_t>(op.outputControlIndices.size());
                 const auto limit = std::min(outputCount, outIndicesCount);
                 const auto* outIndices = op.outputControlIndices.data();
                 for (std::uint32_t i = {}; i < limit; ++i) {
-                    pInput[outIndices[i]] = result[i];
+                    pInput[outIndices[i]] = result[i] * weight;
+                }
+            } else if (weight != 1.0f) {
+                // Intermediate-dependency MLP: scale results into pBuf (where downstream gathers read).
+                // This also normalizes when an odd layer count left result in pBuf's upper half.
+                for (std::size_t i = {}; i < outputCount; ++i) {
+                    pBuf[i] = result[i] * weight;
                 }
             } else if (result != pBuf) {
                 // Intermediate dep MLP with an odd layer count: the ping-pong evaluation left the result
                 // in the second half of the work buffer (pBuf+halfSize) rather than pBuf.
                 // Downstream dep gathers always read from workBufferPtrs[dep] = pBuf, so normalize here.
-                const auto outputCount = static_cast<std::size_t>(op.outputCountsPerLOD[lod]);
                 std::memcpy(pBuf, result, outputCount * sizeof(float));
+            }
+            if (op.tailZeroCount != 0u) {
+                // A WeightedSum consumer reads past this op's output count; zero the over-read region so it blends zeros.
+                std::memset(pBuf + outputCount, 0, static_cast<std::size_t>(op.tailZeroCount) * sizeof(float));
             }
         }
     }
@@ -317,7 +334,8 @@ struct MLPOperationSet : OperationSet {
                     entry.inputControlIndices,
                     entry.outputControlIndices,
                     entry.outputCounts,
-                    entry.defaultValues);
+                    entry.defaultValues,
+                    entry.tailZeroCount);
             if (!entry.neuralNet.layers.empty()) {
                 const auto& lastRows = entry.neuralNet.layers.back().weights.rows;
                 entry.outputCountsPerLOD.resize(lastRows.size());
@@ -350,7 +368,8 @@ struct MLPOperationSet : OperationSet {
                     op.inputControlIndices,
                     op.outputControlIndices,
                     op.outputCounts,
-                    op.defaultValues);
+                    op.defaultValues,
+                    op.tailZeroCount);
         }
     }
 };

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 ################################################
 # Project setup
 set(RL riglogic4)
-set(RL_VERSION 13.2.7)
+set(RL_VERSION 13.2.9)
 # Prevent in-source-tree builds
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 # Create compilation database
