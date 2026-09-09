@@ -2,85 +2,47 @@
 
 ---
 
-<!-- ink:api name="applied" module="tdm/Mat" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="applied" module="tdm/Mat" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `mat<R, C, T> applied(const mat<R, C, T>& lhs, F func)`
+## `template<dim_t R, dim_t C, typename T, typename F> mat<R, C, T> applied(const mat<R, C, T>& lhs, F func)`
 
-Apply a functor to every row of a matrix and return the modified copy, leaving the original unchanged.
+Apply a function to every element of a matrix, returning a new matrix with the results — the source matrix is left unchanged.
 
 ### When to use this
 
-Use when you need a functional-style transform over a matrix's rows without mutating the source. `applied` is the non-mutating counterpart to `mat::apply` — reach for it in expressions and pipelines where you want a new matrix value rather than in-place modification of an existing one.
+Use this when you need an element-wise transform (e.g. clamping, rounding, or a custom per-component operation) without mutating the original matrix. If mutating in place is acceptable, call `apply` directly on the matrix instead.
 
 ### Example
 
 ```cpp
-// Negate every row of a 3×3 matrix
-tdm::mat<3, 3, float> src = tdm::mat<3, 3, float>::diagonal(1.0f);
-tdm::mat<3, 3, float> negated = tdm::applied(src, [](tdm::vec<3, float>& row, tdm::dim_t /*i*/) {
-    row = row * -1.0f;
-});
-// src is unchanged; negated has all elements negated
+mat3<float> m = mat3<float>::identity();
+mat3<float> doubled = applied(m, [](float& value, dim_t /*unused*/) { value *= 2.0f; });
+// doubled now holds the element-wise result; m is untouched
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `lhs` | `const mat<R, C, T>&` | required — the source matrix to copy and transform. |
-| `func` | `F` | required — a callable with signature `void(row_type&, dim_t row_index)` applied to each row in order. |
+| `lhs` | `const mat<R, C, T>&` | required — the source matrix; copied before the function is applied. |
+| `func` | `F` | required — a callable invoked per element (and, depending on `apply`'s contract, per row) to transform the value in place on the copy. |
 
 ### Returns
 
-`mat<R, C, T>` — a new matrix that is a copy of `lhs` with `func` applied to each row.
+`mat<R, C, T>` — a new matrix holding the result of applying `func` to every element of `lhs`.
 
 <!-- ink:api-end name="applied" -->
 
-<!-- ink:api name="column_type" module="tdm/Mat" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
 
-## `mat<R, C, T>::column_type`
+<!-- ink:api name="inverse" module="tdm/Mat" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-Type alias for a single column of a `mat<R, C, T>` matrix — a `vec<R, T>` vector with R elements.
+## `template<dim_t N, typename T> mat<N, N, T> inverse(const mat<N, N, T>& m)`
 
-### Why this exists
-
-Names the column vector type with R components, which is distinct from `row_type` in non-square matrices. The `rows()` static method returns `column_type::dimensions()` (R), making explicit that the row count equals the column vector height. Generic code receiving a column vector from matrix operations can use this alias to determine the expected type without inspecting the R template parameter directly.
-
-### Relationships
-
-- `row_type` — `vec<C, value_type>`: the corresponding row vector type.
-- `from_columns` — factory method that takes `C` arguments of this type.
-
-<!-- ink:api-end name="column_type" -->
-
-<!-- ink:api name="inverse" module="tdm/Mat" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
-
-## `mat<N, N, T> inverse(const mat<N, N, T>& m)`
-
-Compute the inverse of a square matrix — the matrix M⁻¹ such that M × M⁻¹ = I.
+Forward declaration of the matrix inverse operation.
 
 ### When to use this
 
-Use when you need to reverse a transformation: undo a world-to-camera transform, solve a linear system, or recover original coordinates from a transformed space. For orthogonal matrices (rotation-only, no scale), prefer `transpose` — it produces the same result with no division and no risk of numerical instability.
-
-### Example
-
-```cpp
-// Invert a 4×4 transform matrix
-tdm::mat<4, 4, float> world_to_camera = /* camera transform */;
-tdm::mat<4, 4, float> camera_to_world = tdm::inverse(world_to_camera);
-// Apply camera_to_world to bring a camera-space point back to world space
-```
-
-### Parameters
-
-| Name | Type | Description |
-|------|------|-------------|
-| `m` | `const mat<N, N, T>&` | required — the square matrix to invert. Must be N×N (enforced by template). |
-
-### Returns
-
-`mat<N, N, T>` — the matrix inverse of the input.
+This forward declaration lets `mat`-related code reference `tdm::inverse` before its full definition is visible. Call the fully-defined `inverse` (documented under `tdm/Computations`) for actual use.
 
 ### Constraints
 
@@ -89,21 +51,21 @@ tdm::mat<4, 4, float> camera_to_world = tdm::inverse(world_to_camera);
 
 <!-- ink:api-end name="inverse" -->
 
-<!-- ink:api name="is_all_scalar" module="tdm/Mat" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="is_all_scalar" module="tdm/Mat" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
-## `is_all_scalar<T, Us...>`
+## `is_all_scalar`
 
-Internal trait that checks whether every type in a variadic parameter pack is a scalar type. Lives in `tdm::impl` — not part of the public API surface.
+A compile-time trait that checks whether a parameter pack consists entirely of the same scalar type.
 
 ### Why this exists
 
-The `mat` constructors need a compile-time guard that permits variadic scalar packs (e.g., `mat(1.0f, 0.0f, 0.0f, …)`) only when all arguments share the same scalar type. A plain `std::is_scalar` check cannot span a heterogeneous pack, so this recursive trait accumulates the check across all types in the pack before enabling the constructor via `std::enable_if`.
+`is_all_scalar` exists to validate, at compile time, that the variadic scalar constructor of `mat` (`mat(Us... scalars)`) is only enabled when every argument is a scalar of a single consistent type — preventing accidental construction from a mismatched or non-scalar argument list without a confusing template error deep in `mat`'s internals.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| (base) | `std::true_type` or `std::false_type` | Inherits `true_type` when all types in the pack are scalar and homogeneous; `false_type` otherwise. |
+| (trait, no data members) | — | Inherits from `std::true_type` or `std::false_type` depending on whether the pack `Us...` is all the same scalar type `T` |
 
 ### Constraints
 
@@ -112,57 +74,36 @@ The `mat` constructors need a compile-time guard that permits variadic scalar pa
 
 <!-- ink:api-end name="is_all_scalar" -->
 
-<!-- ink:api name="mat" module="tdm/Mat" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="mat" module="tdm/Mat" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
-## `mat<R, C, T>`
+## `mat`
 
-A fixed-size R×C matrix of scalar type T with full construction, factory, and arithmetic support.
+A fixed-size, generic `R`×`C` matrix template parameterized on element type, used throughout `tdm` for linear transforms.
 
 ### Why this exists
 
-`mat<R, C, T>` encodes matrix dimensions as compile-time template parameters, eliminating entire classes of shape-mismatch bugs that a runtime matrix type cannot catch. The template structure ensures that `transpose`, `inverse`, and multiplication are only callable when dimensions are compatible — the compiler rejects invalid operations before the program runs. This is the primary linear-algebra primitive in the `tdm` library; `vec<N, T>` is a specialization of its row and column types.
+`mat` exists to give the library a single, generically-sized matrix type instead of separate hand-written 2x2/3x3/4x4 types, while still supporting row-based storage, scalar/list construction, and conversion between element types. Storing data as an array of `row_type` vectors (rather than a flat array) lets row access and per-row `apply` operations stay type-safe and simple.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `value_type` | `T` | The scalar element type. |
-| `row_type` | `vec<C, T>` | Type of a single row (a C-dimensional vector). |
-| `column_type` | `vec<R, T>` | Type of a single column (an R-dimensional vector). |
+| `values` | `row_type[R]` (private) | Row-major storage; each element is a `vec<C, T>` representing one row |
 
 ### Construction
 
 ```cpp
-// Zero-initialize a 3×3 float matrix
-tdm::mat<3, 3, float> identity{};
-
-// Fill all elements with a scalar
-tdm::mat<3, 3, float> scaled(2.0f);
-
-// Element-by-element (row-major order)
-tdm::mat<2, 2, float> m(1.0f, 0.0f,
-                         0.0f, 1.0f);
-
-// From row vectors
-auto rot = tdm::mat<3, 3, float>::from_rows(
-    tdm::vec<3, float>{1.0f, 0.0f, 0.0f},
-    tdm::vec<3, float>{0.0f, 0.866f, -0.5f},
-    tdm::vec<3, float>{0.0f, 0.5f,  0.866f}
-);
-
-// From column vectors
-auto basis = tdm::mat<3, 3, float>::from_columns(xAxis, yAxis, zAxis);
-
-// Diagonal (square matrices only)
-auto uniform_scale = tdm::mat<4, 4, float>::diagonal(2.0f);
+tdm::mat<3, 3, float> identity = tdm::mat<3, 3, float>::diagonal(1.0f);
+tdm::mat<2, 2, float> m{1.0f, 2.0f, 3.0f, 4.0f};  // row-major scalar list
+tdm::vec2<float> row0{1.0f, 0.0f}, row1{0.0f, 1.0f};
+tdm::mat<2, 2, float> fromRows = tdm::mat<2, 2, float>::from_rows(row0, row1);
 ```
 
 ### Relationships
 
-- `vec<N, T>` — row and column element type; `row_type` and `column_type` are both `vec` instances.
-- `transpose` — free function that produces `mat<C, R, T>` from `mat<R, C, T>`.
-- `inverse` — free function for square matrix inversion.
-- `applied` — free function that applies a functor to a copy of the matrix.
+- `transpose` — *used by `from_columns` to build a matrix from column vectors instead of rows*
+- `is_all_scalar` — *gates the variadic scalar constructor to a single consistent scalar type*
+- `inverse` — *forward-declared here, defined in `tdm/Computations` for inverting square instances*
 
 ### Constraints
 
@@ -171,71 +112,15 @@ auto uniform_scale = tdm::mat<4, 4, float>::diagonal(2.0f);
 
 <!-- ink:api-end name="mat" -->
 
-<!-- ink:api name="row_type" module="tdm/Mat" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
 
-## `mat<R, C, T>::row_type`
+<!-- ink:api name="transpose" module="tdm/Mat" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-Type alias for a single row of a `mat<R, C, T>` matrix — a `vec<C, T>` vector with C elements.
+## `template<dim_t R, dim_t C, typename T> mat<C, R, T> transpose(const mat<R, C, T>& m)`
 
-### Why this exists
-
-Names the concrete row vector type so that generic algorithms and `from_rows` factory callers can construct row arguments at the correct width without repeating the column dimension. The internal `values[R]` storage array is an array of `row_type`, so iterating rows operates directly on this type.
-
-### Relationships
-
-- `column_type` — `vec<R, value_type>`: the corresponding column vector type.
-- `from_rows` — factory method that takes `R` arguments of this type.
-
-<!-- ink:api-end name="row_type" -->
-
-<!-- ink:api name="transpose" module="tdm/Mat" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
-
-## `mat<C, R, T> transpose(const mat<R, C, T>& m)`
-
-Produce the transpose of a matrix — swap rows and columns to get a `mat<C, R, T>` from a `mat<R, C, T>` input.
+Forward declaration of the matrix transpose operation, used internally by `mat::from_columns`.
 
 ### When to use this
 
-Use when you need to convert between row-major and column-major representations, solve a system Aᵀx = b, or construct a matrix from column vectors using `from_columns` (which calls `transpose` internally). For square matrices, `transpose` also undoes the effect of `inverse` for orthogonal matrices without the cost of a full inversion.
-
-### Example
-
-```cpp
-// Transpose a 3×2 matrix to get a 2×3 result
-tdm::mat<3, 2, float> m = tdm::mat<3, 2, float>::from_rows(
-    tdm::vec<2, float>{1.0f, 2.0f},
-    tdm::vec<2, float>{3.0f, 4.0f},
-    tdm::vec<2, float>{5.0f, 6.0f}
-);
-tdm::mat<2, 3, float> mt = tdm::transpose(m);
-// mt rows are now: {1, 3, 5} and {2, 4, 6}
-```
-
-### Parameters
-
-| Name | Type | Description |
-|------|------|-------------|
-| `m` | `const mat<R, C, T>&` | required — the source matrix to transpose. |
-
-### Returns
-
-`mat<C, R, T>` — a new matrix whose row `i` equals column `i` of the input.
+This forward declaration exists so `mat` can call `tdm::transpose` from within `from_columns` before the full definition (in `Computations.h`) is visible. Call the fully-defined `transpose` (documented under `tdm/Computations`) rather than relying on this declaration directly.
 
 <!-- ink:api-end name="transpose" -->
-
-<!-- ink:api name="value_type" module="tdm/Mat" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
-
-## `mat<R, C, T>::value_type`
-
-Type alias for the scalar element type `T` of a `mat<R, C, T>` matrix.
-
-### Why this exists
-
-Follows the C++ standard container convention so that generic code can write `typename Mat::value_type` to recover the element type without knowing the concrete instantiation. This enables template utilities to operate uniformly on `mat`, `vec`, and standard containers.
-
-### Relationships
-
-- `row_type` — `vec<C, value_type>`: each row stores elements of this type.
-- `column_type` — `vec<R, value_type>`: each column stores elements of this type.
-
-<!-- ink:api-end name="value_type" -->

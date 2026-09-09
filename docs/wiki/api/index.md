@@ -1,15 +1,15 @@
 # API Reference
 
-_270 entries across 72 modules._
+_262 entries across 72 modules._
 
-## Plugins
+## Modules by Group
 
-| Plugin | Description | Modules | Entries |
-|--------|-------------|---------|---------|
-| [arrayview](arrayview/index.md) | — | 2 | 13 |
-| [dna](dna/index.md) | — | 38 | 74 |
-| [pma](pma/index.md) | — | 8 | 30 |
-| [riglogic](riglogic/index.md) | — | 6 | 21 |
-| [status](status/index.md) | — | 3 | 9 |
-| [tdm](tdm/index.md) | — | 8 | 98 |
-| [trio](trio/index.md) | — | 7 | 25 |
+| Group | Modules | Entries |
+|-------|---------|---------|
+| [arrayview](arrayview/index.md) | 2 | 5 |
+| [dna](dna/index.md) | 38 | 75 |
+| [pma](pma/index.md) | 8 | 38 |
+| [riglogic](riglogic/index.md) | 6 | 19 |
+| [status](status/index.md) | 3 | 8 |
+| [tdm](tdm/index.md) | 8 | 93 |
+| [trio](trio/index.md) | 7 | 24 |

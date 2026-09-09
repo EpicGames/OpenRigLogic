@@ -2,286 +2,251 @@
 
 ---
 
-<!-- ink:api name="adjoint" module="tdm/Computations" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="adjoint" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `mat<N, N, T> adjoint(const mat<N, N, T>& m)`
+## `template<dim_t N, typename T> mat<N, N, T> adjoint(const mat<N, N, T>& m)`
 
-Compute the adjugate (classical adjoint) of a square matrix — the transpose of its cofactor matrix.
+Compute the adjoint (adjugate) matrix, the transpose of the cofactor matrix.
 
 ### When to use this
 
-Use as a building block for matrix inversion via `adj(M) / det(M)`. This function is in `namespace tdm::impl` and is an internal helper; use `inverse` directly for the full inversion operation.
+Use this as a building block for computing `inverse` via the classical adjugate method (`inverse = adjoint / determinant`) — it is generally not needed directly outside that computation.
 
 ### Example
 
 ```cpp
-tdm::mat<2, 2, float> m = {{4, 3}, {3, 2}};
-tdm::mat<2, 2, float> adj = tdm::impl::adjoint(m);
-// adj == {{2, -3}, {-3, 4}}
+tdm::mat3<float> m{ /* ... */ };
+tdm::mat3<float> adj = tdm::impl::adjoint(m);
+// adj can be divided by determinant(m) to get the inverse
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `m` | `const mat<N, N, T>&` | required — square matrix |
+| `m` | `const mat<N, N, T>&` | required — the square matrix |
 
 ### Returns
 
-`mat<N, N, T>` — the adjugate matrix. For a 1x1 matrix, returns `mat<N,N,T>{1}`.
+`mat<N, N, T>` — the adjoint matrix.
 
 <!-- ink:api-end name="adjoint" -->
 
-<!-- ink:api name="conjugate" module="tdm/Computations" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="conjugate" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `quat<T> conjugate(const quat<T>& q)`
+## `template<typename T> quat<T> conjugate(const quat<T>& q)`
 
-Return the conjugate of a quaternion by negating its x, y, z components while keeping w unchanged.
+Compute the conjugate of a quaternion by negating its vector (imaginary) components.
 
 ### When to use this
 
-Use as a building block when computing the quaternion inverse for unit quaternions — for unit quaternions, the conjugate is equal to the inverse and is cheaper to compute. Use `inverse` instead when the quaternion may not be unit-length.
+Use this as a building block for computing a quaternion's `inverse` (for a unit quaternion, the conjugate equals the inverse), or when you need to reverse the rotation direction represented by a quaternion.
 
 ### Example
 
 ```cpp
-tdm::quat<float> q = {0.0f, 0.707f, 0.0f, 0.707f};  // 90-degree rotation around Y
+tdm::quat<float> q{0.0f, 0.0f, 0.7071f, 0.7071f};
 tdm::quat<float> qc = tdm::conjugate(q);
-// qc == {0.0f, -0.707f, 0.0f, 0.707f}
-// qc represents the inverse rotation (for unit quaternions)
+// qc is {0.0, 0.0, -0.7071, 0.7071}
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `q` | `const quat<T>&` | required — quaternion to conjugate |
+| `q` | `const quat<T>&` | required — the quaternion to conjugate |
 
 ### Returns
 
-`quat<T>` — a new quaternion with `{-q.x, -q.y, -q.z, q.w}`.
+`quat<T>` — the conjugate quaternion (x, y, z negated; w unchanged).
 
 <!-- ink:api-end name="conjugate" -->
 
-<!-- ink:api name="cross" module="tdm/Computations" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="cross" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `vec3<T> cross(const vec3<T>& lhs, const vec3<T>& rhs)`
+## `template<typename T> vec3<T> cross(const vec3<T>& lhs, const vec3<T>& rhs)`
 
-Compute the cross product of two 3D vectors, returning a vector orthogonal to both.
+Compute the cross product of two 3D vectors, producing a vector perpendicular to both.
 
 ### When to use this
 
-Use when you need a vector perpendicular to a plane defined by two direction vectors — for example, computing a surface normal from two edge vectors. Only valid for `vec3`; for dot products or higher-dimensional vectors, see `dot`.
+Use this when you need a vector perpendicular to two others — for example, to derive a surface normal from two edge vectors, or to build an orthogonal basis.
 
 ### Example
 
 ```cpp
-tdm::vec3<float> edge1 = {1.0f, 0.0f, 0.0f};
-tdm::vec3<float> edge2 = {0.0f, 1.0f, 0.0f};
+tdm::vec3<float> edge1{1.0f, 0.0f, 0.0f};
+tdm::vec3<float> edge2{0.0f, 1.0f, 0.0f};
 tdm::vec3<float> normal = tdm::cross(edge1, edge2);
-// normal == {0.0f, 0.0f, 1.0f}
+// normal is {0, 0, 1}
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `lhs` | `const vec3<T>&` | required — left-hand 3D vector |
-| `rhs` | `const vec3<T>&` | required — right-hand 3D vector |
+| `lhs` | `const vec3<T>&` | required — the first vector |
+| `rhs` | `const vec3<T>&` | required — the second vector |
 
 ### Returns
 
-`vec3<T>` — a vector perpendicular to both `lhs` and `rhs`, with magnitude equal to `|lhs| * |rhs| * sin(theta)`.
+`vec3<T>` — a vector orthogonal to both `lhs` and `rhs`, following the right-hand rule.
 
 <!-- ink:api-end name="cross" -->
 
-<!-- ink:api name="decompose" module="tdm/Computations" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="decompose" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `bool decompose(mat<N, N, T>& a, vec<N, dim_t>& permute)`
+## `template<dim_t N, typename T> bool decompose(mat<N, N, T>& a, vec<N, dim_t>& permute)`
 
-Perform LU decomposition with partial pivoting on a square matrix in-place, returning false if the matrix is singular.
+Perform an in-place LU decomposition of a square matrix with partial pivoting, based on the algorithm in *Numerical Recipes in C*.
 
 ### When to use this
 
-Use as the first step before calling `substitute` to solve a linear system `Ax = b`. The LU form is cheaper to compute once and reuse for multiple right-hand sides than calling `inverse` repeatedly. This function is in `namespace tdm::lu`.
+Use this together with `substitute` to solve linear systems or compute a matrix inverse (see `lu::inverse`) more efficiently than the general adjoint/determinant method for larger matrices.
 
 ### Watch out for
 
-- Modifies `a` in-place. The original matrix is destroyed and replaced by its LU factors. Pass a copy if you need to preserve the original.
-- Returns `false` when any row is all-zero (encountered during pivoting). Check the return value before calling `substitute`.
-
-### Example
-
-```cpp
-tdm::mat<3, 3, float> a = {{2, 1, -1}, {-3, -1, 2}, {-2, 1, 2}};
-tdm::vec<3, tdm::dim_t> permute;
-if (tdm::lu::decompose(a, permute)) {
-    tdm::vec<3, float> b = {8.0f, -11.0f, -3.0f};
-    tdm::lu::substitute(a, permute, b);
-    // b now contains the solution x
-}
-```
+- Modifies `a` in place — it is overwritten with the combined L/U factors. Pass a copy if the original matrix must be preserved.
+- Returns `false` if any row is entirely zero (matrix is singular); check the return value before calling `substitute`.
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `a` | `mat<N, N, T>&` | required — square matrix; overwritten in-place with LU factors |
-| `permute` | `vec<N, dim_t>&` | required — output permutation vector recording row swaps |
+| `a` | `mat<N, N, T>&` | required — matrix to decompose; overwritten with LU factors |
+| `permute` | `vec<N, dim_t>&` | required — receives the row permutation performed during partial pivoting |
 
 ### Returns
 
-`bool` — `true` if decomposition succeeded; `false` if the matrix is singular (a zero row was encountered).
+`bool` — `true` if decomposition succeeded; `false` if the matrix is singular.
 
 <!-- ink:api-end name="decompose" -->
 
-<!-- ink:api name="determinant" module="tdm/Computations" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="determinant" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `T determinant(const mat<N, N, T>& m)`
+## `template<dim_t N, typename T> T determinant(const mat<N, N, T>& m)`
 
-Compute the scalar determinant of a square matrix to check invertibility or measure transformation scale.
+Compute the determinant of a square matrix.
 
 ### When to use this
 
-Use to test whether a matrix is invertible before calling `inverse` — a zero determinant means no inverse exists. Also useful for checking whether a transform preserves handedness (positive determinant) or reflects it (negative).
+Use this to check if a matrix is invertible (non-zero determinant) before calling `inverse`, or to measure how a transform scales area/volume, or to determine `coord_sys` handedness via its sign.
 
 ### Example
 
 ```cpp
-tdm::mat<3, 3, float> m = {{2, 0, 0}, {0, 3, 0}, {0, 0, 4}};
+tdm::mat3<float> m{1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 float det = tdm::determinant(m);
-// det == 24.0f  (non-zero: matrix is invertible)
-
-tdm::mat<3, 3, float> singular = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-float det2 = tdm::determinant(singular);
-// det2 == 0.0f  (matrix is singular)
+// det is 1.0 (identity matrix)
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `m` | `const mat<N, N, T>&` | required — square matrix of dimension N x N |
+| `m` | `const mat<N, N, T>&` | required — the square matrix |
 
 ### Returns
 
-`T` — the scalar determinant. Zero indicates a singular (non-invertible) matrix.
+`T` — the determinant; zero indicates the matrix is singular (non-invertible).
 
 <!-- ink:api-end name="determinant" -->
 
-<!-- ink:api name="dot" module="tdm/Computations" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="dot" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `T dot(const vec<L, T>& lhs, const vec<L, T>& rhs)` / `T dot(const quat<T>& q1, const quat<T>& q2)`
+## `template<...> T dot(...)`
 
-Compute the dot product of two vectors or two quaternions.
+Compute the dot product of two vectors or quaternions, a scalar measure of how aligned they are.
 
 ### When to use this
 
-Use the vector overload to measure projection or check orthogonality between two vectors of the same dimension. Use the quaternion overload when computing the cosine of the angle between two orientations — for example, as a prerequisite inside `slerp` to determine interpolation direction.
+Use this to measure alignment between two directions (positive means same general direction, negative means opposite), to project one vector onto another, or — for quaternions — to measure similarity between two rotations before interpolating with `slerp`.
 
 ### Example
 
 ```cpp
-tdm::vec3<float> a = {1.0f, 0.0f, 0.0f};
-tdm::vec3<float> b = {0.0f, 1.0f, 0.0f};
-float result = tdm::dot(a, b);
-// result == 0.0f  (orthogonal vectors)
-
-tdm::quat<float> q1 = {0.0f, 0.0f, 0.0f, 1.0f};
-tdm::quat<float> q2 = {0.0f, 0.0f, 0.0f, 1.0f};
-float cosAngle = tdm::dot(q1, q2);
-// cosAngle == 1.0f  (same orientation)
+tdm::vec3<float> a{1.0f, 0.0f, 0.0f};
+tdm::vec3<float> b{0.0f, 1.0f, 0.0f};
+float alignment = tdm::dot(a, b);
+// alignment is 0.0 (perpendicular)
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `lhs` / `q1` | `const vec<L, T>&` or `const quat<T>&` | required — first operand |
-| `rhs` / `q2` | `const vec<L, T>&` or `const quat<T>&` | required — second operand; must be same type and dimension as first |
+| `lhs` / `q1` | `const vec<L, T>&` or `const quat<T>&` | required — the first vector or quaternion |
+| `rhs` / `q2` | `const vec<L, T>&` or `const quat<T>&` | required — the second vector or quaternion |
 
 ### Returns
 
-`T` — scalar dot product. For unit vectors, equals the cosine of the angle between them.
+`T` — the scalar dot product.
 
 <!-- ink:api-end name="dot" -->
 
-<!-- ink:api name="inverse" module="tdm/Computations" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="inverse" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `quat<T> inverse(const quat<T>& q)` / `mat<N, N, T> inverse(const mat<N, N, T>& m)`
+## `template<...> inverse(...)`
 
-Compute the inverse of a quaternion or a square matrix, returning a zero-initialized result for singular matrices.
+Compute the inverse of a quaternion or a square matrix, undoing its transform.
 
 ### When to use this
 
-Use the quaternion overload to reverse an applied rotation — for example, to transform a vector from world space back to local space. Use the matrix overload when you need the exact matrix inverse; for unit quaternions, prefer `conjugate` which is equivalent but cheaper.
+Use this to reverse a rotation (quaternion) or reverse a linear transform (matrix) — for example, going from world space to local space when you have the local-to-world transform.
 
 ### Watch out for
 
+- The matrix overload returns a default-constructed (zero) matrix when the determinant is exactly zero, rather than throwing — check the input for singularity before relying on the result if that distinction matters.
 - The matrix overload checks whether the determinant is zero and returns a default-constructed (zero) matrix in that case. Always verify the result is non-zero before using it in a transform chain.
 - The quaternion overload divides by `length2()`. Passing a zero quaternion causes division by zero.
 
 ### Example
 
 ```cpp
-// Quaternion inverse
-tdm::quat<float> rotation = {0.0f, 0.707f, 0.0f, 0.707f};
-tdm::quat<float> inv_rotation = tdm::inverse(rotation);
-// Applying rotation then inv_rotation yields identity
-
-// Matrix inverse
-tdm::mat<3, 3, float> m = { /* non-singular 3x3 matrix */ };
-tdm::mat<3, 3, float> m_inv = tdm::inverse(m);
-if (m_inv != tdm::mat<3, 3, float>{}) {
-    // use m_inv
-}
+tdm::quat<float> rotation{0.0f, 0.0f, 0.7071f, 0.7071f};
+tdm::quat<float> reversed = tdm::inverse(rotation);
+// reversed undoes the effect of `rotation` when composed with it
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `q` | `const quat<T>&` | required — quaternion to invert |
-| `m` | `const mat<N, N, T>&` | required — square matrix to invert; must be non-singular |
+| `q` / `m` | `const quat<T>&` or `const mat<N, N, T>&` | required — the quaternion or square matrix to invert |
 
 ### Returns
 
-`quat<T>` or `mat<N, N, T>` — the inverse. For the matrix overload, returns a zero-initialized matrix if the determinant is zero.
+Same type as input — the inverse quaternion or matrix.
 
 <!-- ink:api-end name="inverse" -->
 
-<!-- ink:api name="length" module="tdm/Computations" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="length" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `T length(const vec<L, T>& v)` / `T length(const quat<T>& q)`
+## `template<...> T length(...)`
 
-Compute the Euclidean length (magnitude) of a vector or quaternion.
+Compute the magnitude (length) of a vector or quaternion.
 
 ### When to use this
 
-Use to measure the magnitude of a direction or displacement vector, or to verify that a quaternion is unit-length before using it as a rotation. Only available for floating-point element types; the SFINAE guard prevents instantiation with integer types.
+Use this to measure the size of a vector — for example, the distance represented by a displacement vector, or to check if a quaternion is normalized (length ≈ 1).
 
 ### Example
 
 ```cpp
-tdm::vec3<float> v = {3.0f, 4.0f, 0.0f};
-float len = tdm::length(v);
-// len == 5.0f
-
-tdm::quat<double> q = {0.0, 0.0, 0.0, 1.0};
-double qlen = tdm::length(q);
-// qlen == 1.0  (unit quaternion)
+tdm::vec3<float> displacement{3.0f, 4.0f, 0.0f};
+float dist = tdm::length(displacement);
+// dist is 5.0
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `v` | `const vec<L, T>&` | required — vector; `T` must be a floating-point type |
-| `q` | `const quat<T>&` | required — quaternion; `T` must be a floating-point type |
+| `v` / `q` | `const vec<L, T>&` or `const quat<T>&` | required — the value whose length to compute; `T` must be floating-point |
 
 ### Returns
 
-`T` — the Euclidean norm: `sqrt(sum of squared components)`.
+`T` — the Euclidean length/magnitude.
 
 ### Constraints
 
@@ -289,289 +254,259 @@ double qlen = tdm::length(q);
 
 <!-- ink:api-end name="length" -->
 
-<!-- ink:api name="lerp" module="tdm/Computations" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="lerp" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `quat<T> lerp(const quat<T>& q1, const quat<T>& q2, T t)`
+## `template<typename T> quat<T> lerp(const quat<T>& q1, const quat<T>& q2, T t)`
 
-Linearly interpolate between two quaternions using a weighted component blend.
+Linearly interpolate between two quaternions.
 
 ### When to use this
 
-Use when speed and simplicity matter more than constant angular velocity — for example, blending nearby poses where arc distortion is negligible. Use `slerp` instead when you need smooth constant-speed rotation interpolation along the shortest arc.
+Use this for cheap, approximate rotation blending where per-frame speed variation near the endpoints is acceptable. Use `slerp` instead when you need constant angular velocity across the interpolation, such as smooth camera or character rotation animation.
+
+### Example
+
+```cpp
+tdm::quat<float> start{0.0f, 0.0f, 0.0f, 1.0f};
+tdm::quat<float> end{0.0f, 0.0f, 0.7071f, 0.7071f};
+tdm::quat<float> blended = tdm::lerp(start, end, 0.5f);
+// blended is roughly halfway between start and end (not renormalized)
+```
+
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `q1` | `const quat<T>&` | required — the starting quaternion |
+| `q2` | `const quat<T>&` | required — the ending quaternion |
+| `t` | `T` | required — interpolation factor; `0` returns `q1`, `1` returns `q2` |
+
+### Returns
+
+`quat<T>` — the linearly interpolated quaternion.
 
 ### Watch out for
 
 - The result is not normalized. Call `normalize` on the output before using it as a rotation if unit length is required.
 - Does not take the shortest path automatically. If `dot(q1, q2) < 0`, negate one quaternion before calling to avoid rotating the long way around.
 
-### Example
-
-```cpp
-tdm::quat<float> start = {0.0f, 0.0f, 0.0f, 1.0f};      // identity
-tdm::quat<float> end   = {0.0f, 0.707f, 0.0f, 0.707f};  // 90 degrees around Y
-tdm::quat<float> mid   = tdm::normalize(tdm::lerp(start, end, 0.5f));
-// mid is approximately halfway between the two orientations
-```
-
-### Parameters
-
-| Name | Type | Description |
-|------|------|-------------|
-| `q1` | `const quat<T>&` | required — start quaternion |
-| `q2` | `const quat<T>&` | required — end quaternion |
-| `t` | `T` | required — interpolation factor; `0.0` returns `q1`, `1.0` returns `q2` |
-
-### Returns
-
-`quat<T>` — component-wise blended quaternion. Not guaranteed to be unit-length.
-
 <!-- ink:api-end name="lerp" -->
 
-<!-- ink:api name="minor" module="tdm/Computations" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="minor" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `void minor(const mat<N, N, T>& input, dim_t dimensions, dim_t i, dim_t j, mat<N, N, T>& output)`
+## `template<dim_t N, typename T> void minor(const mat<N, N, T>& input, dim_t dimensions, dim_t i, dim_t j, mat<N, N, T>& output)`
 
-Extract the submatrix formed by deleting row `i` and column `j` from a square matrix.
-
-### When to use this
-
-Use as a building block for cofactor expansion when computing determinants or the adjugate matrix. This function is in `namespace tdm::impl` and is an internal helper; prefer `determinant` and `adjoint` for direct use.
-
-### Example
-
-```cpp
-tdm::mat<3, 3, float> m = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-tdm::mat<3, 3, float> sub;
-tdm::impl::minor(m, 3, 0, 0, sub);
-// sub contains the 2x2 submatrix with row 0 and col 0 deleted
-```
-
-### Parameters
-
-| Name | Type | Description |
-|------|------|-------------|
-| `input` | `const mat<N, N, T>&` | required — source square matrix |
-| `dimensions` | `dim_t` | required — active size of the matrix (may be less than N for recursive calls) |
-| `i` | `dim_t` | required — row index to exclude |
-| `j` | `dim_t` | required — column index to exclude |
-| `output` | `mat<N, N, T>&` | required — output matrix; active region `[0, dimensions-1)` is overwritten |
-
-### Returns
-
-Void — result is written to `output`.
-
-<!-- ink:api-end name="minor" -->
-
-<!-- ink:api name="negate" module="tdm/Computations" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
-
-## `negate(vec<L, T>)` / `negate(mat<R, C, T>)` / `negate(quat<T>)`
-
-Flip the sign of every component of a vector, matrix, or quaternion.
+Extract the minor matrix formed by removing row `i` and column `j` from a square matrix.
 
 ### When to use this
 
-Use when you need to reverse the direction of a vector or negate a quaternion (e.g., to represent the same rotation reached via the antipodal path). Note that `negate(q)` and `q` represent the same 3D rotation — choose based on which hemisphere you need for interpolation continuity.
-
-### Example
-
-```cpp
-tdm::vec3<float> v = {1.0f, -2.0f, 3.0f};
-tdm::vec3<float> neg_v = tdm::negate(v);
-// neg_v == {-1.0f, 2.0f, -3.0f}
-
-tdm::quat<float> q = {0.0f, 0.707f, 0.0f, 0.707f};
-tdm::quat<float> neg_q = tdm::negate(q);
-// neg_q represents the same rotation as q
-```
-
-### Parameters
-
-| Name | Type | Description |
-|------|------|-------------|
-| `v` | `vec<L, T>` | required — vector to negate (passed by value) |
-| `m` | `mat<R, C, T>` | required — matrix to negate (passed by value) |
-| `q` | `quat<T>` | required — quaternion to negate (passed by value) |
-
-### Returns
-
-The same type as the input — a new object with all components sign-flipped.
-
-<!-- ink:api-end name="negate" -->
-
-<!-- ink:api name="normalize" module="tdm/Computations" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
-
-## `vec<L, T> normalize(vec<L, T> v)` / `quat<T> normalize(quat<T> q)`
-
-Scale a vector or quaternion to unit length.
-
-### When to use this
-
-Use before passing a direction vector to operations that assume unit-length input — such as computing lighting normals or feeding orientations to `slerp`. Only available for floating-point element types.
+Use this as a building block for cofactor expansion when computing a matrix's `determinant` or `adjoint` — it is not typically called directly outside those algorithms.
 
 ### Watch out for
 
-- Normalizing a zero vector produces undefined behavior (division by zero). Check that the vector is non-zero before calling.
+- This is an implementation-detail helper (`impl::minor`), macro-guarded to avoid colliding with a `minor` macro defined on some platforms — not part of the stable public API surface.
+
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `input` | `const mat<N, N, T>&` | required — the source matrix |
+| `dimensions` | `dim_t` | required — the active size to operate over (may be less than `N` during recursive determinant computation) |
+| `i` | `dim_t` | required — row index to exclude |
+| `j` | `dim_t` | required — column index to exclude |
+| `output` | `mat<N, N, T>&` | required — receives the resulting minor matrix |
+
+<!-- ink:api-end name="minor" -->
+
+<!-- ink:api name="negate" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+## `template<...> negate(...)`
+
+Compute the negation of a vector, matrix, or quaternion, flipping the sign of every component.
+
+### When to use this
+
+Use this as a free-function form of negation when writing generic code that operates over `vec`, `mat`, or `quat` uniformly, rather than calling each type's own `.negate()` member directly.
 
 ### Example
 
 ```cpp
-tdm::vec3<float> dir = {3.0f, 0.0f, 4.0f};
-tdm::vec3<float> unit = tdm::normalize(dir);
-// unit == {0.6f, 0.0f, 0.8f}  (length == 1.0f)
+tdm::vec3<float> v{1.0f, -2.0f, 3.0f};
+tdm::vec3<float> negated = tdm::negate(v);
+// negated is {-1, 2, -3}
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `v` | `vec<L, T>` | required — vector to normalize; `T` must be floating-point |
-| `q` | `quat<T>` | required — quaternion to normalize; `T` must be floating-point |
+| `v` / `m` / `q` | `vec<L, T>`, `mat<R, C, T>`, or `quat<T>` | required — the value to negate (passed by value) |
 
 ### Returns
 
-The same type as the input — a new object scaled to length 1.
+Same type as the input — every component negated.
+
+<!-- ink:api-end name="negate" -->
+
+<!-- ink:api name="normalize" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+## `template<...> normalize(...)`
+
+Scale a vector or quaternion to unit length while preserving its direction.
+
+### When to use this
+
+Use this before using a vector as a direction (e.g. a normal or an axis) or before treating a quaternion as a valid rotation, since many operations assume unit length.
+
+### Example
+
+```cpp
+tdm::vec3<float> v{3.0f, 4.0f, 0.0f};
+tdm::vec3<float> unit = tdm::normalize(v);
+// unit is {0.6, 0.8, 0.0}, length 1.0
+```
+
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `v` / `q` | `vec<L, T>` or `quat<T>` | required — the value to normalize; `T` must be floating-point |
+
+### Returns
+
+Same type as input — the unit-length version of the input.
 
 ### Constraints
 
 - `T` must satisfy `std::is_floating_point<T>`. Integer element types will not compile.
 
+### Watch out for
+
+- Normalizing a zero vector produces undefined behavior (division by zero). Check that the vector is non-zero before calling.
+
 <!-- ink:api-end name="normalize" -->
 
-<!-- ink:api name="slerp" module="tdm/Computations" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="slerp" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `quat<T> slerp(const quat<T>& q1, const quat<T>& q2, T t)`
+## `template<typename T> quat<T> slerp(const quat<T>& q1, const quat<T>& q2, T t)`
 
-Smoothly interpolate between two quaternion orientations at constant angular velocity.
+Spherically interpolate between two rotations, moving at a constant angular velocity.
 
 ### When to use this
 
-Use for animation blending or camera interpolation where you need the rotation to proceed at constant speed without distortion through the midpoint. Use `lerp` instead when blending very close orientations where the difference is too small to matter — `slerp` automatically falls back to linear blending when `cos(theta)` is near 1, so there is no discontinuity at the boundary.
+Use this for animation and camera work where a smooth, constant-speed rotation blend matters. Use `lerp` instead when the interpolation is short or performance-critical and speed artifacts near the endpoints are acceptable.
 
 ### Watch out for
 
+- If the dot product of the two quaternions is negative, the function negates one of them internally to take the shorter path — this avoids unwanted long-way-around rotation.
+- Falls back to linear interpolation when the quaternions are nearly identical (`costheta` close to 1), to avoid a division by a near-zero `sin(theta)`.
 - Automatically negates `q2` when `dot(q1, q2) < 0` to ensure the shortest-path arc is taken. This means the output quaternion may differ in sign from `q2` even at `t = 1.0`.
-- Falls back to linear interpolation when the quaternions are nearly parallel (`cos(theta) > 1 - epsilon`). This prevents division by near-zero sine values.
 
 ### Example
 
 ```cpp
-tdm::quat<float> start = {0.0f, 0.0f, 0.0f, 1.0f};  // identity rotation
-tdm::quat<float> end   = {0.0f, 1.0f, 0.0f, 0.0f};  // 180 degrees around Y
-tdm::quat<float> mid   = tdm::slerp(start, end, 0.5f);
-// mid is exactly 90 degrees around Y, traveled at constant angular speed
+tdm::quat<float> start{0.0f, 0.0f, 0.0f, 1.0f};
+tdm::quat<float> end{0.0f, 0.0f, 0.7071f, 0.7071f};
+tdm::quat<float> mid = tdm::slerp(start, end, 0.5f);
+// mid is the rotation exactly halfway along the shortest arc from start to end
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `q1` | `const quat<T>&` | required — start orientation |
-| `q2` | `const quat<T>&` | required — end orientation |
-| `t` | `T` | required — interpolation factor in `[0, 1]`; `0.0` returns `q1`, `1.0` returns `q2` |
+| `q1` | `const quat<T>&` | required — the starting rotation |
+| `q2` | `const quat<T>&` | required — the ending rotation |
+| `t` | `T` | required — interpolation factor from `0` (q1) to `1` (q2) |
 
 ### Returns
 
-`quat<T>` — unit quaternion interpolated along the great-circle arc from `q1` to `q2`.
+`quat<T>` — the spherically interpolated quaternion.
 
 <!-- ink:api-end name="slerp" -->
 
-<!-- ink:api name="substitute" module="tdm/Computations" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="substitute" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `void substitute(const mat<N, N, T>& a, const vec<N, dim_t>& permute, vec<N, T>& b)`
+## `template<dim_t N, typename T> void substitute(const mat<N, N, T>& a, const vec<N, dim_t>& permute, vec<N, T>& b)`
 
-Solve a linear system `Ax = b` using forward and backward substitution on an LU-decomposed matrix.
+Solve a linear system in place using the LU-decomposed matrix and permutation produced by `decompose`.
 
 ### When to use this
 
-Call this after `tdm::lu::decompose` to solve for `x` in `Ax = b`. You can reuse the same decomposed matrix `a` and `permute` for multiple different right-hand sides `b` without re-decomposing. This function is in `namespace tdm::lu`.
+Use this immediately after a successful `decompose` call to solve `A x = b` for `x`, applying forward and back substitution against the LU factors.
 
 ### Watch out for
 
-- Modifies `b` in-place. On return, `b` contains the solution vector `x`, not the original right-hand side.
+- Must be called with the `a` and `permute` outputs from a prior `decompose` call on the same original matrix — calling it with an unrelated matrix produces meaningless results.
+- `b` is overwritten in place with the solution vector `x`.
 - Only safe to call after a successful `decompose` call (return value `true`). Calling on a singular decomposition produces undefined results.
-
-### Example
-
-```cpp
-tdm::mat<3, 3, float> a = {{2, 1, -1}, {-3, -1, 2}, {-2, 1, 2}};
-tdm::vec<3, tdm::dim_t> permute;
-if (tdm::lu::decompose(a, permute)) {
-    tdm::vec<3, float> b = {8.0f, -11.0f, -3.0f};
-    tdm::lu::substitute(a, permute, b);
-    // b now holds the solution: {2.0f, 3.0f, -1.0f}
-}
-```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `a` | `const mat<N, N, T>&` | required — LU-decomposed matrix from `decompose` |
-| `permute` | `const vec<N, dim_t>&` | required — permutation vector from `decompose` |
-| `b` | `vec<N, T>&` | required — right-hand side on input; solution vector on output |
-
-### Returns
-
-Void — the solution is written back into `b`.
+| `a` | `const mat<N, N, T>&` | required — the LU-decomposed matrix from `decompose` |
+| `permute` | `const vec<N, dim_t>&` | required — the permutation vector from `decompose` |
+| `b` | `vec<N, T>&` | required — right-hand side vector on input; solution vector on output |
 
 <!-- ink:api-end name="substitute" -->
 
-<!-- ink:api name="trace" module="tdm/Computations" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="trace" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `T trace(const mat<N, N, T>& m)`
+## `template<dim_t N, typename T> T trace(const mat<N, N, T>& m)`
 
-Sum the diagonal elements of a square matrix.
+Compute the trace of a square matrix, the sum of its diagonal elements.
 
 ### When to use this
 
-Use to extract the sum of eigenvalues of a matrix, or as part of algorithms that derive rotation angle from a rotation matrix (the trace of a 3x3 rotation matrix equals `1 + 2*cos(theta)`).
+Use this when you need a quick invariant scalar summary of a matrix — for example, as part of extracting a rotation angle from a rotation matrix.
 
 ### Example
 
 ```cpp
-tdm::mat<3, 3, float> m = {{1, 0, 0}, {0, 2, 0}, {0, 0, 3}};
-float tr = tdm::trace(m);
-// tr == 6.0f
+tdm::mat3<float> m{1.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 3.0f};
+float t = tdm::trace(m);
+// t is 6.0
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `m` | `const mat<N, N, T>&` | required — square N x N matrix |
+| `m` | `const mat<N, N, T>&` | required — the square matrix |
 
 ### Returns
 
-`T` — sum of `m(0,0) + m(1,1) + ... + m(N-1,N-1)`.
+`T` — sum of the diagonal elements.
 
 <!-- ink:api-end name="trace" -->
 
-<!-- ink:api name="transpose" module="tdm/Computations" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="transpose" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `mat<C, R, T> transpose(const mat<R, C, T>& m)`
+## `template<dim_t R, dim_t C, typename T> mat<C, R, T> transpose(const mat<R, C, T>& m)`
 
-Produce the transpose of a matrix by swapping rows and columns.
+Flip a matrix's rows and columns.
 
 ### When to use this
 
-Use when converting between row-major and column-major conventions, or when you need the adjoint direction matrix for a normal transform (the inverse-transpose of the model matrix). For square orthogonal matrices, the transpose equals the inverse — prefer this over `inverse` in that case.
+Use this when you need to convert between row-major and column-major representations of the same linear map, or when building a matrix from column vectors via `from_columns`.
 
 ### Example
 
 ```cpp
-tdm::mat<2, 3, float> m = {{1, 2, 3}, {4, 5, 6}};
-tdm::mat<3, 2, float> t = tdm::transpose(m);
-// t == {{1, 4}, {2, 5}, {3, 6}}
+tdm::mat<3, 4, float> m{ /* ... */ };
+tdm::mat<4, 3, float> mt = tdm::transpose(m);
+// mt(j, i) == m(i, j) for all i, j
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `m` | `const mat<R, C, T>&` | required — input matrix with R rows and C columns |
+| `m` | `const mat<R, C, T>&` | required — the matrix to transpose |
 
 ### Returns
 
-`mat<C, R, T>` — new matrix with dimensions swapped; element at `[i][j]` in the input appears at `[j][i]` in the output.
+`mat<C, R, T>` — the transposed matrix, with rows and columns swapped.
 
 <!-- ink:api-end name="transpose" -->

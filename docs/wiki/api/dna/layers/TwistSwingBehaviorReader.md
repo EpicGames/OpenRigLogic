@@ -2,54 +2,50 @@
 
 ---
 
-<!-- ink:api name="TwistSwingBehaviorReader" module="dna/layers/TwistSwingBehaviorReader" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="TwistSwingBehaviorReader" module="dna/layers/TwistSwingBehaviorReader" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
 ## `class TwistSwingBehaviorReader : public virtual DefinitionReader`
 
-Read the twist and swing deformation parameters for a rig — the per-group axis, driver control indices, output joint indices, and blend weights for both motion types.
+Read-only accessors to the swing and twist data associated with a rig — which joint rotations drive twist/swing transformations, which joints they output to, and the blend weights applied.
 
 ### When to use this
 
-Use this interface when you need to inspect or serialize the twist/swing behavioral layer of a DNA asset. It pairs with `TwistSwingBehaviorWriter` for read/write access. Do not implement this interface directly — implementors should subclass `Reader` instead, as this class is an internal layer in the reader hierarchy.
+Use this when evaluating how a driver joint's rotation should propagate twist or swing onto other joints — for example, distributing a forearm's twist along multiple joints in a chain. Implementors should inherit from `Reader` itself, not this class directly.
 
 ### Method groups
 
 | Group | Methods |
 |-------|---------|
-| Twist | `getTwistCount`, `getTwistSetupTwistAxis`, `getTwistInputControlIndices`, `getTwistOutputJointIndices`, `getTwistBlendWeights` |
-| Swing | `getSwingCount`, `getSwingSetupTwistAxis`, `getSwingInputControlIndices`, `getSwingOutputJointIndices`, `getSwingBlendWeights` |
+| Twist | getTwistCount, getTwistSetupTwistAxis, getTwistInputControlIndices, getTwistOutputJointIndices, getTwistBlendWeights |
+| Swing | getSwingCount, getSwingSetupTwistAxis, getSwingInputControlIndices, getSwingOutputJointIndices (and corresponding blend weights) |
 
 ### Example
 
 ```cpp
-// Iterate all twist groups and read their driver quaternion control indices
-const uint16_t twistCount = reader->getTwistCount();
-for (uint16_t i = 0u; i < twistCount; ++i) {
-    TwistAxis axis = reader->getTwistSetupTwistAxis(i);
-    // Always exactly 4 elements: quaternion [x, y, z, w]
-    auto driverIndices = reader->getTwistInputControlIndices(i);
-    auto outputJoints  = reader->getTwistOutputJointIndices(i);
-    auto weights       = reader->getTwistBlendWeights(i);
-}
-
-// Iterate all swing groups symmetrically
-const uint16_t swingCount = reader->getSwingCount();
-for (uint16_t i = 0u; i < swingCount; ++i) {
-    TwistAxis axis = reader->getSwingSetupTwistAxis(i);
-    auto driverIndices = reader->getSwingInputControlIndices(i);
-    auto outputJoints  = reader->getSwingOutputJointIndices(i);
-    auto weights       = reader->getSwingBlendWeights(i);
+// reader implements Reader, which composes TwistSwingBehaviorReader
+for (std::uint16_t twistIdx = 0u; twistIdx < reader->getTwistCount(); ++twistIdx) {
+    auto axis = reader->getTwistSetupTwistAxis(twistIdx);
+    auto drivenJoints = reader->getTwistOutputJointIndices(twistIdx);
+    auto weights = reader->getTwistBlendWeights(twistIdx);
 }
 ```
 
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `twistIndex` | `std::uint16_t` | required — position of the twist parameter group; must be less than `getTwistCount`. |
+| `swingIndex` | `std::uint16_t` | required — position of the swing parameter group; must be less than `getSwingCount`. |
+
 ### Returns
 
-`ConstArrayView<T>` — a non-owning view over the underlying data. Do not store the view beyond the lifetime of the reader object.
+`std::uint16_t` / `TwistAxis` / `ConstArrayView<std::uint16_t>` / `ConstArrayView<float>` — counts, axis, driver/driven joint index views, or blend weights, depending on the accessor called.
 
 ### Watch out for
 
+- The raw control indices representing the driver joint rotation are always exactly 4 values, corresponding to a single quaternion's [x, y, z, w] attributes.
+- There is exactly one blend weight per output joint in the returned list — the two lists are parallel and must be indexed together.
 - All index parameters (`twistIndex`, `swingIndex`) must be strictly less than the value returned by `getTwistCount()` or `getSwingCount()` respectively. Passing an out-of-range index is undefined behavior — validate with the count getter before each call.
-- `getTwistInputControlIndices` and `getSwingInputControlIndices` always return exactly 4 indices representing a single quaternion `[x, y, z, w]`. Do not treat the view length as variable.
 - Do not subclass `TwistSwingBehaviorReader` directly. Implementors must subclass `Reader`; this class is an intermediate layer in the interface hierarchy.
 
 <!-- ink:api-end name="TwistSwingBehaviorReader" -->

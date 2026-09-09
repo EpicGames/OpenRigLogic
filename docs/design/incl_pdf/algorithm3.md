@@ -1,4 +1,3 @@
-{% raw %}
 \begin{algorithm}
 \DontPrintSemicolon
 \KwIn{Input indices $InInd[]$}
@@ -24,4 +23,3 @@ $offset \gets 0$\;
 \caption{{\sc EvalCond} Evaluate Conditional Dependent Outputs - See Appendix A}
 \label{algo:EvalCond}
 \end{algorithm}
-{% endraw %}

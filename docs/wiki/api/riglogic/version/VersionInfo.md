@@ -2,38 +2,33 @@
 
 ---
 
-<!-- ink:api name="VersionInfo" module="riglogic/version/VersionInfo" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="VersionInfo" module="riglogic/version/VersionInfo" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `struct VersionInfo`
+## `struct RLAPI VersionInfo`
 
-Query the compiled RigLogic library version at runtime. Use this to verify the loaded library matches the expected version before making version-dependent API calls.
+Reports the RigLogic library version at runtime, as major/minor/patch numbers and a formatted string.
 
 ### When to use this
 
-Reach for `VersionInfo` when logging the library version at startup, asserting a minimum version in a plugin loader, or diagnosing mismatches between a compiled host and a dynamically loaded RigLogic build. All four accessors are static — no instance is needed.
+Use this to check which RigLogic version a linked binary was built against — for example, to log it at startup or to verify compatibility with a DNA file format before loading it.
+
+### Method groups
+
+| Group | Methods |
+|-------|---------|
+| Version | getMajorVersion, getMinorVersion, getPatchVersion, getVersionString |
 
 ### Example
 
 ```cpp
-#include "riglogic/version/VersionInfo.h"
-#include <cassert>
-
-// Assert minimum required version at plugin load time
-assert(rl4::VersionInfo::getMajorVersion() == 4);
-assert(rl4::VersionInfo::getMinorVersion() >= 1);
-
-// Log the full version string for diagnostics
-const auto version = rl4::VersionInfo::getVersionString();
-// version == "4.1.0" (or equivalent for the compiled library)
+int major = rl4::VersionInfo::getMajorVersion();
+int minor = rl4::VersionInfo::getMinorVersion();
+rl4::StringView versionStr = rl4::VersionInfo::getVersionString();
+// e.g. major == 13, minor == 2, versionStr == "13.2.9"
 ```
 
 ### Returns
 
-| Method | Return type | Description |
-|--------|-------------|-------------|
-| `getMajorVersion()` | `int` | Major version component of the compiled library. |
-| `getMinorVersion()` | `int` | Minor version component of the compiled library. |
-| `getPatchVersion()` | `int` | Patch version component of the compiled library. |
-| `getVersionString()` | `StringView` | Full version string (e.g., `"4.1.0"`). Non-owning view — do not store past the library's lifetime. |
+`int` / `StringView` — the numeric version components and the combined human-readable version string, respectively.
 
 <!-- ink:api-end name="VersionInfo" -->

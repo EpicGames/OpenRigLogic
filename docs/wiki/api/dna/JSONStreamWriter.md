@@ -2,7 +2,7 @@
 
 ---
 
-<!-- ink:api name="BinaryStreamReader" module="dna/JSONStreamWriter" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="BinaryStreamReader" module="dna/JSONStreamWriter" last_commit="api_scan" updated="2026-06-10" api_kind="callable" -->
 
 ## `class BinaryStreamReader`
 
@@ -19,55 +19,53 @@ Pass a `BinaryStreamReader*` to `JSONStreamWriter::setFrom` when you need to con
 
 <!-- ink:api-end name="BinaryStreamReader" -->
 
-<!-- ink:api name="DefaultInstanceCreator" module="dna/JSONStreamWriter" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="DefaultInstanceCreator" module="dna/JSONStreamWriter" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
-## `DefaultInstanceCreator<dna::JSONStreamWriter>`
+## `pma::DefaultInstanceCreator<dna::JSONStreamWriter>`
 
-PMA policy struct that wires `pma::FactoryCreate` as the default construction strategy for `dna::JSONStreamWriter`.
+Template specialization that tells generic `pma` factory code to use `JSONStreamWriter::create` when constructing instances of this type.
 
 ### Why this exists
 
-The `pma` memory management layer uses a traits pattern to decouple object construction from the calling code. By specializing `DefaultInstanceCreator` for `JSONStreamWriter`, PMA utilities such as `ScopedPtr` automatically know to call `JSONStreamWriter::create(...)` rather than `new`. This keeps smart-pointer and container code generic without hard-coding factory calls at each use site.
+Routes construction of `JSONStreamWriter` through its static `create` method so generic `pma` ownership utilities don't need to special-case this type's custom allocation.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `type` | `pma::FactoryCreate<dna::JSONStreamWriter>` | required — the creator strategy type consumed by PMA utilities |
+| `type` | `pma::FactoryCreate<dna::JSONStreamWriter>` | the creator implementation used by generic `pma` code for this type |
 
 ### Relationships
 
-- `DefaultInstanceDestroyer<dna::JSONStreamWriter>` — the paired destruction policy; both must be set when using PMA smart pointers
-- `pma::FactoryCreate` — the underlying factory functor this trait aliases
-- `JSONStreamWriter::create` — the factory method invoked by `FactoryCreate`
+- `DefaultInstanceDestroyer<dna::JSONStreamWriter>` — *the matching specialization used to destroy instances created this way*
+- `JSONStreamWriter::create` — *the factory method this specialization delegates to*
 
 <!-- ink:api-end name="DefaultInstanceCreator" -->
 
-<!-- ink:api name="DefaultInstanceDestroyer" module="dna/JSONStreamWriter" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="DefaultInstanceDestroyer" module="dna/JSONStreamWriter" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
-## `DefaultInstanceDestroyer<dna::JSONStreamWriter>`
+## `pma::DefaultInstanceDestroyer<dna::JSONStreamWriter>`
 
-PMA policy struct that wires `pma::FactoryDestroy` as the default destruction strategy for `dna::JSONStreamWriter`.
+Template specialization that tells generic `pma` factory code to use `JSONStreamWriter::destroy` when releasing instances of this type.
 
 ### Why this exists
 
-Mirrors `DefaultInstanceCreator` on the destruction side. PMA smart pointers and container utilities look up `DefaultInstanceDestroyer<T>::type` to find the functor to call when releasing a `T`. Specializing this for `JSONStreamWriter` ensures that `ScopedPtr<JSONStreamWriter>` automatically calls `JSONStreamWriter::destroy(instance)` on scope exit, preventing leaks without hard-coding the factory call at each use site.
+Because `JSONStreamWriter` instances are created through a custom factory, they must be released through the matching `destroy` static method rather than `delete`.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `type` | `pma::FactoryDestroy<dna::JSONStreamWriter>` | required — the destroyer strategy type consumed by PMA utilities |
+| `type` | `pma::FactoryDestroy<dna::JSONStreamWriter>` | the destroyer implementation used by generic `pma` code for this type |
 
 ### Relationships
 
-- `DefaultInstanceCreator<dna::JSONStreamWriter>` — the paired construction policy
-- `pma::FactoryDestroy` — the underlying factory destructor this trait aliases
-- `JSONStreamWriter::destroy` — the factory method invoked by `FactoryDestroy`
+- `DefaultInstanceCreator<dna::JSONStreamWriter>` — *the matching specialization used to create instances*
+- `JSONStreamWriter::destroy` — *the factory method this specialization delegates to*
 
 <!-- ink:api-end name="DefaultInstanceDestroyer" -->
 
-<!-- ink:api name="JSONStreamReader" module="dna/JSONStreamWriter" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="JSONStreamReader" module="dna/JSONStreamWriter" last_commit="api_scan" updated="2026-06-10" api_kind="callable" -->
 
 ## `class JSONStreamReader`
 
@@ -84,70 +82,44 @@ Pass a `JSONStreamReader*` to `JSONStreamWriter::setFrom` when you need to re-se
 
 <!-- ink:api-end name="JSONStreamReader" -->
 
-<!-- ink:api name="JSONStreamWriter" module="dna/JSONStreamWriter" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="JSONStreamWriter" module="dna/JSONStreamWriter" last_commit="api_scan" updated="2026-09-09" api_kind="callable" cpp_abstract_class="true" -->
 
-## `class DNAAPI JSONStreamWriter : public StreamWriter`
+## `class JSONStreamWriter : public StreamWriter`
 
-Write DNA rig data to a stream in human-readable JSON format, with configurable indentation. Use this instead of `BinaryStreamWriter` when you need human-readable output for debugging, tooling interchange, or text-based diffing.
+Write DNA rig data out as human-readable JSON, and optionally populate it directly from an existing `BinaryStreamReader` or `JSONStreamReader`.
 
 ### When to use this
 
-Use `JSONStreamWriter` when you need to serialize DNA rig data to JSON — for example, to produce text output that can be inspected in an editor, diffed in version control, or consumed by JSON-based tooling. When output size and parse speed matter more than readability, use `BinaryStreamWriter` instead.
+Use `JSONStreamWriter` when you need a diffable, hand-editable representation of the rig — for example exporting a binary DNA to JSON for review or version control. Use `BinaryStreamWriter` instead when output size and load speed matter more than readability.
+
+### Method groups
+
+| Group | Methods |
+|-------|---------|
+| Lifecycle | create, destroy |
+| Data transfer | setFrom |
 
 ### Example
 
 ```cpp
-// Create a stream to write into
-auto* stream = SomeBoundedIOStream::create();
-
-// Create a JSONStreamWriter with 2-space indentation
-auto* writer = dna::JSONStreamWriter::create(stream, 2u);
-
-// Populate from an existing binary reader
-writer->setFrom(binaryReader, dna::DataLayer::All,
-                dna::UnknownLayerPolicy::Preserve);
-
-// Write and release
+FileStream stream("rig.json", FileStream::AccessMode::Write, FileStream::OpenMode::Text);
+JSONStreamWriter* writer = JSONStreamWriter::create(&stream, 4u);
+writer->setFrom(binaryReader, DataLayer::All, UnknownLayerPolicy::Preserve);
 writer->write();
-dna::JSONStreamWriter::destroy(writer);
+JSONStreamWriter::destroy(writer);
 ```
 
-### Parameters (create)
+### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `stream` | `BoundedIOStream*` | required — target stream to write JSON output into |
-| `indentWidth` | `std::uint32_t` | optional — number of spaces per indentation level; defaults to `4` |
-| `memRes` | `MemoryResource*` | optional — custom memory resource for allocations; defaults to the platform default allocator |
-
-### Returns
-
-`JSONStreamWriter*` — caller-owned pointer. Must be released by calling `destroy(instance)`.
+| `stream` | `BoundedIOStream*` | required — stream into which the data is written |
+| `indentWidth` | `std::uint32_t` | optional — number of spaces used for indentation; defaults to 4 |
+| `memRes` | `MemoryResource*` | optional — allocator for internal structures; defaults to a built-in allocator when omitted |
 
 ### Watch out for
 
 - You own the returned pointer. Forgetting to call `destroy` leaks memory. Pair every `create` call with a `destroy` call, or use a PMA smart pointer with the `DefaultInstanceDestroyer` policy.
 - This class is conditionally compiled under `DNA_BUILD_WITH_JSON_SUPPORT`. Without that define the class is absent from the build.
 
-### Description
-
-`JSONStreamWriter` uses a factory pattern — construction via `create()`, destruction via `destroy()` — rather than direct `new`/`delete`, to keep allocations routed through the optional `MemoryResource`. The two `setFrom` overloads let you copy data from either a `BinaryStreamReader` or a `JSONStreamReader`, selecting which `DataLayer` to include and how to handle unknown layers via `UnknownLayerPolicy`.
-
 <!-- ink:api-end name="JSONStreamWriter" -->
-
-<!-- ink:api name="type" module="dna/JSONStreamWriter" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
-
-## `using type = pma::FactoryCreate<dna::JSONStreamWriter>`
-
-Member alias inside `DefaultInstanceCreator<dna::JSONStreamWriter>` that resolves to the concrete factory creator type.
-
-### Why this exists
-
-This `using type` alias is the conventional member name expected by PMA's traits system. PMA utilities look up `DefaultInstanceCreator<T>::type` to find the factory functor to invoke when constructing a `T`. This alias makes `JSONStreamWriter` compatible with those utilities without any additional boilerplate.
-
-### Relationships
-
-- `DefaultInstanceCreator<dna::JSONStreamWriter>` — the struct that contains this alias
-- `pma::FactoryCreate<dna::JSONStreamWriter>` — the concrete type this resolves to
-
-<!-- ink:api-end name="type" -->

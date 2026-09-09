@@ -2,35 +2,35 @@
 
 ---
 
-<!-- ink:api name="ManagedInstance" module="pma/utils/ManagedInstance" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="ManagedInstance" module="pma/utils/ManagedInstance" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `template<class TPointer, class TTarget, class TBase = TTarget> class ManagedInstance`
+## `template<class TPointer, class TTarget, class TBase = TTarget> class ManagedInstance { static ManagedInstance with(MemoryResource* memRes); PointerType create(Args&&... args); }`
 
-Allocate a heap object through a custom `MemoryResource` and bind its destructor to that same resource, returning a smart pointer that owns the lifetime. Prefer the `UniqueInstance` or `SharedInstance` aliases over instantiating this template directly.
+Build a smart pointer (`unique_ptr` or `shared_ptr`) whose object was allocated from a specific `pma::MemoryResource`, with a deleter that knows how to free it back to that same resource.
 
 ### When to use this
 
-Reach for `ManagedInstance` (via its aliases) when an object must be allocated and freed through the same `MemoryResource` that owns the memory budget — for example, when a DNA reader and all its internal structures must share a single arena. Use `UniqueInstance` when only one owner is needed; use `SharedInstance` when the object is shared across subsystems with no clear single owner.
+Use `ManagedInstance::with(memRes).create(...)` instead of `std::make_unique`/`std::make_shared` whenever the object must be allocated through a particular `MemoryResource` — the deleter captures the allocator so the object is freed correctly even though the caller only holds a generic smart pointer.
 
 ### Example
 
 ```cpp
-// Allocate a DNAReader through a custom memory resource
-pma::MemoryResource* memRes = pma::makeDefaultMemoryResource();
-auto reader = pma::UniqueInstance<DNAReader>::with(memRes).create(stream, dataLayer);
-// reader is a unique_ptr; its deleter calls memRes->deleteObject on destruction
+pma::MemoryResource* memRes = getArenaMemoryResource();
+auto instance = pma::impl::ManagedInstance<std::unique_ptr<Base, std::function<void(Base*)>>, Derived, Base>::with(memRes)
+                    .create(constructorArg1, constructorArg2);
+// instance is a std::unique_ptr<Base, ...> whose deleter frees Derived via memRes
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `memRes` | `MemoryResource*` | required — the memory resource that will allocate and later destroy the object. Must outlive all smart pointers produced by `create()`. |
-| `args...` | `Args&&...` | required — constructor arguments forwarded to `TTarget`'s constructor via `newObject`. |
+| `memRes` | `MemoryResource*` | required — the memory resource the constructed object is allocated from and later freed to. |
+| `args` | `Args&&...` | required — forwarded to `TTarget`'s constructor. |
 
 ### Returns
 
-`PointerType` — a smart pointer (`unique_ptr` or `shared_ptr` depending on alias) owning the newly allocated `TTarget`, cast to `TBase*`. The pointer's deleter routes back through `PolyAllocator::deleteObject` on the originating `MemoryResource`.
+`PointerType` — a `unique_ptr`/`shared_ptr` (per the `TPointer` alias used) holding the newly constructed `TTarget`, deleted through `memRes`.
 
 ### Watch out for
 
@@ -39,67 +39,48 @@ auto reader = pma::UniqueInstance<DNAReader>::with(memRes).create(stream, dataLa
 
 <!-- ink:api-end name="ManagedInstance" -->
 
-<!-- ink:api name="MemoryResource" module="pma/utils/ManagedInstance" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="MemoryResource" module="pma/utils/ManagedInstance" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
-## `MemoryResource`
+## `class MemoryResource;`
 
-Abstract memory resource interface that serves as the allocator policy for `ManagedInstance`. Pass a pointer to this type when constructing `UniqueInstance` or `SharedInstance` via `with()`.
+Forward declaration of the `MemoryResource` interface used by `ManagedInstance` to allocate and free the objects it manages.
 
 ### Why this exists
 
-`MemoryResource` decouples object construction from the global heap by providing a pluggable allocation policy. Any subsystem that controls its own memory budget can supply a custom `MemoryResource` implementation, and all objects created through `ManagedInstance::create()` will be allocated and freed through that resource. This prevents silent heap fragmentation when many short-lived DNA objects are created and destroyed at high frequency.
+`ManagedInstance` only needs a pointer to `MemoryResource`, so a forward declaration here avoids pulling in the full `MemoryResource` header just for this utility.
 
 ### Relationships
 
-- `ManagedInstance` — consumes a `MemoryResource*` to allocate `TTarget` objects
-- `UniqueInstance` — convenience alias; passes `MemoryResource*` through `with()`
-- `SharedInstance` — convenience alias; passes `MemoryResource*` through `with()`
+- `ManagedInstance` — *uses `MemoryResource*` to create and destroy managed objects.*
 
 <!-- ink:api-end name="MemoryResource" -->
 
-<!-- ink:api name="PointerType" module="pma/utils/ManagedInstance" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="PointerType" module="pma/utils/ManagedInstance" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
-## `PointerType`
+## `using PointerType = TPointer;`
 
-Member type alias inside `ManagedInstance` that resolves to the smart pointer type `TPointer`. Use it to name the return type of `create()` without repeating the full template instantiation.
+Public member typedef of `ManagedInstance` naming the smart-pointer type it produces from `create()`.
 
 ### Why this exists
 
-The concrete `TPointer` type (either `unique_ptr<TBase, …>` or `shared_ptr<TBase>`) is long and template-specific. Exposing `PointerType` lets call sites write `ManagedInstance<…>::PointerType` or simply rely on auto, without coupling themselves to the pointer kind selected by the alias. This also allows `UniqueInstance` and `SharedInstance` to unify their public interface under the same member name.
-
-### Relationships
-
-- `ManagedInstance::create()` — returns `PointerType`
-- `UniqueInstance` — resolves `PointerType` to `unique_ptr<TBase, function<void(TBase*)>>`
-- `SharedInstance` — resolves `PointerType` to `shared_ptr<TBase>`
+Exposing `PointerType` lets `UniqueInstance`/`SharedInstance` (and callers) refer to the exact return type of `create()` without repeating the full `std::unique_ptr<...>`/`std::shared_ptr<...>` spelling.
 
 <!-- ink:api-end name="PointerType" -->
 
-<!-- ink:api name="SharedInstance" module="pma/utils/ManagedInstance" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="SharedInstance" module="pma/utils/ManagedInstance" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
-## `SharedInstance<TTarget, TBase>`
+## `SharedInstance`
 
-Convenience alias for `ManagedInstance` that produces a `std::shared_ptr<TBase>` with a custom allocator-backed deleter, enabling shared ownership of an object allocated through a `MemoryResource`.
+A managed-instance alias that wraps a target type in a `std::shared_ptr`, giving multiple owners a reference-counted handle to the same instance.
 
 ### Why this exists
 
-When a DNA object must be referenced by multiple subsystems with no clear single owner, a `unique_ptr` is insufficient. `SharedInstance` wires `ManagedInstance` to produce a `shared_ptr` so the reference count governs lifetime, while still routing deallocation through the originating `MemoryResource` — ensuring that memory is returned to the correct budget rather than to the global heap.
-
-### Construction
-
-```cpp
-pma::MemoryResource* memRes = pma::makeDefaultMemoryResource();
-// Create a RigInstance shared between the renderer and the physics system
-auto rig = pma::SharedInstance<RigInstance>::with(memRes).create(rigConfig);
-// rig type: std::shared_ptr<RigInstance>
-auto rigCopy = rig; // reference count incremented; same allocator deleter
-```
+Constructing and destroying `pma` types can require routing through custom allocators and factory/destroy functions rather than plain `new`/`delete`. `SharedInstance` packages that lifecycle management behind the familiar `std::shared_ptr` interface so callers get reference-counted shared ownership without hand-rolling a custom deleter each time. It pairs with `UniqueInstance`, which provides the same guarantee for single-owner (`std::unique_ptr`) lifetimes.
 
 ### Relationships
 
-- `ManagedInstance` — the underlying template this alias configures
-- `UniqueInstance` — use instead when exclusive ownership is sufficient
-- `MemoryResource` — the allocator policy supplied via `with()`
+- `UniqueInstance` — *sibling alias using `std::unique_ptr` with a custom deleter for single ownership.*
+- `ManagedInstance` — *the underlying `impl::ManagedInstance` template that both aliases specialize.*
 
 ### Constraints
 
@@ -107,30 +88,26 @@ auto rigCopy = rig; // reference count incremented; same allocator deleter
 
 <!-- ink:api-end name="SharedInstance" -->
 
-<!-- ink:api name="UniqueInstance" module="pma/utils/ManagedInstance" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="UniqueInstance" module="pma/utils/ManagedInstance" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
-## `UniqueInstance<TTarget, TBase>`
+## `template<class TTarget, class TBase = TTarget> using UniqueInstance = impl::ManagedInstance<std::unique_ptr<TBase, std::function<void(TBase*)>>, TTarget, TBase>;`
 
-Convenience alias for `ManagedInstance` that produces a `std::unique_ptr<TBase, std::function<void(TBase*)>>` with a custom deleter that frees the object through the originating `MemoryResource`. Use this when exactly one subsystem owns the object's lifetime.
+Convenience alias for building `ManagedInstance`s that hand back a `std::unique_ptr` with a memory-resource-aware deleter.
 
 ### Why this exists
 
-Constructing `impl::ManagedInstance` with the correct `unique_ptr` + deleter template arguments is verbose and error-prone. `UniqueInstance` pre-wires those arguments so callers only need to specify the concrete type (`TTarget`) and optionally a base interface type (`TBase`). The `std::function` deleter allows the allocator to be captured by value, so the correct `MemoryResource` is used at destruction even if the pointer is moved across subsystems.
+Spelling out `impl::ManagedInstance<std::unique_ptr<TBase, std::function<void(TBase*)>>, TTarget, TBase>` at every call site is verbose and easy to get wrong; `UniqueInstance<TTarget, TBase>` gives the same behavior with just the two types that matter to the caller.
 
 ### Construction
 
 ```cpp
-pma::MemoryResource* memRes = pma::makeDefaultMemoryResource();
-// Create a DNAReader with exclusive ownership
-auto reader = pma::UniqueInstance<DNAReader>::with(memRes).create(stream, dataLayer);
-// reader type: std::unique_ptr<DNAReader, std::function<void(DNAReader*)>>
+auto ptr = pma::UniqueInstance<Derived, Base>::with(memRes).create(args...);
 ```
 
 ### Relationships
 
-- `ManagedInstance` — the underlying template this alias configures
-- `SharedInstance` — use instead when shared ownership across subsystems is required
-- `MemoryResource` — the allocator policy supplied via `with()`
+- `ManagedInstance` — *the underlying implementation `UniqueInstance` aliases.*
+- `SharedInstance` — *sibling alias producing a `shared_ptr` instead.*
 
 ### Constraints
 

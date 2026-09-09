@@ -1,39 +1,31 @@
 # API Reference — `arrayview`
 
-_13 entries across 2 modules._
+_5 entries across 2 modules._
 
 ## By Task
 
-### View containers
+### Array and string views
 
-Wrap arrays without copying. Use `ArrayView<T>` for mutable or `ConstArrayView<T>` for read-only access.
-
-| API | Module | Summary |
-|-----|--------|---------|
-| [ArrayView](ArrayView.md) | ArrayView | Non-owning view over a contiguous sequence without allocation |
-| [ConstArrayView](ArrayView.md) | ArrayView | Read-only non-owning view; type alias for `ArrayView<const T>` |
-| [StringView](StringView.md) | StringView | Lightweight non-owning string view, similar to `std::string_view` |
-
-### Associated types
-
-Type members and traits for `ArrayView` and string views.
+Create and use non-owning views over contiguous sequences of objects and C strings
 
 | API | Module | Summary |
 |-----|--------|---------|
-| [ArrayViewTraits](ArrayView.md) | ArrayView | Traits policy struct mapping element type to associated types |
-| [const_pointer](ArrayView.md) | ArrayView | Read-only pointer-to-element type |
-| [const_reference](ArrayView.md) | ArrayView | Read-only lvalue-reference type |
-| [difference_type](ArrayView.md) | ArrayView | Signed integer type for pointer differences |
-| [IsCompatible](ArrayView.md) | ArrayView | Compile-time predicate for cross-type construction |
-| [pointer](ArrayView.md) | ArrayView | Pointer-to-element type |
-| [reference](ArrayView.md) | ArrayView | Lvalue-reference type |
-| [size_type](ArrayView.md) | ArrayView | Unsigned integer type for element counts |
-| [Base](StringView.md) | StringView | Base class providing string view semantics |
-| [value_type](ArrayView.md) | ArrayView | Underlying element type stripped of decoration |
+| [ArrayView](ArrayView.md) | ArrayView | A non-owning view over a contiguous sequence of objects — a pointer-and-count pair with helper methods, but with no allocation or deallocation of its own. |
+| [ConstArrayView](ArrayView.md) | ArrayView | A read-only view over a contiguous sequence of objects — an alias for `ArrayView<const T>`. |
+| [StringView](StringView.md) | StringView | A non-owning, NULL-safe view over a C string, built on top of `ConstArrayView<char>`. |
+
+### View type traits
+
+Compile-time type checking and trait utilities for safe view conversions and const-correctness
+
+| API | Module | Summary |
+|-----|--------|---------|
+| [ArrayViewTraits](ArrayView.md) | ArrayView | A traits type that resolves the value/reference/pointer typedefs `ArrayView<T>` needs, with a specialization for `const T` that keeps all pointer and reference types const-correct. |
+| [IsCompatible](ArrayView.md) | ArrayView | A compile-time trait that checks whether an `ArrayView<U>` can be converted to an `ArrayView<T>` — same underlying type, and not converting a const view to a non-const one. |
 
 ## All Modules
 
 | Module | File | Entries |
 |--------|------|---------|
-| ArrayView | [ArrayView.md](ArrayView.md) | 11 |
-| StringView | [StringView.md](StringView.md) | 2 |
+| ArrayView | [ArrayView.md](ArrayView.md) | 4 |
+| StringView | [StringView.md](StringView.md) | 1 |

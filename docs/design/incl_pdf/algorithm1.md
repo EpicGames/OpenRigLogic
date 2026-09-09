@@ -1,4 +1,3 @@
-{% raw %}
 \begin{algorithm}
 \DontPrintSemicolon
 \KwIn{PSD matrix non-zero values $Mat[]$}
@@ -21,4 +20,3 @@ $offset \gets 0$\;
 \caption{{\sc EvalPsd} Evaluate PSD Inputs - See Appendix A}
 \label{algo:EvalPsd}
 \end{algorithm}
-{% endraw %}

@@ -3,7 +3,7 @@
 <!-- This file is managed by the Ink plugin. Do not edit anchor tags manually. -->
 
 <!-- ink:start id=3f24d88d type=release_notes conflict_score=1.0 last_confirmed=2026-06-10 created=2026-06-10 -->
-## Release notes for v13.2.5 (2026-06-10)
+## Release v13.2.5
 
 This release includes changes across 16 modules, with the heaviest activity in `include/dna` (5 items), `include/riglogic` (4 items), and `src/riglogic` (4 items). It introduces 11 new features including a consolidated `dna::Configuration` struct, an extended ML behavior API, and new TDM math types. This release contains 6 breaking changes that require call-site updates.
 
@@ -149,3 +149,162 @@ After:
 
 **Tags**: release, v13.2.5, dna, riglogic, tdm, pma, trio, cmake
 <!-- ink:end id=3f24d88d -->
+
+<!-- ink:start id=74910689 type=release_notes conflict_score=1.0 last_confirmed=2026-07-31 created=2026-07-31 -->
+## Release v13.2.7
+
+This release spans four modules, with most of the work in `dna` (5 changes), the build root (3), and `include` (2). It adds two features and four bug fixes, all centred on coordinate system conversion fidelity. There are no breaking changes; tdm moves from 6.0.0 to 6.0.1.
+
+### Highlights
+
+- **dna**: Twist and swing axes are now remapped during coordinate system conversion, and RBF pose quaternions are conjugated directly rather than through an euler roundtrip
+- **dna**: Layers are explicitly indexed so converted data survives raw-copy serialization of v2.1 and pre-v2.7 sources
+- **include**: Six gimbal-lock sign corrections in `mat_to_euler` across four rotation sequences
+- **cmake**: Registered a new exhaustive matrix/euler round-trip test suite
+- **(root)**: Benchmark targets are now sanitized alongside the benchmark runner
+
+### Features
+
+- **dna**: Added `CoordinateSystemConverter::convertTwistAxes`, which remaps twist, swing, and RBF-solver twist axes to the dominant destination axis during coordinate system conversion
+- **dna**: Added `DNA::ensureLayerIndexed` to create a layer index entry when one is absent
+
+### Examples
+
+**dna** — after a Maya-to-UE conversion, twist, swing, and RBF-solver axes are remapped to the dominant destination axis
+
+```cpp
+ASSERT_EQ(reader->getTwistSetupTwistAxis(0), TwistAxis::Z);
+ASSERT_EQ(reader->getTwistSetupTwistAxis(1), TwistAxis::X);
+ASSERT_EQ(reader->getTwistSetupTwistAxis(2), TwistAxis::Y);
+ASSERT_EQ(reader->getSwingSetupTwistAxis(0), TwistAxis::Z);
+ASSERT_EQ(reader->getSwingSetupTwistAxis(1), TwistAxis::X);
+ASSERT_EQ(reader->getSwingSetupTwistAxis(2), TwistAxis::Y);
+```
+
+**include** — the new round-trip check: euler angles need not match, but the rotation they encode must
+
+```cpp
+float roundTripError(tdm::rot_seq seq, tdm::rot_sign signs, const tdm::frad3& euler) {
+    const tdm::mat3<float> m = tdm::impl::euler2mat<float>(euler, seq, signs);
+    const tdm::frad3 extracted = tdm::impl::mat2euler<float>(m, seq, signs);
+    const tdm::mat3<float> reconstructed = tdm::impl::euler2mat<float>(extracted, seq, signs);
+    return maxMatrixDiff(m, reconstructed);
+}
+```
+
+### Bug Fixes
+
+- **dna**: RBF pose quaternions are now conjugated directly as `q' = (det(C) * (v * C), w)` instead of via an euler roundtrip, preserving the q versus -q distinction that half-rotation RBF solvers rely on to track driver rotations beyond 180 degrees
+- **dna**: v2.1 monolithic DNAs now explicitly index the descriptor, definition, behavior, and geometry layers before the format upgrade, so they are not silently dropped when serializing with `UpgradeFormatPolicy::Disallowed`
+- **dna**: The DescriptorExt layer is now explicitly indexed so converted rotation and winding conventions survive raw-copy serialization from sources older than v2.7
+- **include**: Corrected the `atan2` sign in six `mat_to_euler` gimbal-lock branches across rotation sequences xyz, xzy, yzx, and zxy
+
+### Infrastructure
+
+- **(root)**: CMake now collects benchmark targets into `RL_BENCHMARK_TARGETS` and passes them to `sanitize_targets`, so the bundled `benchmark` target is sanitized alongside the runner
+- **(root)**: Added `/.clang-format-tool` to `.gitignore`
+- **cmake**: Registered `tests/tdmtests/TestMatEulerConverter.cpp` in the test source list
+
+### Other Changes
+
+- **(root)**: `CMakeLists.txt` `RL_VERSION` raised from 13.2.5 to 13.2.7
+- **include**: Version bumps: RigLogic 13.2.5 to 13.2.7, DNA 10.1.3 to 10.1.5, tdm 6.0.0 to 6.0.1
+
+**Tags**: release, v13.2.7, include, dna, root, cmake
+<!-- ink:end id=74910689 -->
+
+<!-- ink:start id=f250a654 type=release_notes conflict_score=1.0 last_confirmed=2026-07-31 created=2026-07-31 -->
+## Release v13.2.8
+
+This release is a focused change to how scale is converted between coordinate systems, touching three modules. It contains one breaking change: `tdm::convert_scale` now requires an explicit `sign_policy` argument, moving tdm from 6.0.1 to 7.0.0. Two call sites in `dna` and `riglogic` adopt `sign_policy::preserve` so signed scale deltas keep their sign through an axis permutation.
+
+### Highlights
+
+- **include**: `tdm::convert_scale` gains a required `sign_policy` argument — a breaking change, reflected in the tdm 6.0.1 to 7.0.0 major bump
+- **include**: New `tdm::sign_policy` enum distinguishes absolute scale magnitudes from signed scale deltas
+- **dna**: Joint scale deltas now preserve their sign through coordinate system conversion
+- **riglogic**: Machine-learned scale deltas now preserve their sign through coordinate system conversion
+
+### Features
+
+- **include**: Added the `tdm::sign_policy` enum (`discard`, `preserve`) to control whether a change of basis preserves per-component scale signs
+
+### Examples
+
+**include** — `sign_policy::preserve` permutes the axes but keeps each component's own sign
+
+```cpp
+const tdm::fvec3 maya_delta{-0.5f, 0.5f, -0.25f};  // Maya (mx, my, mz) -> UE (mz, mx, my)
+
+const auto preserved = tdm::convert_scale(maya_delta, maya_cs, ue_cs, tdm::sign_policy::preserve);
+ASSERT_NEAR(preserved[0], -0.25f, 0.001f);  // mz
+ASSERT_NEAR(preserved[1], -0.5f, 0.001f);   // mx
+ASSERT_NEAR(preserved[2], 0.5f, 0.001f);    // my
+```
+
+**include** — `sign_policy::discard` reproduces the pre-7.0.0 absolute-value behaviour
+
+```cpp
+const tdm::fvec3 ue_scale{1.0f, 3.0f, 2.0f};
+const auto maya_scale = tdm::convert_scale(ue_scale, ue_cs, maya_cs, tdm::sign_policy::discard);
+
+ASSERT_NEAR(maya_scale[0], 3.0f, 0.001f);  // uy
+ASSERT_NEAR(maya_scale[1], 2.0f, 0.001f);  // uz
+ASSERT_NEAR(maya_scale[2], 1.0f, 0.001f);  // ux
+```
+
+### Bug Fixes
+
+- **dna**: Joint scale deltas now convert with `sign_policy::preserve`, so negative deltas are no longer corrupted by an absolute value
+- **riglogic**: Machine-learned scale deltas now convert with `sign_policy::preserve`, so negative deltas survive the axis permutation
+
+### Breaking Changes
+
+- **include**: `tdm::convert_scale` now requires an explicit `sign_policy` argument on both the `mat3` and `coord_sys` overloads; tdm major version bumped from 6.0.1 to 7.0.0
+
+### Migration Guide
+
+**include — `tdm::convert_scale` now requires an explicit `sign_policy` argument**
+
+Pass `tdm::sign_policy::discard` at existing call sites to keep the previous absolute-value behaviour, or `sign_policy::preserve` when the vector is a signed scale delta.
+
+Before:
+```
+inline vec3<T> convert_scale(const vec3<T>& scale, const mat3<T>& c) {
+```
+
+After:
+```
+inline vec3<T> convert_scale(const vec3<T>& scale, const mat3<T>& c, sign_policy policy) {
+```
+
+### Other Changes
+
+- **include**: Version bumps: RigLogic 13.2.7 to 13.2.8, DNA 10.1.5 to 10.1.6, tdm 6.0.1 to 7.0.0
+
+**Tags**: release, v13.2.8, include, dna, riglogic
+<!-- ink:end id=f250a654 -->
+
+<!-- ink:start id=d0f5e815 type=release_notes conflict_score=1.0 last_confirmed=2026-09-09 created=2026-09-09 -->
+## Release v13.2.9
+
+This release includes changes across three modules, with all functional work in the riglogic ML CPU evaluator (three bug fixes) plus the version bump to 13.2.9. Single upstream snapshot import (UE5.8.3); no breaking changes.
+
+### Highlights
+
+- **riglogic**: ML CPU evaluator correctness fixes — operation indices stay aligned with the DNA when ops are skipped, and WeightedSum consumers can no longer read past a dependency's output buffer
+- **(root)**: RigLogic version bumped from 13.2.7 to 13.2.9
+
+### Bug Fixes
+
+- **riglogic**: Skipped ML operations (non-MLP type or layer-less networks) are now kept as inert, layer-less placeholder entries so op indices remain aligned with the DNA — LOD lists and cross-op dependency indices reference original op indices; `execute()` skips layer-less ops so placeholders contribute nothing at runtime
+- **riglogic**: When a WeightedSum op reads more elements from a dependency buffer than the dependency's true output width, the dependency's buffer is now grown so the read stays in bounds, and MLP dependencies mark the over-read tail via the new `tailZeroCount` field (zeroed padding floats)
+- **riglogic**: Masked-op default-value scatter now uses the per-LOD output count (`outputCountsPerLOD[lod]`) as its limit instead of the full `defaultValues` size
+
+### Infrastructure
+
+- **(root)**: Bumped `RL_VERSION` from 13.2.7 to 13.2.9 in CMakeLists.txt
+- **include/riglogic**: Updated version constants and `RL_VERSION_STRING` to 13.2.9 in Version.h
+
+**Tags**: release, v13.2.9, riglogic, ml, cpu, cmake, include
+<!-- ink:end id=d0f5e815 -->

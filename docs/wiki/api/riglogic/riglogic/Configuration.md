@@ -2,25 +2,29 @@
 
 ---
 
-<!-- ink:api name="CalculationType" module="riglogic/riglogic/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="CalculationType" module="riglogic/riglogic/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `CalculationType`
 
-Choose the CPU instruction set RigLogic uses for character deformation calculations. `AnyVector` (the default) picks the best available at runtime.
+Selects which CPU algorithm implementation RigLogic uses to evaluate a rig.
 
 ### Why this exists
 
-Selecting an explicit implementation type lets a project trade portability for throughput — `Scalar` runs everywhere; `SSE`, `AVX`, and `NEON` exploit SIMD lanes for faster joint evaluation. Without this enum a caller would need to manage platform `#ifdef` blocks manually. The `AnyVector` sentinel delegates that decision to the runtime, covering most use-cases without build-time specialisation.
+Different hardware supports different vectorization instruction sets, and RigLogic needs a way to pick (or auto-select) the fastest available path without the caller having to know the build's capabilities. `AnyVector` lets RigLogic pick whichever vectorized path is available, while the explicit values let a caller pin a specific implementation for testing or platform-specific tuning.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `Scalar` | enumerator | Scalar CPU algorithm. Runs on all platforms. |
-| `SSE` | enumerator | Vectorized SSE CPU algorithm. |
-| `AVX` | enumerator | Vectorized AVX CPU algorithm. Falls back to `Scalar` if RigLogic was not built with AVX support. |
-| `NEON` | enumerator | Vectorized NEON CPU algorithm. Falls back to `Scalar` if RigLogic was not built with NEON support. |
-| `AnyVector` | enumerator | Pick any available vectorization at runtime. Recommended default. |
+| `Scalar` | enum value | Scalar CPU algorithm; always available. |
+| `SSE` | enum value | Vectorized CPU algorithm using SSE instructions. |
+| `AVX` | enum value | Vectorized CPU algorithm using AVX instructions; requires RigLogic built with AVX support, otherwise falls back to `Scalar`. |
+| `NEON` | enum value | Vectorized CPU algorithm using NEON instructions; requires RigLogic built with NEON support, otherwise falls back to `Scalar`. |
+| `AnyVector` | enum value | Picks any available vectorization automatically. |
+
+### Relationships
+
+- `Configuration` — *stores a `CalculationType` in its `calculationType` field.*
 
 ### Watch out for
 
@@ -28,65 +32,48 @@ Selecting an explicit implementation type lets a project trade portability for t
 
 <!-- ink:api-end name="CalculationType" -->
 
-<!-- ink:api name="Configuration" module="riglogic/riglogic/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="Configuration" module="riglogic/riglogic/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `Configuration`
 
-Aggregate settings struct that controls which RigLogic subsystems are loaded and how deformation calculations are performed.
+The set of options that determines how RigLogic loads DNA data and evaluates a rig.
 
 ### Why this exists
 
-Grouping all construction-time knobs into a single plain struct lets a caller configure RigLogic in one place and pass it by value, without managing a builder object or a long parameter list. Every field carries a sensible default, so `Configuration{}` is a fully valid "load everything, use best available hardware" configuration that requires no further setup for most projects.
+Loading and evaluating a rig involves several independent choices — which algorithm to run, which floating point precision to use, which behavior submodules to load, and which output conventions to emit — that would otherwise require a long list of separate constructor parameters. `Configuration` groups all of these into a single value with sensible defaults, so callers only need to override the fields that matter to them. Loading fewer submodules (e.g. setting `loadRBFBehavior` to `false`) reduces the memory allocated for a `RigLogic` instance.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `calculationType` | `CalculationType` | optional — CPU instruction set for deformation math. Default: `AnyVector`. |
-| `floatingPointType` | `FloatingPointType` | optional — Floating-point precision for vectorized calculations. Default: `HalfFloat`. |
-| `loadJoints` | `bool` | optional — Whether to load joint deformation data. Default: `true`. |
-| `loadBlendShapes` | `bool` | optional — Whether to load blend shape data. Default: `true`. |
-| `loadAnimatedMaps` | `bool` | optional — Whether to load animated map data. Default: `true`. |
-| `loadMachineLearnedBehavior` | `bool` | optional — Whether to load ML behavior data. Default: `true`. |
-| `loadRBFBehavior` | `bool` | optional — Whether to load RBF behavior data. Default: `true`. |
-| `loadTwistSwingBehavior` | `bool` | optional — Whether to load twist/swing behavior data. Default: `true`. |
-| `translationType` | `TranslationType` | optional — Joint translation representation. Default: `Vector`. |
-| `rotationType` | `RotationType` | optional — Joint rotation representation. Default: `EulerAngles`. |
-| `scaleType` | `ScaleType` | optional — Joint scale representation. Default: `Vector`. |
-| `translationPruningThreshold` | `float` | optional — Discard translation values below this magnitude. Default: `0.0f` (disabled). Safe trial value: `0.0001f`. |
-| `rotationPruningThreshold` | `float` | optional — Discard rotation values below this magnitude. Default: `0.0f` (disabled). Safe trial value: `0.1f`. |
-| `scalePruningThreshold` | `float` | optional — Discard scale values below this magnitude. Default: `0.0f` (disabled). Safe trial value: `0.001f`. |
+| `calculationType` | `CalculationType` | optional. Algorithm implementation to use; defaults to `AnyVector`. |
+| `floatingPointType` | `FloatingPointType` | optional. Precision for vectorized calculations; defaults to `HalfFloat`. |
+| `loadJoints` | `bool` | optional. Whether to load joint behavior; defaults to `true`. |
+| `loadBlendShapes` | `bool` | optional. Whether to load blend shape behavior; defaults to `true`. |
+| `loadAnimatedMaps` | `bool` | optional. Whether to load animated map behavior; defaults to `true`. |
+| `loadMachineLearnedBehavior` | `bool` | optional. Whether to load ML behavior; defaults to `true`. |
+| `loadRBFBehavior` | `bool` | optional. Whether to load RBF behavior; defaults to `true`. |
+| `loadTwistSwingBehavior` | `bool` | optional. Whether to load twist/swing behavior; defaults to `true`. |
+| `translationType` | `TranslationType` | optional. Output representation for translation; defaults to `Vector`. |
+| `rotationType` | `RotationType` | optional. Output representation for rotation; defaults to `EulerAngles`. |
+| `scaleType` | `ScaleType` | optional. Output representation for scale; defaults to `Vector`. |
+| `translationPruningThreshold` | `float` | optional. Threshold below which translation deltas are pruned; defaults to `0.0f` (comment suggests `0.0001f` is reasonably safe to try). |
+| `rotationPruningThreshold` | `float` | optional. Threshold below which rotation deltas are pruned; defaults to `0.0f` (comment suggests `0.1f` is reasonably safe to try). |
+| `scalePruningThreshold` | `float` | optional. Threshold below which scale deltas are pruned; defaults to `0.0f` (comment suggests `0.001f` is reasonably safe to try). |
 
 ### Construction
 
 ```cpp
-// Use all defaults: load every subsystem, AnyVector SIMD, HalfFloat precision
-rl4::Configuration cfg{};
-
-// Load only joints; use scalar math for a deterministic reference path
-rl4::Configuration cfg{
-    .calculationType = rl4::CalculationType::Scalar,
-    .loadBlendShapes = false,
-    .loadAnimatedMaps = false,
-    .loadMachineLearnedBehavior = false,
-    .loadRBFBehavior = false,
-    .loadTwistSwingBehavior = false
-};
-
-// Enable gentle pruning to reduce output buffer writes
-rl4::Configuration cfg{
-    .translationPruningThreshold = 0.0001f,
-    .rotationPruningThreshold = 0.1f,
-    .scalePruningThreshold = 0.001f
-};
+rl4::Configuration config;
+config.calculationType = rl4::CalculationType::AVX;
+config.loadRBFBehavior = false;
+auto* rigLogic = rl4::RigLogic::create(reader, config);
 ```
 
 ### Relationships
 
-- `CalculationType` — selects the SIMD path used during evaluation
-- `FloatingPointType` — selects weight buffer precision
-- `RotationType` — controls whether output rotations are Euler or quaternion
-- `TranslationType` / `ScaleType` — control output component layout for translation and scale
+- `RigLogic` — *`RigLogic::create` takes a `Configuration` and `RigLogic::getConfiguration` returns the one it was built with.*
+- `CalculationType`, `FloatingPointType`, `TranslationType`, `RotationType`, `ScaleType` — *enum types held by this struct's fields.*
 
 ### Watch out for
 
@@ -95,76 +82,84 @@ rl4::Configuration cfg{
 
 <!-- ink:api-end name="Configuration" -->
 
-<!-- ink:api name="FloatingPointType" module="riglogic/riglogic/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="FloatingPointType" module="riglogic/riglogic/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `FloatingPointType`
 
-Select the floating-point precision used in vectorized RigLogic calculations.
+Selects the floating point precision used in RigLogic's vectorized calculations.
 
 ### Why this exists
 
-Using `HalfFloat` halves the memory bandwidth of weight buffers, which is often the bottleneck in vectorized joint evaluation. `Float` trades that memory saving for higher precision — useful when weight values are very small or accumulate across many joints in a way that causes noticeable drift.
+Vectorized rig evaluation can trade precision for memory and bandwidth. `FloatingPointType` makes that trade-off an explicit, per-`Configuration` choice rather than a compile-time constant, so callers can pick `HalfFloat` for reduced memory footprint or `Float` for full precision.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `Float` | enumerator | Standard 32-bit single-precision float. Higher precision, higher memory cost. |
-| `HalfFloat` | enumerator | 16-bit half-precision float. Lower memory bandwidth; default in `Configuration`. |
+| `Float` | enum value | Full-precision floating point calculations. |
+| `HalfFloat` | enum value | Reduced-precision (half float) calculations; the default in `Configuration`. |
+
+### Relationships
+
+- `Configuration` — *stores a `FloatingPointType` in its `floatingPointType` field.*
 
 <!-- ink:api-end name="FloatingPointType" -->
 
-<!-- ink:api name="RotationType" module="riglogic/riglogic/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="RotationType" module="riglogic/riglogic/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `RotationType`
 
-Select whether joint rotations are expressed as Euler angles or quaternions.
+Selects the representation RigLogic uses for rotation output values.
 
 ### Why this exists
 
-Euler angles match the representation used by most DCC tools and the existing DNA file format, making them the default. Quaternions avoid gimbal lock and are preferable when the downstream consumer performs further rotation math — such as blend trees or IK solvers — where composing Euler-angle rotations accumulates floating-point error. The enumerator values (`3` and `4`) encode the component count, used internally to stride rotation output buffers.
+Rig consumers may expect rotations either as Euler angles or as quaternions depending on the downstream engine or rig rig binding. `RotationType` lets `Configuration` pick the representation without RigLogic needing separate evaluation code paths per convention.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `EulerAngles` | enumerator | 3-component Euler angle representation. Default. Compatible with most DCC tools and the DNA format. |
-| `Quaternions` | enumerator | 4-component quaternion representation. Preferred for downstream rotation composition (IK, blend trees). |
+| `EulerAngles` | enum value = 3 | 3-component Euler angle representation of rotation; the default in `Configuration`. |
+| `Quaternions` | enum value = 4 | 4-component quaternion representation of rotation. |
+
+### Relationships
+
+- `Configuration` — *stores a `RotationType` in its `rotationType` field.*
 
 <!-- ink:api-end name="RotationType" -->
 
-<!-- ink:api name="ScaleType" module="riglogic/riglogic/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="ScaleType" module="riglogic/riglogic/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `ScaleType`
 
-Specifies the representation used for joint scale data in RigLogic.
-
-### Why this exists
-
-Mirrors `TranslationType` — a named enum rather than a bare component count keeps `Configuration` readable and provides a future extension point for non-uniform or non-vector scale representations. Currently only `Vector` (3 components: X, Y, Z scale) is defined.
+Selects the representation RigLogic uses for scale output values.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `Vector` | enumerator | 3-component XYZ scale vector. Value `3` encodes the component count used internally to stride scale buffers. |
+| `Vector` | enum value = 3 | 3-component vector representation of scale. |
+
+### Relationships
+
+- `Configuration` — *stores a `ScaleType` in its `scaleType` field.*
 
 <!-- ink:api-end name="ScaleType" -->
 
-<!-- ink:api name="TranslationType" module="riglogic/riglogic/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="TranslationType" module="riglogic/riglogic/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `TranslationType`
 
-Specifies the representation used for joint translation data in RigLogic.
-
-### Why this exists
-
-Using a named enum rather than a bare component count makes `Configuration` self-documenting and provides an explicit extension point for future translation representations without breaking existing code that switches on this value. Currently only `Vector` (3 components: X, Y, Z) is defined.
+Selects the representation RigLogic uses for translation output values.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `Vector` | enumerator | 3-component XYZ vector. Value `3` encodes the component count used internally to stride translation buffers. |
+| `Vector` | enum value = 3 | 3-component vector representation of translation. |
+
+### Relationships
+
+- `Configuration` — *stores a `TranslationType` in its `translationType` field.*
 
 <!-- ink:api-end name="TranslationType" -->

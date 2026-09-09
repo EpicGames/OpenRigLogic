@@ -2,7 +2,23 @@
 
 ---
 
-<!-- ink:api name="Writer" module="dna/Writer" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="Reader" module="dna/Writer" last_commit="api_scan" updated="2026-07-31" api_kind="data_shape" -->
+
+## `Reader`
+
+A forward-declared reader type that `Writer::setFrom` accepts as the source when copying an entire DNA document into a writer.
+
+### Why this exists
+
+`Writer::setFrom` needs to call every getter on a `Reader` and forward each value into the matching setter on itself, but it only needs the `Reader` interface at the call site — so `Reader` is forward-declared here rather than included, keeping the writer header decoupled from the full reader hierarchy.
+
+### Relationships
+
+- `Writer` — *`setFrom(const Reader* source, ...)` copies all data from a `Reader` instance into the `Writer`, respecting the given `DataLayer` and `UnknownLayerPolicy`.*
+
+<!-- ink:api-end name="Reader" -->
+
+<!-- ink:api name="Writer" module="dna/Writer" last_commit="api_scan" updated="2026-06-10" api_kind="callable" -->
 
 ## `class DNAAPI Writer : public RBFBehaviorWriter, public GeometryWriter, public MachineLearnedBehaviorExtWriter, public JointBehaviorMetadataWriter, public TwistSwingBehaviorWriter`
 

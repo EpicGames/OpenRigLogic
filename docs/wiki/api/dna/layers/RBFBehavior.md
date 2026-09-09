@@ -2,125 +2,122 @@
 
 ---
 
-<!-- ink:api name="AutomaticRadius" module="dna/layers/RBFBehavior" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="AutomaticRadius" module="dna/layers/RBFBehavior" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `AutomaticRadius`
 
-Enable or disable automatic radius computation for RBF targets.
+Toggles whether an RBF target's radius of influence is computed automatically rather than set explicitly.
 
 ### Why this exists
 
-When set to `On`, the solver derives a per-target influence radius from the distribution of target poses, removing the need to hand-tune radius values. `Off` gives callers manual control over radius, which is necessary when auto-computed radii produce undesired blending behavior in sparse or non-uniform target layouts.
+Manually tuning each RBF target's radius is tedious and error-prone across large pose sets; this flag lets a rig opt into automatic radius computation instead, falling back to explicit control only where needed.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `On` | enumerator | Solver automatically computes per-target radius from target distribution. |
-| `Off` | enumerator | Radius is specified manually by the caller. |
-
-### Relationships
-
-- `RBFSolverType` — automatic radius applies to both solver types
+| `On` | enumerator | Radius is computed automatically. |
+| `Off` | enumerator | Radius must be set explicitly. |
 
 <!-- ink:api-end name="AutomaticRadius" -->
 
-<!-- ink:api name="RBFDistanceMethod" module="dna/layers/RBFBehavior" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="RBFDistanceMethod" module="dna/layers/RBFBehavior" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `RBFDistanceMethod`
 
-Specify how the RBF solver measures distance between input poses and target poses.
+Selects how the distance between an input and an RBF pose target is measured.
 
 ### Why this exists
 
-Rotation inputs cannot be meaningfully compared with standard Euclidean distance — doing so produces artifacts because quaternion space is curved. This enum encodes the geometric assumption the solver makes about its inputs, preventing silent misuse of a Euclidean metric on rotation data. The `SwingAngle` and `TwistAngle` variants decompose rotation distance along anatomically meaningful axes, enabling per-axis RBF solvers used in character rigging workflows.
+Raw Euclidean distance is not always the right metric for RBF inputs — rotational data behaves differently depending on whether it's treated as a full quaternion or decomposed into swing/twist about a specific axis. This type lets a pose target be evaluated with the distance metric that matches the kind of data driving it (n-dimensional, quaternion, swing, or twist).
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `Euclidean` | enumerator | Standard n-dimensional distance measure. Use when inputs are not rotations. |
-| `Quaternion` | enumerator | Treats inputs as quaternions and uses geodesic distance in quaternion space. |
-| `SwingAngle` | enumerator | Treats inputs as quaternions; measures the angle between rotated `TwistAxis` directions. Isolates swing component of rotation. |
-| `TwistAngle` | enumerator | Treats inputs as half-quaternions; measures distance between rotations around the `TwistAxis`. Isolates twist component. |
+| `Euclidean` | enumerator | Standard n-dimensional distance measure. |
+| `Quaternion` | enumerator | Treats inputs as a quaternion. |
+| `SwingAngle` | enumerator | Treats inputs as a quaternion and finds distance between rotated `TwistAxis` direction. |
+| `TwistAngle` | enumerator | Treats inputs as a half quaternion and finds distance between rotations around the `TwistAxis` direction. |
 
 ### Relationships
 
-- `RBFSolverType` — distance method is an input to the solver's weight computation
-- `Twist` (`dna/layers/Twist.h`) — defines the `TwistAxis` used by `SwingAngle` and `TwistAngle`
+- `TwistAxis` — *the axis used by `SwingAngle` and `TwistAngle` distance measures.*
+- `RBFSolverType` — *the solver that consumes this distance measure.*
 
 <!-- ink:api-end name="RBFDistanceMethod" -->
 
-<!-- ink:api name="RBFFunctionType" module="dna/layers/RBFBehavior" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="RBFFunctionType" module="dna/layers/RBFBehavior" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `RBFFunctionType`
 
-Choose the radial basis function kernel applied when computing influence weights from target distances.
+Selects the radial falloff function applied to distance when computing an RBF target's contribution weight.
 
 ### Why this exists
 
-Different RBF kernels produce qualitatively different weight falloff curves, and the right choice depends on the density and distribution of targets. `Gaussian` and `Exponential` decay smoothly toward zero, which suits densely packed targets. `Linear`, `Cubic`, and `Quintic` are polynomial kernels that avoid the sharp near-zero tails of exponentials and can generalize better with sparse targets.
+RBF solvers need a way to convert "distance from target" into "contribution weight," and different falloff shapes (Gaussian, exponential, linear, cubic, quintic) produce different blend characteristics. Exposing this as a type lets each RBF setup choose the falloff curve that best matches its desired responsiveness.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `Gaussian` | enumerator | Smooth exponential falloff; `exp(-r²)` shape. |
-| `Exponential` | enumerator | Exponential decay; steeper falloff than Gaussian. |
-| `Linear` | enumerator | Linear polynomial kernel; fastest to evaluate. |
-| `Cubic` | enumerator | Cubic polynomial kernel; smoother than linear. |
-| `Quintic` | enumerator | Fifth-degree polynomial kernel; smoothest polynomial option. |
+| `Gaussian` | enumerator | Bell-curve falloff. |
+| `Exponential` | enumerator | Exponential decay falloff. |
+| `Linear` | enumerator | Linear falloff. |
+| `Cubic` | enumerator | Cubic falloff. |
+| `Quintic` | enumerator | Quintic falloff. |
 
 ### Relationships
 
-- `RBFSolverType` — the solver type determines how the chosen kernel's outputs are combined
-- `RBFDistanceMethod` — the distance metric feeds into the kernel's `r` parameter
+- `RBFSolverType` — *the solver algorithm that applies this falloff function.*
+- `RBFDistanceMethod` — *supplies the distance value this function is applied to.*
 
 <!-- ink:api-end name="RBFFunctionType" -->
 
-<!-- ink:api name="RBFNormalizeMethod" module="dna/layers/RBFBehavior" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="RBFNormalizeMethod" module="dna/layers/RBFBehavior" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `RBFNormalizeMethod`
 
-Control when the RBF solver normalizes blended weights to sum to 1.0.
+Selects when contribution weights from an RBF solve are normalized to sum to a consistent total.
 
 ### Why this exists
 
-Additive RBF solvers can produce summed weights greater than 1.0 when targets overlap, and normalization is needed to keep blended outputs in a valid range. Applying normalization unconditionally when weights already sum to ≤1 can unnecessarily rescale valid outputs. Separating `OnlyNormalizeAboveOne` from `AlwaysNormalize` gives callers explicit control over that tradeoff; this enum is primarily relevant when `RBFSolverType::Additive` is selected, as interpolative solvers produce bounded weights without requiring normalization.
+The additive `RBFSolverType` can produce weights that exceed the expected 0-100% range depending on how many targets contribute, so a normalization policy is needed to keep results well-behaved. This type lets that policy be chosen per setup — only normalize when weights exceed one, or always normalize.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `OnlyNormalizeAboveOne` | enumerator | Normalizes weights only when their sum exceeds 1.0. Avoids rescaling already-valid weight distributions. |
-| `AlwaysNormalize` | enumerator | Normalizes weights unconditionally on every evaluation. |
+| `OnlyNormalizeAboveOne` | enumerator | Normalize only when the summed weight exceeds one. |
+| `AlwaysNormalize` | enumerator | Always normalize the summed weight. |
 
 ### Relationships
 
-- `RBFSolverType` — normalization is most relevant when `Additive` is selected; `Interpolative` produces bounded weights without it
+- `RBFSolverType` — *the additive solver is the primary consumer of this normalization policy.*
 
 <!-- ink:api-end name="RBFNormalizeMethod" -->
 
-<!-- ink:api name="RBFSolverType" module="dna/layers/RBFBehavior" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="RBFSolverType" module="dna/layers/RBFBehavior" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `RBFSolverType`
 
-Select the algorithm an RBF solver uses to combine target contributions — additive summation or distance-weighted interpolation.
+Selects the algorithm used to combine RBF (radial basis function) pose target contributions into a final weight.
 
 ### Why this exists
 
-Additive and interpolative RBF solvers make different tradeoffs between speed, coverage, and output quality. Encoding the choice as a typed enum makes call sites self-documenting and prevents invalid solver identifiers from being passed. The critical operational difference is that `Additive` requires a normalization pass (see `RBFNormalizeMethod`) for smooth results, while `Interpolative` guarantees weight values within 0%–100% with no normalization step needed.
+An RBF solver needs to be able to trade off speed for coverage: the additive solver sums contributions and is cheap but needs more targets and a normalization pass, while the interpolative solver blends by distance and gives smoother results with fewer targets at higher cost. Exposing this as a type lets a rig pick the right trade-off per solver instead of hard-coding one strategy.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `Additive` | enumerator | Sums contributions from each target. Faster but may require more targets for full coverage; requires normalization for smooth results. |
-| `Interpolative` | enumerator | Interpolates values by distance from each target. Produces smoother results with fewer targets than `Additive`, but at higher computational cost. Weights are bounded within 0%–100% without normalization. |
+| `Additive` | enumerator | Sums contributions from each target; faster, may need more targets and normalization for smooth results. |
+| `Interpolative` | enumerator | Interpolates values from each target by distance; smoother with fewer targets, at higher computational cost. |
 
 ### Relationships
 
-- `RBFNormalizeMethod` — controls whether and when normalization is applied; most relevant when `Additive` is selected
-- `AutomaticRadius` — radius tuning applies to both solver types
+- `RBFFunctionType` — *the falloff function used to weight each target's contribution.*
+- `RBFDistanceMethod` — *how distance between input and target is measured for this solver.*
+- `RBFNormalizeMethod` — *whether/how results are normalized, most relevant to the additive solver.*
 
 <!-- ink:api-end name="RBFSolverType" -->

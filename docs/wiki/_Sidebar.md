@@ -1,6 +1,6 @@
 ### [OpenRigLogic](Home)
 
-A C++ runtime that evaluates character rig control logic via a DNA data format.
+OpenRigLogic contains the RigLogic and DNA libraries that enable you to load a MetaHuman character with the same runtime rig evaluation as Unreal Engine.
 
 ---
 
@@ -17,4 +17,3 @@ A C++ runtime that evaluates character rig control logic via a DNA data format.
 ---
 
 ### [Release Notes](release_notes)
-

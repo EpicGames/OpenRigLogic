@@ -2,203 +2,199 @@
 
 ---
 
-<!-- ink:api name="DefaultInstanceCreator" module="pma/ScopedPtr" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="complete_type_checker" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
-## `pma::DefaultInstanceCreator<T>`
+## `complete_type_checker` (local alias inside `Delete::operator()`)
 
-Type trait that resolves the default creator policy for `T`. Evaluates to `New<T>` out of the box; specialize it to override the default for a specific type.
+A local array-type alias (`char[sizeof(T) ? 1 : -1]`) used purely to force a compile-time error when `T` is incomplete at the point `Delete<T>` deletes it.
 
 ### Why this exists
 
-`makeScoped<T>(args...)` needs to know which creator to use without requiring the caller to spell it out every time. `DefaultInstanceCreator<T>::type` provides that default in one specializable place. If a type later switches from `operator new` to a factory pattern, specializing this trait — rather than updating every call site — keeps all `makeScoped<T>()` uses correct automatically.
+Calling `delete` on an incomplete type is undefined behavior and compilers often accept it silently; `complete_type_checker` forces `sizeof(T)` to be evaluated, which fails to compile for an incomplete `T`, turning a silent UB risk into a hard compile error. It has no runtime effect — `static_cast<void>(sizeof(complete_type_checker))` discards the value, keeping only the compile-time check.
 
-### Fields
+<!-- ink:api-end name="complete_type_checker" -->
 
-| Name | Type | Description |
-|------|------|-------------|
-| `type` | `New<T>` | The resolved creator type. Access via `DefaultInstanceCreator<T>::type`. |
+<!-- ink:api name="DefaultInstanceCreator" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
-### Construction
+## `template<class T> struct DefaultInstanceCreator { using type = New<T>; }`
 
-```cpp
-// Consume via trait lookup (typical)
-using Creator = pma::DefaultInstanceCreator<MyClass>::type;  // == pma::New<MyClass>
-Creator creator;
-MyClass* obj = creator(arg1, arg2);
+Select `New<T>` as the default creator policy when no custom creator is specified for `ScopedPtr`/`makeScoped`.
 
-// Specialize to override the default for a given type:
-namespace pma {
-template<>
-struct DefaultInstanceCreator<MyPooledClass> {
-    using type = FactoryCreate<MyPooledClass>;
-};
-}
-```
+### When to use this
 
-### Relationships
+You don't call this directly — `makeScoped<T>(args...)` uses it internally to pick `New<T>` as the creator when the type has an ordinary constructor. Provide a custom creator (e.g., `FactoryCreate`) only when `T` needs factory-based construction instead.
 
-- `DefaultInstanceDestroyer<T>` — the parallel trait for the destroyer side
-- `New<T>` — the default resolved type
-- `makeScoped` — queries this trait when no explicit creator is provided
+### Returns
+
+`type` — alias for `New<T>`, the creator used by `makeScoped` unless a custom creator template is supplied.
 
 <!-- ink:api-end name="DefaultInstanceCreator" -->
 
-<!-- ink:api name="DefaultInstanceDestroyer" module="pma/ScopedPtr" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="DefaultInstanceDestroyer" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
-## `pma::DefaultInstanceDestroyer<T>`
+## `template<class T> struct DefaultInstanceDestroyer { using type = Delete<T>; }`
 
-Type trait that resolves the default destroyer policy for `T`. Evaluates to `Delete<T>` out of the box; specialize it to change the destruction path for a specific type without touching its call sites.
+Select `Delete<T>` as the default destroyer policy when no custom destroyer is specified for `ScopedPtr`/`makeScoped`.
 
-### Why this exists
+### When to use this
 
-`ScopedPtr<T>` uses `DefaultInstanceDestroyer<T>::type` as its default `TDestroyer`. This means you can globally change how `T` is destroyed — switching from `delete` to a factory `T::destroy()` call — by specializing this one trait. All `ScopedPtr<T>` and `makeScoped<T>()` usages then pick up the correct destroyer automatically.
+Used internally as `ScopedPtr`'s default `TDestroyer` template argument, so a plain `ScopedPtr<T>` calls `delete` on destruction without any extra typing. Override it only when `T` requires factory-based or array destruction (`FactoryDestroy`, `Delete<T[]>`).
 
-### Fields
+### Returns
 
-| Name | Type | Description |
-|------|------|-------------|
-| `type` | `Delete<T>` | The resolved destroyer type. Access via `DefaultInstanceDestroyer<T>::type`. |
-
-### Construction
-
-```cpp
-// Consume via trait lookup:
-using Destroyer = pma::DefaultInstanceDestroyer<MyClass>::type;  // == pma::Delete<MyClass>
-
-// Specialize to override:
-namespace pma {
-template<>
-struct DefaultInstanceDestroyer<MyPooledClass> {
-    using type = FactoryDestroy<MyPooledClass>;
-};
-}
-// Now ScopedPtr<MyPooledClass> automatically calls MyPooledClass::destroy()
-```
-
-### Relationships
-
-- `DefaultInstanceCreator<T>` — the parallel trait for the creator side
-- `Delete<T>` — the default resolved type
-- `ScopedPtr` — reads this trait as its default `TDestroyer` parameter
+`type` — alias for `Delete<T>`, the destroyer `ScopedPtr` inherits from by default.
 
 <!-- ink:api-end name="DefaultInstanceDestroyer" -->
 
-<!-- ink:api name="Delete" module="pma/ScopedPtr" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="Delete" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `pma::Delete<T, B>`
+## `template<class T, class B = T> struct Delete`
 
-Deallocate a `B*` via `operator delete`, enforcing at compile time that `T` is a complete type. The array specialization `Delete<T[]>` uses `delete[]`.
+The default destruction policy for `ScopedPtr`, releasing a pointer allocated by `New` via `delete`.
 
-### Why this exists
+### When to use this
 
-Calling `delete` on an incomplete type is undefined behavior in C++, but the compiler only warns — it does not error. `Delete` uses a `complete_type_checker` typedef (`char[sizeof(T) ? 1 : -1]`) that produces a compile error for incomplete types, making the UB impossible to reach silently. This is the safety contract that makes `ScopedPtr` safe to use with forward-declared types as long as the destroyer is instantiated where `T` is complete.
+Use this as the destroyer policy paired with `New` whenever `ScopedPtr` owns a heap object allocated with plain `new`. It guards against deleting an incomplete type at compile time rather than allowing undefined behavior at runtime.
 
-### Fields
+### Method groups
+
+| Group | Methods |
+|-------|---------|
+| Destruction | operator() (calls `delete ptr` after a completeness check) |
+
+### Example
+
+```cpp
+pma::Delete<dna::VersionInfo> destroyer;
+destroyer(obj); // equivalent to delete obj, with a compile-time completeness guard
+```
+
+### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `T` | template type param | The concrete type being destroyed. Must be a complete type at the point where `Delete<T>::operator()` is instantiated. |
-| `B` | template type param | The base pointer type accepted; defaults to `T`. |
+| `ptr` | `B*` | required — pointer to the object to delete. |
 
-### Construction
+### Raises
 
-```cpp
-// Single-object form — called by ScopedPtr automatically
-pma::Delete<MyClass> destroyer;
-destroyer(ptr);   // equivalent to: delete ptr (with completeness check)
-
-// Array form
-pma::Delete<MyClass[]> array_destroyer;
-array_destroyer(arr);   // equivalent to: delete[] arr
-```
+- Compile error via `complete_type_checker` — triggered if `T` is an incomplete type at the point of deletion, since calling `delete` on an incomplete type is undefined behavior. Ensure `T`'s full definition is visible wherever `Delete<T>` is instantiated.
 
 ### Watch out for
 
+- `Delete<T[]>` is a separate specialization that calls `delete[]` instead — using the non-array `Delete` on an array-allocated pointer is incorrect.
 - `Delete<T>::operator()` must be instantiated in a translation unit where `T` is fully defined. If `T` is forward-declared in the header that owns `ScopedPtr<T>`, move the `ScopedPtr` destructor definition to a `.cpp` where `T` is complete. The compile error from `complete_type_checker` signals exactly this problem.
 
 ### Relationships
 
-- `New<T>` — the companion creator; `Delete<T>` is the corresponding destroyer
-- `DefaultInstanceDestroyer<T>` — trait that resolves to `Delete<T>`
-- `ScopedPtr` — uses `Delete<T>` as its default `TDestroyer`
-- `FactoryDestroy<T>` — alternative destroyer for types that use a static `T::destroy()` factory pattern
+- `New` — *the matching creator policy.*
+- `complete_type_checker` — *the compile-time completeness guard used internally.*
 
 <!-- ink:api-end name="Delete" -->
 
-<!-- ink:api name="FactoryCreate" module="pma/ScopedPtr" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="destroyer_type" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
-## `pma::FactoryCreate<T, B>`
+## `using destroyer_type = TDestroyer;`
 
-Create a `T` by calling `T::create(args...)` and return the result as `B*`. Use this as the creator policy for `ScopedPtr` when `T` controls its own allocation via a static factory method.
+Public alias on `ScopedPtr` for its `TDestroyer` template parameter — the policy type invoked to release the owned pointer.
 
 ### Why this exists
 
-Many C++ types in this codebase (and plugin/module boundaries in general) expose a `static T* create(…)` / `static void destroy(T*)` pair rather than public constructors, because they manage their own memory allocator or need to return a different concrete subtype. `FactoryCreate` adapts that pattern to the `ScopedPtr` policy interface so that factory-managed objects participate in the same scoped lifetime system as heap-allocated objects.
+Exposing `destroyer_type` lets calling code (and `ScopedPtr`'s own converting move constructor) refer to the exact destroyer policy in use without re-specifying `TDestroyer`, which matters when moving between `ScopedPtr` instances with related but distinct destroyer types.
 
-### Fields
+<!-- ink:api-end name="destroyer_type" -->
+
+<!-- ink:api name="FactoryCreate" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+## `template<class T, class B = T> struct FactoryCreate { B* operator()(Args&&... args); }`
+
+Create an object through a type's static `create` factory method instead of `new`, for types that manage their own construction.
+
+### When to use this
+
+Use `FactoryCreate` as the creator policy for `ScopedPtr`/`makeScoped` when `T` exposes a static `create(...)` factory instead of a public constructor — common for types that need to control allocation or return a base-class pointer. Pair it with `FactoryDestroy` so lifetime is handled through the same factory interface, not `delete`.
+
+### Example
+
+```cpp
+// Impl exposes static Impl* create(Args...) / static void destroy(Impl*)
+pma::ScopedPtr<Impl, FactoryDestroy<Impl>> instance{FactoryCreate<Impl>{}(regionSize, upstream)};
+```
+
+### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `T` | template type param | The concrete type whose static `create()` method is called. Must have `static B* T::create(Args...)`. |
-| `B` | template type param | The base type returned; defaults to `T`. |
+| `args` | `Args&&...` | required — forwarded verbatim to `T::create`. |
 
-### Construction
+### Returns
 
-```cpp
-// Pair with FactoryDestroy and use via makeScoped:
-auto ptr = pma::makeScoped<MyService, pma::FactoryCreate, pma::FactoryDestroy>();
-// ptr is ScopedPtr<MyService, FactoryDestroy<MyService>>
-// constructed via MyService::create(), destroyed via MyService::destroy()
-```
-
-### Relationships
-
-- `FactoryDestroy<T>` — the mandatory companion destroyer; always pair these two
-- `New<T>` — the alternative creator for types using `operator new`
-- `makeScoped` — accepts `FactoryCreate` and `FactoryDestroy` as template-template args
+`B*` — pointer returned by `T::create`, typed as the base `B` (defaults to `T`).
 
 <!-- ink:api-end name="FactoryCreate" -->
 
-<!-- ink:api name="FactoryDestroy" module="pma/ScopedPtr" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="FactoryDestroy" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `pma::FactoryDestroy<T, B>`
+## `template<class T, class B = T> struct FactoryDestroy { void operator()(B* ptr); }`
 
-Release a `B*` by calling `T::destroy(static_cast<T*>(ptr))`. Always pair with `FactoryCreate<T>` when owning objects that use a static factory allocation pattern.
+Destroy an object through a type's static `destroy` method instead of `delete`, matching a `FactoryCreate`-constructed instance.
 
-### Why this exists
+### When to use this
 
-When a type owns its memory via `T::create()` / `T::destroy()`, calling `delete` on the pointer would bypass the type's deallocation path — potentially leaking allocator state or custom heap resources. `FactoryDestroy` enforces that the correct destruction path is always taken, and it does so with zero overhead when used as a stateless policy in `ScopedPtr`.
+Use this as the destroyer policy for `ScopedPtr`/`makeScoped` whenever the owned type was built with `FactoryCreate` — the two must be paired so the object is torn down through the same factory API it was created with, not a raw `delete`.
 
-### Fields
+### Example
+
+```cpp
+// Impl exposes static Impl* create(Args...) / static void destroy(Impl*)
+pma::ScopedPtr<Impl, FactoryDestroy<Impl>> instance{FactoryCreate<Impl>{}(regionSize, upstream)};
+// destructor calls FactoryDestroy<Impl>{}(ptr) -> Impl::destroy(ptr)
+```
+
+### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `T` | template type param | The concrete type whose static `destroy()` method is called. Must have `static void T::destroy(T*)`. |
-| `B` | template type param | The base pointer type accepted; defaults to `T`. The cast `static_cast<T*>(ptr)` is applied before dispatch. |
-
-### Construction
-
-```cpp
-pma::FactoryDestroy<MyService> destroyer;
-destroyer(ptr);   // calls MyService::destroy(static_cast<MyService*>(ptr))
-
-// Typical usage — let makeScoped wire it automatically:
-auto svc = pma::makeScoped<MyService, pma::FactoryCreate, pma::FactoryDestroy>();
-```
+| `ptr` | `B*` | required — pointer to destroy; cast to `T*` before calling `T::destroy`. |
 
 ### Watch out for
 
 - The `static_cast<T*>(ptr)` in `operator()` means `B*` must be safely downcasted to `T*`. If `B` is a virtual base or an unrelated type, the cast produces undefined behavior. Ensure the pointer was originally a `T*` before assigning it to a `ScopedPtr<B, FactoryDestroy<T, B>>`.
 
-### Relationships
-
-- `FactoryCreate<T>` — always pair together
-- `Delete<T>` — the alternative for types using `operator delete`
-- `ScopedPtr` — stores this as its `TDestroyer` policy
-
 <!-- ink:api-end name="FactoryDestroy" -->
 
-<!-- ink:api name="makeScoped" module="pma/ScopedPtr" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="inspect" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+## `template<typename U> struct inspect { using element_type = U; using pointer_type = element_type*; using is_array = std::false_type; }` (with a `U[]` specialization)
+
+A private trait used by `ScopedPtr` to derive its `pointer`, `element_type`, and `is_array` members from the template argument `T`.
+
+### Why this exists
+
+Because `ScopedPtr<T>` can be instantiated with either a scalar type or an array type (`T[]`), `inspect` centralizes the logic for picking the right pointer/element types and whether array-specific operations (like `operator[]`) should be enabled, via its `U[]` partial specialization.
+
+### Fields
+
+| Name | Type | Description |
+|------|------|-------------|
+| `element_type` | `U` | The underlying element type — `U` for scalars, or the array element type for `U[]`. |
+| `pointer_type` | `element_type*` | The pointer type `ScopedPtr::pointer` is defined as. |
+| `is_array` | `std::false_type` / `std::true_type` | Tag type used with `std::enable_if` to select array (`operator[]`) vs. scalar (`operator*`) access. |
+
+<!-- ink:api-end name="inspect" -->
+
+<!-- ink:api name="is_array" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+## `using is_array = std::false_type;` (or `std::true_type` for the `U[]` specialization)
+
+Compile-time tag member of `inspect<U>` indicating whether `T` is an array type.
+
+### Why this exists
+
+`ScopedPtr` uses `is_array` with `std::enable_if` to enable `operator[]` only for array-typed instantiations and `operator*` only for scalar instantiations, so calling the wrong accessor is a compile error rather than a runtime bug.
+
+<!-- ink:api-end name="is_array" -->
+
+<!-- ink:api name="makeScoped" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-06-10" api_kind="callable" -->
 
 ## `pma::makeScoped<T>(args...)` / `pma::makeScoped<T, TCreator, TDestroyer>(args...)`
 
@@ -248,89 +244,89 @@ auto reader2 = pma::makeScoped<dna::StreamReader, Creator, Destroyer>(stream, la
 
 <!-- ink:api-end name="makeScoped" -->
 
-<!-- ink:api name="New" module="pma/ScopedPtr" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="New" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `pma::New<T, B>`
+## `template<class T, class B = T> struct New`
 
-Allocate a `T` instance on the heap and return it as `B*`. Used as the default creator policy for `ScopedPtr` and `makeScoped`.
-
-### Why this exists
-
-`ScopedPtr` separates object creation from lifetime management, letting you swap either half independently. `New` is the default creation half — it calls `operator new T{args...}` and is zero-cost when used as a stateless policy. The array specialization `New<T[]>` allocates with `new T[size]{}` (value-initialized), which is the safe default for raw arrays.
-
-### Fields
-
-| Name | Type | Description |
-|------|------|-------------|
-| `T` | template type param | The concrete type to allocate. |
-| `B` | template type param | The base type returned; defaults to `T`. Allows returning a base-class pointer from a derived allocation. |
-
-### Construction
-
-```cpp
-// Single-object form
-pma::New<MyClass> creator;
-MyClass* obj = creator(arg1, arg2);  // calls new MyClass{arg1, arg2}
-
-// Array form
-pma::New<MyClass[]> array_creator;
-MyClass* arr = array_creator(16);   // calls new MyClass[16]{} (value-initialized)
-```
-
-### Relationships
-
-- `Delete<T>` — the companion destroyer; used alongside `New<T>` as the default destroyer policy
-- `DefaultInstanceCreator<T>` — trait that resolves to `New<T>`; use when selecting the creator via traits
-- `ScopedPtr` — consumes `New` as its `TDestroyer`-paired creator via `makeScoped`
-- `makeScoped` — factory that instantiates `New` automatically when no creator is specified
-
-<!-- ink:api-end name="New" -->
-
-<!-- ink:api name="ScopedPtr" module="pma/ScopedPtr" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
-
-## `pma::ScopedPtr<T, TDestroyer>`
-
-Take ownership of a raw pointer and automatically destroy it via `TDestroyer` when the `ScopedPtr` goes out of scope. Prefer `makeScoped<T>(args...)` over constructing `ScopedPtr` directly.
+A default construction policy for `ScopedPtr` that allocates an instance with `new` and forwards constructor arguments.
 
 ### When to use this
 
-Use `ScopedPtr` when you own a raw pointer that must be released through a specific destructor policy — particularly for types with a static `T::destroy()` factory (use `FactoryDestroy`) or custom allocators. Prefer `std::unique_ptr` for simple heap ownership with no policy requirements; reach for `ScopedPtr` when you need the swappable creator/destroyer policy system.
+Use this as the default (or explicit) creator policy for `ScopedPtr` when the pointee should be heap-allocated with plain `new`. Pair it with `Delete` as the matching destroyer so the pointer is released with `delete`, not some other deallocation strategy.
 
-### Description
+### Method groups
 
-`ScopedPtr` inherits from `TDestroyer` privately, making stateless destroyer policies (like `Delete<T>` or `FactoryDestroy<T>`) zero-cost via the empty base optimization. For stateful destroyers (lambdas with captures, custom allocator instances), pass the destroyer instance to the `ScopedPtr(pointer, destroyer_type&&)` constructor. Copy construction and copy assignment are deleted; only move semantics are supported. Cross-type moves are supported when the source pointer is convertible to the target pointer type.
+| Group | Methods |
+|-------|---------|
+| Construction | operator() (variadic, forwards args to `new T{...}`) |
 
 ### Example
 
 ```cpp
-// Simple heap-allocated object (Delete<MyClass> destroyer is zero-cost)
-auto ptr = pma::makeScoped<MyClass>(ctorArg1, ctorArg2);
-// ptr is ScopedPtr<MyClass, Delete<MyClass>>
-ptr->doWork();
-// destroyed automatically on scope exit
-
-// Factory-managed type
-auto svc = pma::makeScoped<MyService, pma::FactoryCreate, pma::FactoryDestroy>();
-// calls MyService::create(), destroys via MyService::destroy()
-
-// Array form
-auto buf = pma::makeScoped<float[]>(1024);
-buf[0] = 1.0f;
-
-// Stateful destroyer (e.g., pool allocator)
-MyAllocator alloc;
-auto pooled = pma::ScopedPtr<MyClass, MyAllocator>(
-    alloc.allocate<MyClass>(), std::move(alloc));
+pma::New<dna::VersionInfo> creator;
+auto* obj = creator(); // equivalent to new dna::VersionInfo{}
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `T` | template type param | The owned type (may be `T[]` for array ownership). |
-| `TDestroyer` | template type param | optional — The destroyer policy; defaults to `DefaultInstanceDestroyer<T>::type`. Must be callable as `TDestroyer()(pointer)`. |
-| `ptr_` | `pointer` | The raw pointer to take ownership of. Must not be shared with any other owner. |
-| `destroyer` | `destroyer_type&&` | optional — A stateful destroyer instance; only for the `(pointer, destroyer_type&&)` constructor overload. |
+| `args` | `Args&&...` | optional — forwarded to `T`'s constructor. |
+
+### Returns
+
+`B*` — pointer to the newly constructed `T`, returned as base type `B`.
+
+### Relationships
+
+- `Delete` — *the matching destroyer policy that releases what `New` allocates.*
+- `New<T[]>` — *the array specialization, using `new T[size]{}` instead.*
+- `ScopedPtr` — *the primary consumer of this creator policy.*
+
+<!-- ink:api-end name="New" -->
+
+<!-- ink:api name="pointer_type" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+## `using pointer_type = element_type*;`
+
+Member typedef of the private `inspect<U>` trait struct, used internally by `ScopedPtr` to derive its public `pointer` alias.
+
+### Why this exists
+
+Separating `pointer_type` from `element_type` inside `inspect` lets `ScopedPtr` compute the correct pointer type uniformly whether `T` is a scalar or an array element, without repeating the `*`-decoration logic at the `ScopedPtr` level.
+
+<!-- ink:api-end name="pointer_type" -->
+
+<!-- ink:api name="ScopedPtr" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+## `template<class T, class TDestroyer = typename DefaultInstanceDestroyer<T>::type> class ScopedPtr : private TDestroyer`
+
+Takes ownership over a given pointer and handles its lifetime, similar in spirit to `std::unique_ptr` but with pluggable, stateful or stateless destroyer policies.
+
+### Why this exists
+
+`ScopedPtr` inherits its destroyer type rather than storing it as a member, so stateless lifetime managers (like `Delete<T>` or `FactoryDestroy<T>`) add zero size overhead. A dedicated constructor also accepts a destroyer *instance*, so stateful destroyers — lambdas with captures, or anything holding extra state — work too, which a plain `unique_ptr`-style design using only a type parameter would not support as cleanly.
+
+### Construction
+
+```cpp
+// Default destroyer (delete)
+pma::ScopedPtr<Impl> owned{new Impl{}};
+
+// Custom destroyer via makeScoped
+auto arena = pma::makeScoped<ArenaMemoryResource, FactoryCreate<ArenaMemoryResource>, FactoryDestroy<ArenaMemoryResource>>(regionSize, growthFactor, upstream);
+```
+
+### Relationships
+
+- `makeScoped` — *factory function that constructs a `ScopedPtr` with the right creator/destroyer pair.*
+- `FactoryCreate` / `FactoryDestroy` — *destroyer/creator policies for factory-managed types.*
+- `DefaultInstanceCreator` / `DefaultInstanceDestroyer` — *default `New`/`Delete` policies used when none are specified.*
+
+### Constraints
+
+- Not copyable — copy constructor and copy assignment are deleted.
+- Move-only: supports move construction/assignment, including converting moves between compatible `T`/`TDestroyer` pairs.
 
 ### Watch out for
 
@@ -338,11 +334,59 @@ auto pooled = pma::ScopedPtr<MyClass, MyAllocator>(
 - Moving from a `ScopedPtr<U, UDestroyer>` to `ScopedPtr<T, TDestroyer>` requires that `U*` is implicitly convertible to `T*`. The static assertion in `makeScoped` checks this; the cross-type move constructor does not independently verify it.
 - After `release()` the caller owns the pointer and is responsible for its destruction — the `ScopedPtr` no longer manages it.
 
-### Relationships (see also)
-
-- `makeScoped` — preferred factory; avoids spelling out policy types
-- `New` / `Delete` — default creator/destroyer policies
-- `FactoryCreate` / `FactoryDestroy` — policies for static-factory types
-- `DefaultInstanceCreator` / `DefaultInstanceDestroyer` — traits that resolve the defaults
-
 <!-- ink:api-end name="ScopedPtr" -->
+
+<!-- ink:api name="TCreator" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+## `template<class T, class TCreator, class TDestroyer, typename... Args> ScopedPtr<Base, TDestroyer> makeScoped(Args&&... args)`
+
+`TCreator` is the template parameter of `makeScoped` naming the callable invoked as `TCreator{}(args...)` to construct the object that ends up owned by the returned `ScopedPtr`.
+
+### Why this exists
+
+Making the creator a separate template parameter from the destroyer lets `makeScoped` pair any construction strategy (a plain `new`-based `New<T>`, or a factory-based `FactoryCreate<T>`) with any matching cleanup strategy, and lets `makeScoped` deduce the constructed `Base` type from `TCreator`'s return type via `decltype`.
+
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `TCreator` | template type parameter | required — callable type; `TCreator{}(args...)` must return a pointer convertible to `Base*`. |
+
+<!-- ink:api-end name="TCreator" -->
+
+<!-- ink:api name="TCreatorTemplate" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+## `template<class T, template<class...> class TCreatorTemplate, template<class...> class TDestroyerTemplate, typename... Args> ScopedPtr<T, TDestroyerTemplate<T>> makeScoped(Args&&... args)`
+
+`TCreatorTemplate` is a template-template parameter — a template like `DefaultInstanceCreator` — that this `makeScoped` overload instantiates with `T` to obtain the concrete creator type.
+
+### When to use this
+
+This overload is selected when you want to pick creator/destroyer *templates* (e.g., `DefaultInstanceCreator`, a custom factory-template) rather than already-instantiated creator/destroyer types, letting `makeScoped<T>(args...)` derive both from `T` in one step.
+
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `TCreatorTemplate` | template-template parameter | required — instantiated as `TCreatorTemplate<T>` to obtain the creator type. |
+
+<!-- ink:api-end name="TCreatorTemplate" -->
+
+<!-- ink:api name="TDestroyer" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+## `template<class T, class TCreator, class TDestroyer, typename... Args> ScopedPtr<Base, TDestroyer> makeScoped(Args&&... args)`
+
+`TDestroyer` is the template parameter naming the destroyer policy that `makeScoped` bakes into the returned `ScopedPtr<Base, TDestroyer>`'s type.
+
+### Why this exists
+
+Keeping `TDestroyer` as an explicit template parameter (rather than deriving it) lets `makeScoped` be called with any creator/destroyer pair — including mismatched ones for advanced cases — while still producing a `ScopedPtr` whose static type correctly reflects the destroyer that will run.
+
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `TDestroyer` | template type parameter | required — destroyer policy; becomes the second template argument of the returned `ScopedPtr`. |
+
+<!-- ink:api-end name="TDestroyer" -->
+

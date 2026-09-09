@@ -1,4 +1,3 @@
-{% raw %}
 \begin{algorithm}
 \DontPrintSemicolon
 \KwIn{Dimensions of sub-matrices $Extents[]$}
@@ -30,4 +29,3 @@ $outoff \gets 0$\;
 \caption{{\sc EvalLinV} Evaluate Linear Outputs(Vectorized) - See Appendix A}
 \label{algo:EvalLinV}
 \end{algorithm}
-{% endraw %}

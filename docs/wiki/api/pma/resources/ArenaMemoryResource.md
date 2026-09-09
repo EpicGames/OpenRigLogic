@@ -2,54 +2,42 @@
 
 ---
 
-<!-- ink:api name="ArenaMemoryResource" module="pma/resources/ArenaMemoryResource" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="ArenaMemoryResource" module="pma/resources/ArenaMemoryResource" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
-## `ArenaMemoryResource`
+## `class ArenaMemoryResource : public MemoryResource`
 
-Allocate memory from a growing pool of preallocated regions, avoiding per-request calls to the system allocator. Use this when many objects share the same lifetime and you want to free them all at once by destroying the arena.
+Serves allocations from a preallocated memory region instead of hitting the upstream allocator on every request.
 
-### When to use this
+### Why this exists
 
-Reach for `ArenaMemoryResource` when you have a burst of allocations that all become invalid at the same point — for example, per-frame scratch buffers, per-request parsing state, or loading-time temporaries. Individual `deallocate` calls are no-ops; reclamation happens only when the arena is destroyed. Use a general-purpose `MemoryResource` instead when objects have independent, unpredictable lifetimes.
+Arena allocation amortizes the cost of many small allocations into a few large upstream requests, and lets a whole set of related allocations be released together implicitly (deallocate is a no-op — the arena frees everything when it itself is destroyed). When the active region runs out of space, an additional region is allocated and scaled by `growthFactor`, so the arena grows without requiring the caller to size it perfectly up front.
 
-### Example
+### Construction
 
 ```cpp
-// Upstream allocator (e.g. the default system allocator)
-pma::MemoryResource* upstream = pma::getAllocator();
+// initial region sized separately from subsequent growth regions, 1.5x growth per new region
+pma::ArenaMemoryResource arena{/*initialSize=*/4096, /*regionSize=*/1024, /*growthFactor=*/1.5f, upstream};
 
-// Arena with 64 KiB initial region, 256 KiB subsequent regions, 2x growth
-pma::ArenaMemoryResource arena{65536u, 262144u, 2.0f, upstream};
-
-// Serve individual allocations — no system-allocator calls until a new region is needed
-void* buf = arena.allocate(1024u, alignof(std::max_align_t));
-
-// No-op: individual frees do nothing; all memory reclaimed when arena destructs
-arena.deallocate(buf, 1024u, alignof(std::max_align_t));
-
-// Fixed-size regions (no growth): all regions are 128 KiB
-pma::ArenaMemoryResource fixed{131072u, upstream};
+// simpler form: same regionSize used for initial and all subsequent regions, no growth
+pma::ArenaMemoryResource fixedArena{/*regionSize=*/1024, upstream};
 ```
 
-### Parameters
+### Relationships
 
-The class provides three constructor overloads; all require an `upstream` allocator.
+- `MemoryResource` — *base interface `ArenaMemoryResource` implements.*
+- `ScopedPtr` / `FactoryDestroy` — *used internally to manage the arena's private `Impl`.*
 
-| Name | Type | Description |
-|------|------|-------------|
-| `initialSize` | `std::size_t` | optional (overload 1 only) — size in bytes of the first region; subsequent regions use `regionSize`. |
-| `regionSize` | `std::size_t` | required — size in bytes of each additionally allocated region (and the initial region when `initialSize` is absent). |
-| `growthFactor` | `float` | optional (overloads 1–2) — multiplier applied to each subsequent region relative to the previous one. `1.0` means all regions are the same size. Omit to default to `1.0` (no growth). |
-| `upstream` | `MemoryResource*` | required — backing allocator used to obtain each region from the OS or a parent pool. |
+### Constraints
+
+- Not copyable — copy constructor and copy assignment are deleted.
+- Move-only: supports move construction and move assignment.
+- `deallocate` is a no-op; regions are only freed when the arena itself is destroyed.
+- Region allocation sequence follows the geometric series: `{initialSize, regionSize, regionSize × growthFactor, regionSize × growthFactor², …}`. When `initialSize` is omitted, the first region is also `regionSize`.
+- The `upstream` pointer must remain valid for the entire lifetime of the `ArenaMemoryResource`.
 
 ### Watch out for
 
 - `deallocate` is a no-op. Calling it does not free any memory. All memory held by the arena is released only when the `ArenaMemoryResource` object is destroyed or goes out of scope. Do not rely on individual frees for resource management.
 - Copy construction and copy assignment are deleted. `ArenaMemoryResource` is move-only — transfer ownership with `std::move` rather than copying.
-
-### Constraints
-
-- Region allocation sequence follows the geometric series: `{initialSize, regionSize, regionSize × growthFactor, regionSize × growthFactor², …}`. When `initialSize` is omitted, the first region is also `regionSize`.
-- The `upstream` pointer must remain valid for the entire lifetime of the `ArenaMemoryResource`.
 
 <!-- ink:api-end name="ArenaMemoryResource" -->

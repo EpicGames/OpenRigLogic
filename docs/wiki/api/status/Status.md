@@ -2,84 +2,63 @@
 
 ---
 
-<!-- ink:api name="HookFunction" module="status/Status" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="HookFunction" module="status/Status" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `HookFunction`
 
-Intercept and remap status messages or interpolation arguments before they are used by the status system.
+A function pointer type for intercepting and overriding status messages and their interpolation arguments before they are used.
 
 ### Why this exists
 
-Status messages are often generated deep inside a call stack with no easy way to remap them at the point of origin. `HookFunction` decouples message production from message presentation by letting callers substitute a different string — or the same string — before it reaches the consumer. This makes runtime localization, log filtering, and sensitive-value redaction possible without modifying the status machinery itself.
-
-### Fields
-
-| Signature component | Type | Description |
-|---|---|---|
-| parameter 1 | `StatusCode` | The status code associated with the current message or argument. |
-| parameter 2 | `std::size_t` | Index of the interpolation argument (0-based); 0 when the call carries the primary status message. |
-| parameter 3 | `const char*` | The original status message or interpolation argument string. |
-| return value | `const char*` | required — the replacement string to use instead of the original. Return the original pointer to pass through unchanged. |
-
-### Construction
-
-```cpp
-// Define a hook that inspects every status message
-const char* myHook(StatusCode code, std::size_t argIndex, const char* original) {
-    // Return the original unchanged, or substitute a localized/redacted string
-    return original;
-}
-
-// Register the hook before running sc operations
-sc::Status::setHook(myHook);
-```
+Callers may want to customize how status messages or their `const char*` arguments are rendered (for example, translating messages or sanitizing arguments) without modifying `StatusProvider`/`Status` themselves. `HookFunction` defines the fixed signature — `(StatusCode, std::size_t, const char*) -> const char*` — that any such override must implement, where the `std::size_t` index distinguishes the message itself (index 0) from each interpolation argument (index 1+).
 
 ### Relationships
 
-- `Status` — registered and retrieved via `Status::setHook()` / `Status::getHook()`
-- `StatusCode` — passed as the first argument to every hook invocation
+- `Status` — *exposes `getHook`/`setHook` to install a `HookFunction`.*
+- `StatusProvider` — *invokes the installed hook via `execHook` while formatting status messages.*
 
 <!-- ink:api-end name="HookFunction" -->
 
-<!-- ink:api name="Status" module="status/Status" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="Status" module="status/Status" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `Status`
+## `class SCAPI Status`
 
-Query and intercept operation results for the `sc` namespace without passing error objects through call stacks.
+Provides read access to the current status and lets callers install a hook to intercept status messages and arguments.
 
 ### When to use this
 
-Call `Status::isOk()` after any `sc` operation to check whether it succeeded before using its output. Use `Status::setHook()` when you need to intercept, remap, or log every status message globally — for example, to redirect messages to a localization layer or to redact sensitive content from logs.
+Call `Status::isOk()` or `Status::get()` after invoking code that reports through `StatusProvider` to check whether an operation succeeded. Use `Status::setHook` when you need to intercept or transform status messages/arguments globally — for example, to redact sensitive values before they are formatted.
+
+### Method groups
+
+| Group | Methods |
+|-------|---------|
+| Query | isOk, get |
+| Hook | getHook, setHook |
 
 ### Example
 
 ```cpp
-#include "status/Status.h"
-
-// Check whether the last sc operation succeeded
 if (!sc::Status::isOk()) {
-    StatusCode code = sc::Status::get();
-    // Inspect code for the specific failure reason
+    sc::StatusCode code = sc::Status::get();
+    // inspect code.code / code.message
 }
-
-// Install a hook to remap all status messages
-sc::Status::setHook([](StatusCode code, std::size_t argIndex, const char* msg) -> const char* {
-    // Return msg unchanged, or substitute a localized/redacted string
-    return msg;
-});
-
-// Retrieve the currently installed hook (nullptr if none)
-sc::HookFunction currentHook = sc::Status::getHook();
 ```
+
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `hook` | `HookFunction` | required (on `setHook`). The function to invoke for each status message and interpolation argument. |
 
 ### Returns
 
-Each static method returns independently:
+`bool` (from `isOk`) — whether the current status represents success. `StatusCode` (from `get`) — the current status code and message. `HookFunction` (from `getHook`) — the currently installed hook, if any.
 
-- `isOk()` → `bool` — `true` if the current status represents a successful result.
-- `get()` → `StatusCode` — the current status code; inspect when `isOk()` returns `false`.
-- `getHook()` → `HookFunction` — the currently registered hook, or `nullptr` if none has been set.
-- `setHook(hook)` → `void` — replaces the global hook; pass `nullptr` to clear.
+### Relationships
+
+- `HookFunction` — *the callback type installed and retrieved via `setHook`/`getHook`.*
+- `StatusProvider` — *the counterpart class that reports the statuses `Status` reads.*
 
 ### Watch out for
 

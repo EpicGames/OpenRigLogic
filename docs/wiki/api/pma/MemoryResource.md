@@ -2,38 +2,43 @@
 
 ---
 
-<!-- ink:api name="MemoryResource" module="pma/MemoryResource" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="MemoryResource" module="pma/MemoryResource" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
 ## `class PMAAPI MemoryResource`
 
-Abstract base for polymorphic memory allocation. Implement this interface to supply a custom allocator across API boundaries without modifying the signatures of the APIs that consume it.
+An abstract base for polymorphic allocators, letting arbitrary allocation strategies be passed across API boundaries without changing the signatures or types involved.
 
 ### When to use this
 
-Use `MemoryResource` when you need to pass a custom allocator into a subsystem that you do not own — for example, to redirect all `pma` allocations to a pool, arena, or tracking wrapper. Because it decouples the allocator policy from the API surface, you can swap implementations at runtime without touching call sites.
+Use this when a component needs to accept a caller-supplied allocator without templating every function or type on the allocator's concrete type — implement `allocate`/`deallocate` and pass a pointer to your `MemoryResource` wherever the API expects one. This is the base type that `PolyAllocator` wraps to plug into standard-library containers.
+
+### Method groups
+
+| Group | Methods |
+|-------|---------|
+| Allocation | allocate, deallocate |
 
 ### Example
 
 ```cpp
-#include "pma/MemoryResource.h"
-#include <cstdlib>
-
-class MallocResource : public pma::MemoryResource {
+class MyArenaResource : public pma::MemoryResource {
 public:
     void* allocate(std::size_t size, std::size_t alignment) override {
-        // Use aligned_alloc or platform equivalent
-        return std::aligned_alloc(alignment, size);
+        return arena.alloc(size, alignment);
     }
-
-    void deallocate(void* ptr, std::size_t /*size*/, std::size_t /*alignment*/) override {
-        std::free(ptr);
+    void deallocate(void* ptr, std::size_t size, std::size_t alignment) override {
+        arena.free(ptr, size, alignment);
     }
 };
-
-// Pass to any pma API that accepts a MemoryResource*
-MallocResource resource;
-auto* reader = pma::BinaryStreamReader::create(&stream, &resource);
 ```
+
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `size` | `std::size_t` | required — number of bytes requested (allocate) or being freed (deallocate). |
+| `alignment` | `std::size_t` | required — required alignment in bytes for the allocation. |
+| `ptr` | `void*` | required — pointer previously returned by `allocate`, being released. |
 
 ### Watch out for
 

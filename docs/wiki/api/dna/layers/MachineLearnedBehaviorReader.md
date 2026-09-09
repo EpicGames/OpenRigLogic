@@ -2,47 +2,56 @@
 
 ---
 
-<!-- ink:api name="MachineLearnedBehaviorReader" module="dna/layers/MachineLearnedBehaviorReader" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="MachineLearnedBehaviorReader" module="dna/layers/MachineLearnedBehaviorReader" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
 ## `class MachineLearnedBehaviorReader : public virtual DefinitionReader`
 
-Query neural network topology and ML control data from a loaded rig asset.
+Read-only accessors to the neural network data associated with a rig — ML control names, neural network counts, which networks are active at each LOD, and which networks drive which mesh region.
 
 ### When to use this
 
-Reach for this interface when you need to inspect the machine-learned behavior layer of a DNA rig — iterating over ML controls by name, resolving which neural networks are active at a given LOD, or mapping mesh regions to their associated network indices. Use `MachineLearnedBehaviorWriter` when you need to author or modify this data rather than read it.
+Use this to discover how many neural networks a rig has, which ones are relevant at a given level of detail, and which mesh regions they affect. Implementors should inherit from `Reader` itself, not this class directly.
 
 ### Method groups
 
 | Group | Methods |
-|---|---|
-| ML Controls | `getMLControlCount`, `getMLControlName` |
-| Neural Networks | `getNeuralNetworkCount`, `getNeuralNetworkIndexListCount`, `getNeuralNetworkIndicesForLOD`, `getNeuralNetworkIndicesForMeshRegion` |
-| Mesh Regions | `getMeshRegionCount`, `getMeshRegionName` |
+|-------|---------|
+| ML controls | getMLControlCount, getMLControlName |
+| Neural networks | getNeuralNetworkCount, getNeuralNetworkIndexListCount, getNeuralNetworkIndicesForLOD |
+| Mesh regions | getMeshRegionCount, getMeshRegionName, getNeuralNetworkIndicesForMeshRegion |
 
 ### Example
 
 ```cpp
-// Assume `reader` is a concrete Reader obtained via BinaryStreamReader::create()
-
-// Iterate all ML control names
-for (std::uint16_t i = 0u; i < reader->getMLControlCount(); ++i) {
-    StringView name = reader->getMLControlName(i);
-    // use name ...
+// reader implements Reader, which composes MachineLearnedBehaviorReader
+const auto lod = 0u;
+for (auto netIdx : reader->getNeuralNetworkIndicesForLOD(lod)) {
+    // evaluate neural network at netIdx
 }
 
-// Resolve neural networks active at LOD 0
-ConstArrayView<std::uint16_t> lod0Nets = reader->getNeuralNetworkIndicesForLOD(0u);
-
-// Map mesh regions to their neural networks (mesh index 0)
-for (std::uint16_t r = 0u; r < reader->getMeshRegionCount(0u); ++r) {
-    StringView regionName = reader->getMeshRegionName(0u, r);
-    ConstArrayView<std::uint16_t> nets = reader->getNeuralNetworkIndicesForMeshRegion(0u, r);
+const auto meshIdx = 0u;
+for (std::uint16_t r = 0u; r < reader->getMeshRegionCount(meshIdx); ++r) {
+    auto regionName = reader->getMeshRegionName(meshIdx, r);
+    auto nets = reader->getNeuralNetworkIndicesForMeshRegion(meshIdx, r);
 }
 ```
 
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `index` | `std::uint16_t` | required — position of the ML control name; must be less than `getMLControlCount`. |
+| `lod` | `std::uint16_t` | required — level of detail; must be less than `DescriptorReader::getLODCount`. |
+| `meshIndex` | `std::uint16_t` | required — mesh position; must be less than `DefinitionReader::getMeshCount`. |
+| `regionIndex` | `std::uint16_t` | required — region position; must be less than `getMeshRegionCount`. |
+
+### Returns
+
+`std::uint16_t` / `StringView` / `ConstArrayView<std::uint16_t>` — counts, name strings, or index lists depending on the accessor called.
+
 ### Watch out for
 
+- `getNeuralNetworkIndexListCount` is only useful in the context of `MachineLearnedBehaviorWriter` — reading it in isolation from `Reader` has limited meaning.
 - Do not subclass `MachineLearnedBehaviorReader` directly in implementations — inherit from `Reader` instead. This class is an interface layer, not the implementation base.
 - Every index parameter (`index`, `lod`, `meshIndex`, `regionIndex`) must be less than the value returned by its corresponding count method. Passing an out-of-range index has undefined behavior; validate with `getMLControlCount`, `getLODCount`, `getMeshCount`, and `getMeshRegionCount` first.
 - `getNeuralNetworkIndexListCount()` is meaningful only when used alongside `MachineLearnedBehaviorWriter`. During read-only traversal its value does not correspond to the count of LOD or mesh-region index lists — use `getNeuralNetworkIndicesForLOD` or `getNeuralNetworkIndicesForMeshRegion` to enumerate those.

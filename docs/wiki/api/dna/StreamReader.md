@@ -2,38 +2,36 @@
 
 ---
 
-<!-- ink:api name="StreamReader" module="dna/StreamReader" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="StreamReader" module="dna/StreamReader" last_commit="api_scan" updated="2026-09-09" api_kind="callable" cpp_abstract_class="true" -->
 
 ## `class StreamReader : public Reader`
 
-Abstract base for DNA stream readers — defines the `read()` contract and error status codes shared by all concrete reader implementations.
+Extends `Reader` with the ability to actually pull rig data from a stream into internal structures.
 
 ### When to use this
 
-Inherit from `StreamReader` (via `BinaryStreamReader` or `JSONStreamReader`) when you need to load DNA data from an I/O stream. Use the static status codes — `SignatureMismatchError`, `VersionMismatchError`, `InvalidDataError` — to interpret failure results after calling `read()` without needing to know which concrete subclass is in use.
+Use `StreamReader` as the common base when you need to read DNA data from any stream-backed source rather than the plain in-memory `Reader` interface — concrete stream formats like `BinaryStreamReader` and `JSONStreamReader` derive from it.
+
+### Method groups
+
+| Group | Methods |
+|-------|---------|
+| I/O | read |
 
 ### Example
 
 ```cpp
-// Obtain a concrete reader via BinaryStreamReader::create()
-dna::BinaryStreamReader* reader = dna::BinaryStreamReader::create(stream);
+StreamReader* reader = BinaryStreamReader::create(&stream);
 reader->read();
-
-// Check the status context after read()
-if (sc::Status::currentCode() == dna::StreamReader::SignatureMismatchError) {
-    // The stream does not contain a valid DNA file
-}
-if (sc::Status::currentCode() == dna::StreamReader::VersionMismatchError) {
-    // The DNA version is not supported by this reader build
-}
-
-dna::BinaryStreamReader::destroy(reader);
+// reader now has data loaded into internal structures
 ```
 
 ### Raises
 
+- `SignatureMismatchError` — thrown when the stream's leading signature doesn't match the expected DNA format signature. Verify the file is a genuine DNA stream before retrying.
+- `VersionMismatchError` — thrown when the stream's format version isn't supported by this reader. Use a compatible reader version or re-export the file.
+- `InvalidDataError` — thrown when the stream's data fails structural validation during `read`. Check that the source stream wasn't truncated or corrupted.
 - `SignatureMismatchError` — Set on the status context when the stream does not begin with the expected DNA file signature. Verify that the stream points to a valid DNA file and that the stream position is at the start.
-- `VersionMismatchError` — Set when the DNA file version is incompatible with this reader. Check that the DNA file was produced by a compatible toolchain version.
 - `InvalidDataError` — Set when the stream contains structurally malformed data. Inspect the source asset for corruption or truncation.
 
 ### Watch out for

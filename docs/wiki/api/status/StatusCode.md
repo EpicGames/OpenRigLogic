@@ -2,40 +2,26 @@
 
 ---
 
-<!-- ink:api name="StatusCode" module="status/StatusCode" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="StatusCode" module="status/StatusCode" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `StatusCode`
 
-Pair a numeric status code with a human-readable message for results that need both machine-checkable identity and a displayable reason.
+Represents the outcome of an operation as a numeric code paired with a human-readable message.
 
 ### Why this exists
 
-Raw integer codes force callers to do a separate lookup to get a diagnostic string, while raw strings make programmatic comparison fragile. `StatusCode` solves both: equality is always code-based, so dispatch and matching stay numeric, while `message` is available directly for logging or display. The `SCAPI` export macro signals that this type crosses a shared-library boundary, making the plain-struct layout intentional.
+`StatusCode` exists so that operations across module boundaries (including C API boundaries where exceptions cannot cross) can report success or failure without relying on exceptions. Pairing an integer `code` with a `message` lets callers branch on the code while still surfacing a readable description for logging or diagnostics.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `code` | `int` | required — numeric identifier for the status condition. All equality and comparison operations are based solely on this field. |
-| `message` | `const char*` | required — human-readable description of the status. Does not own the pointed-to string; must point to a stable allocation or string literal. |
-
-### Construction
-
-```cpp
-// Aggregate-initialise with a stable string literal
-sc::StatusCode ok   = {0,    "OK"};
-sc::StatusCode fail = {1001, "Joint count mismatch"};
-
-// Compare by code
-if (result != ok) {
-    fprintf(stderr, "Error %d: %s\n", result.code, result.message);
-}
-```
+| `code` | `int` | required — numeric status/error code; `0` conventionally indicates success, non-zero indicates a specific failure condition |
+| `message` | `const char*` | required — human-readable description of the status, typically for logging or diagnostics |
 
 ### Relationships
 
-- `operator==` — free function in `namespace sc`; returns `true` when both operands share the same `code`, regardless of `message`.
-- `operator!=` — free function in `namespace sc`; logical negation of `operator==`.
+- `operator==` / `operator!=` — compare two `StatusCode` values by their `code` field only (message is ignored for equality)
 
 ### Constraints
 

@@ -2,267 +2,228 @@
 
 ---
 
-<!-- ink:api name="Bounded" module="trio/Concepts" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="Bounded" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
 ## `class TRIOAPI Bounded`
 
-Abstract interface to query the total byte size of a stream without reading it.
+Abstract interface for streams that have a known, finite size in bytes.
 
 ### When to use this
 
-Implement `Bounded` when callers need to pre-allocate buffers, validate integrity, or display progress — any situation where knowing the stream's total length before reading is useful. Combine with `Seekable` when you also need to rewind after inspecting the size.
-
-### Method groups
-
-| Group | Methods |
-|-------|---------|
-| Measurement | `size` |
+Implement `Bounded` when a stream's total size can be queried up front, such as a file — useful for pre-allocating buffers or validating read ranges before issuing reads.
 
 ### Example
 
 ```cpp
-// Pre-allocate a buffer exactly sized to the stream before reading
-void loadAll(trio::Readable* src, trio::Bounded* meta) {
-    std::uint64_t totalBytes = meta->size();
-    std::vector<char> buffer(static_cast<std::size_t>(totalBytes));
-    src->read(buffer.data(), buffer.size());
-}
+std::uint64_t totalBytes = stream->size();
 ```
 
 ### Returns
 
-`std::uint64_t` — total size of the stream in bytes.
+`std::uint64_t` — size of the stream in bytes.
 
 <!-- ink:api-end name="Bounded" -->
 
-<!-- ink:api name="Buffered" module="trio/Concepts" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="Buffered" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
 ## `class TRIOAPI Buffered`
 
-Abstract interface for streams that stage writes in memory and must be explicitly flushed to persist data to the filesystem.
+Abstract interface for streams that buffer writes and need an explicit flush to guarantee data reaches the filesystem.
 
 ### When to use this
 
-Call `flush()` after a batch of writes to guarantee that in-memory staged data reaches underlying storage. Implement `Buffered` when your concrete stream wraps a buffered I/O layer (such as `FILE*` or `std::ofstream`) where process termination without flushing can silently discard data.
+Implement `Buffered` when writes to the stream may be held in memory before being committed, so callers can force a flush at points where durability matters (e.g., before closing or after a critical write).
+
+### Example
+
+```cpp
+stream->write(data, size);
+stream->flush();
+// data is now guaranteed to be committed to disk
+```
 
 ### Watch out for
 
 - `flush()` is distinct from `close()`. Closing a stream does not guarantee that buffered data is flushed unless the implementation explicitly does so. Call `flush()` before `close()` when durability is required.
 
-### Method groups
-
-| Group | Methods |
-|-------|---------|
-| Buffer control | `flush` |
-
-### Example
-
-```cpp
-FileWriteStream stream("output.dna");
-stream.open();
-// ... write all DNA layers ...
-stream.flush();  // ensure bytes reach disk before signaling completion
-stream.close();
-```
-
 <!-- ink:api-end name="Buffered" -->
 
-<!-- ink:api name="Closeable" module="trio/Concepts" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="Closeable" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
 ## `class TRIOAPI Closeable`
 
-Abstract interface that provides a single `close()` method to release access to a stream resource.
+Abstract interface for streams that must release an underlying resource when done.
 
 ### When to use this
 
-Implement `Closeable` when your stream holds a resource that must be explicitly released — file handles, network connections, or memory-mapped regions. Most callers use `Controllable` (which inherits both `Openable` and `Closeable`) rather than `Closeable` alone.
-
-### Method groups
-
-| Group | Methods |
-|-------|---------|
-| Lifecycle | `close` |
+Implement `Closeable` alongside `Openable` when a stream wraps a resource that needs explicit release, such as a file handle.
 
 ### Example
 
 ```cpp
-// Use Closeable directly only when open semantics are handled elsewhere.
-class MappedRegion : public trio::Closeable, public trio::Readable {
-public:
-    void close() override {
-        if (ptr_) { munmap(ptr_, length_); ptr_ = nullptr; }
-    }
-    std::size_t read(char* dst, std::size_t n) override { /* memcpy impl */ }
-    std::size_t read(trio::Writable* dst, std::size_t n) override { /* pipe impl */ }
-private:
-    void* ptr_ = nullptr;
-    std::size_t length_ = 0;
-};
+stream->close();
+// underlying resource is released
 ```
 
 <!-- ink:api-end name="Closeable" -->
 
-<!-- ink:api name="Controllable" module="trio/Concepts" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="Controllable" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
 ## `class TRIOAPI Controllable : public Openable, public Closeable`
 
-Convenience mixin that combines `Openable` and `Closeable` into a single base for streams that require explicit open/close lifecycle management.
+Combines `Openable` and `Closeable` into a single interface for streams whose lifecycle needs both an explicit open and close step.
 
 ### When to use this
 
-Inherit from `Controllable` instead of inheriting `Openable` and `Closeable` separately — it is the standard base for any concrete stream type that owns a resource. Callers that accept a `Controllable*` can manage the full open/close lifecycle without knowing the concrete stream type.
-
-### Method groups
-
-| Group | Methods |
-|-------|---------|
-| Lifecycle | `open`, `close` |
+Use `Controllable` as the base for any stream type where you want to require both open and close support at once, instead of implementing `Openable` and `Closeable` separately and hoping callers use both.
 
 ### Example
 
 ```cpp
-class FileStream : public trio::Controllable,
-                   public trio::Readable,
-                   public trio::Seekable {
-public:
-    void open() override  { file_ = fopen("character.dna", "rb"); }
-    void close() override { if (file_) { fclose(file_); file_ = nullptr; } }
-    std::size_t read(char* dst, std::size_t n) override { return fread(dst, 1, n, file_); }
-    std::size_t read(trio::Writable* dst, std::size_t n) override { /* pipe impl */ }
-    std::uint64_t tell() override { return ftell(file_); }
-    void seek(std::uint64_t pos) override { fseek(file_, pos, SEEK_SET); }
-private:
-    FILE* file_ = nullptr;
-};
-
-void process(trio::Controllable* stream) {
-    stream->open();
-    // use stream ...
-    stream->close();
-}
+trio::Controllable* stream = /* ... */;
+stream->open();
+// use the stream
+stream->close();
 ```
 
 <!-- ink:api-end name="Controllable" -->
 
-<!-- ink:api name="Openable" module="trio/Concepts" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="Openable" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
 ## `class TRIOAPI Openable`
 
-Abstract interface that provides a single `open()` method to begin access to a stream resource.
+Abstract interface for streams that must be explicitly opened before use.
 
 ### When to use this
 
-Implement `Openable` when your stream requires explicit initialization before reads or writes — opening a file descriptor, establishing a connection, or mapping memory. Most concrete stream types in `trio` inherit both `Openable` and `Closeable` via `Controllable`; implement `Openable` alone only when close semantics are not needed.
-
-### Method groups
-
-| Group | Methods |
-|-------|---------|
-| Lifecycle | `open` |
+Implement `Openable` when a stream wraps a resource (e.g., a file handle) that needs an explicit open step before reads or writes are valid.
 
 ### Example
 
 ```cpp
-// Prefer Controllable for types needing both open and close.
-// Use Openable in isolation only when no close step is required.
-class FileStream : public trio::Controllable, public trio::Readable {
-public:
-    void open() override  { file_ = fopen("rig.dna", "rb"); }
-    void close() override { if (file_) { fclose(file_); file_ = nullptr; } }
-    std::size_t read(char* dst, std::size_t n) override { return fread(dst, 1, n, file_); }
-    std::size_t read(trio::Writable* dst, std::size_t n) override { /* pipe impl */ }
-private:
-    FILE* file_ = nullptr;
-};
-
-FileStream stream;
-stream.open();
-// ... read DNA data ...
-stream.close();
+stream->open();
+// stream is now ready for read/write calls
 ```
 
 <!-- ink:api-end name="Openable" -->
 
-<!-- ink:api name="Readable" module="trio/Concepts" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="Readable" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" cpp_abstract_class="true" -->
 
 ## `class TRIOAPI Readable`
 
-Abstract interface for reading bytes from a stream — into a raw buffer or directly into a `Writable` destination.
+Abstract interface for anything bytes can be read from — into a buffer or into another stream.
 
 ### When to use this
 
-Implement `Readable` when constructing a source stream that callers will consume. Use the buffer overload (`read(char*, size_t)`) to fill an in-memory buffer; use the stream overload (`read(Writable*, size_t)`) to forward bytes directly to a `Writable` without staging them in memory.
+Implement `Readable` on any stream-like type that needs to produce byte input, so calling code that only reads data can depend on this interface rather than a concrete stream type. Use the buffer-read overload to pull bytes into memory, and the stream-read overload to pipe bytes directly into a `Writable` destination.
 
 ### Method groups
 
 | Group | Methods |
 |-------|---------|
-| Read | `read` |
+| read | read(char* destination, std::size_t size), read(Writable* destination, std::size_t size) |
 
 ### Example
 
 ```cpp
-// Implement Readable over a memory region
-class MemoryReadable : public trio::Readable {
-public:
-    MemoryReadable(const char* data, std::size_t length)
-        : data_{data}, length_{length}, pos_{0} {}
-
-    std::size_t read(char* destination, std::size_t size) override {
-        std::size_t n = std::min(size, length_ - pos_);
-        std::memcpy(destination, data_ + pos_, n);
-        pos_ += n;
-        return n;
-    }
-    std::size_t read(trio::Writable* destination, std::size_t size) override {
-        std::size_t n = std::min(size, length_ - pos_);
-        std::size_t written = destination->write(data_ + pos_, n);
-        pos_ += written;
-        return written;
-    }
-private:
-    const char* data_;
-    std::size_t length_;
-    std::size_t pos_;
-};
+char buffer[4096];
+std::size_t bytesRead = stream->read(buffer, sizeof(buffer));
+// process buffer[0..bytesRead)
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `destination` | `char*` or `trio::Writable*` | required — buffer or stream to write the read bytes into |
-| `size` | `std::size_t` | required — number of bytes to read from the stream |
+| `destination` | `char*` / `Writable*` | required. Where read bytes are placed, either a raw buffer or another stream. |
+| `size` | `std::size_t` | required. Number of bytes to read. |
 
 ### Returns
 
-`std::size_t` — number of bytes actually read. Returns less than `size` at end-of-stream.
+`std::size_t` — the number of bytes actually read.
+
+### Watch out for
+
+- The destructor is `protected`, so instances must be destroyed through the owning concrete type, not deleted directly through a `Readable*`.
 
 <!-- ink:api-end name="Readable" -->
 
-<!-- ink:api name="Resizable" module="trio/Concepts" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="Resizable" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
 ## `class TRIOAPI Resizable`
 
-Abstract interface for streams that support explicit resizing — truncating or extending the underlying storage to a requested byte length.
+Abstract interface for streams whose underlying storage can be resized to an exact byte length.
 
 ### When to use this
 
-Implement `Resizable` when the stream's backing store is growable or truncatable (files, memory buffers). Use `resize()` to pre-allocate space before a large write sequence, or to truncate after rewriting a smaller payload into an existing stream.
+Implement `Resizable` when a stream needs to grow or truncate its backing storage to a specific size — for example, pre-allocating a file to its final size, or truncating it after an overwrite.
+
+### Example
+
+```cpp
+stream->resize(1024u);
+// underlying storage is now exactly 1024 bytes
+```
+
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `size` | `std::uint64_t` | required. Requested size of the underlying storage, in bytes. |
+
+<!-- ink:api-end name="Resizable" -->
+
+<!-- ink:api name="Seekable" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+## `class TRIOAPI Seekable`
+
+Abstract interface for streams that support random access via a position cursor.
+
+### When to use this
+
+Implement `Seekable` when a stream needs to support jumping to arbitrary offsets (e.g., a file), rather than only sequential reads/writes.
+
+### Example
+
+```cpp
+std::uint64_t pos = stream->tell();
+stream->seek(0u);
+// stream cursor is now at the start
+```
+
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `position` | `std::uint64_t` | required. Offset relative to the start of the stream (0 = start). |
+
+### Returns
+
+`std::uint64_t` — (from `tell()`) the current position relative to the stream's start.
+
+<!-- ink:api-end name="Seekable" -->
+
+<!-- ink:api name="Writable" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" cpp_abstract_class="true" -->
+
+## `class TRIOAPI Writable`
+
+Abstract interface for anything bytes can be written to — a byte buffer or another stream.
+
+### When to use this
+
+Implement `Writable` on any stream-like type that needs to accept byte output (e.g., a file or memory stream), so calling code that only writes data can depend on this interface rather than a concrete stream type. Use the buffer-write overload for raw byte data, and the stream-write overload when writing bytes to come from another `Readable` stream.
 
 ### Method groups
 
 | Group | Methods |
 |-------|---------|
-| Storage control | `resize` |
+| write | write(const char* source, std::size_t size), write(Readable* source, std::size_t size) |
 
 ### Example
 
 ```cpp
-// Truncate a DNA stream to a newly computed size after stripping unused layers
-void trimStream(trio::Resizable* stream, std::uint64_t newSize) {
-    stream->resize(newSize);
-    // subsequent writes stay within [0, newSize)
+void saveHeader(trio::Writable* stream, const char* header, std::size_t size) {
+    stream->write(header, size);
 }
 ```
 
@@ -270,110 +231,15 @@ void trimStream(trio::Resizable* stream, std::uint64_t newSize) {
 
 | Name | Type | Description |
 |------|------|-------------|
-| `size` | `std::uint64_t` | required — target size in bytes; may be larger (extend) or smaller (truncate) than the current size |
-
-<!-- ink:api-end name="Resizable" -->
-
-<!-- ink:api name="Seekable" module="trio/Concepts" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
-
-## `class TRIOAPI Seekable`
-
-Abstract interface for random-access positioning within a stream — query the current byte offset or jump to an absolute position.
-
-### When to use this
-
-Implement `Seekable` when the stream supports non-sequential access (files, memory buffers). Callers combine it with `Readable` or `Writable` to rewind, skip headers, or patch previously written data. Do not implement it for purely sequential streams such as network sockets where repositioning is undefined.
-
-### Method groups
-
-| Group | Methods |
-|-------|---------|
-| Position | `tell`, `seek` |
-
-### Example
-
-```cpp
-class FileStream : public trio::Readable, public trio::Seekable {
-public:
-    std::uint64_t tell() override {
-        return static_cast<std::uint64_t>(ftell(file_));
-    }
-    void seek(std::uint64_t position) override {
-        fseek(file_, static_cast<long>(position), SEEK_SET);
-    }
-    std::size_t read(char* dst, std::size_t n) override { return fread(dst, 1, n, file_); }
-    std::size_t read(trio::Writable* dst, std::size_t n) override { /* pipe impl */ }
-private:
-    FILE* file_;
-};
-
-// Rewind after scanning the header
-std::uint64_t headerEnd = stream.tell();
-stream.seek(0);  // back to beginning
-```
-
-### Parameters
-
-| Name | Type | Description |
-|------|------|-------------|
-| `position` | `std::uint64_t` | required (`seek` only) — absolute byte offset from stream start; 0 is the beginning |
+| `source` | `const char*` / `Readable*` | required. Data to write, either a raw buffer or another stream to read from. |
+| `size` | `std::size_t` | required. Number of bytes to write. |
 
 ### Returns
 
-`std::uint64_t` (`tell`) — current byte offset from stream start; 0 denotes the beginning.
+`std::size_t` — the number of bytes actually written.
 
-<!-- ink:api-end name="Seekable" -->
+### Watch out for
 
-<!-- ink:api name="Writable" module="trio/Concepts" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
-
-## `class TRIOAPI Writable`
-
-Abstract interface for writing bytes to a stream — from a raw buffer or by pulling from a `Readable` source.
-
-### When to use this
-
-Implement `Writable` when constructing a destination stream that downstream code writes into. Use the buffer overload (`write(const char*, size_t)`) when data lives in memory; use the stream overload (`write(Readable*, size_t)`) to pipe a `Readable` directly into this stream without an intermediate copy.
-
-### Method groups
-
-| Group | Methods |
-|-------|---------|
-| Write | `write` |
-
-### Example
-
-```cpp
-// Implement Writable to wrap a file handle
-class FileWritable : public trio::Writable {
-public:
-    std::size_t write(const char* source, std::size_t size) override {
-        return fwrite(source, 1, size, file_);
-    }
-    std::size_t write(trio::Readable* source, std::size_t size) override {
-        char buf[4096];
-        std::size_t written = 0;
-        while (written < size) {
-            std::size_t chunk = std::min(size - written, sizeof(buf));
-            std::size_t r = source->read(buf, chunk);
-            if (r == 0) break;
-            written += write(buf, r);
-        }
-        return written;
-    }
-private:
-    FILE* file_;
-};
-```
-
-### Parameters
-
-| Name | Type | Description |
-|------|------|-------------|
-| `source` | `const char*` or `trio::Readable*` | required — buffer or stream to read bytes from |
-| `size` | `std::size_t` | required — number of bytes to write to the stream |
-
-### Returns
-
-`std::size_t` — number of bytes actually written. May be less than `size` if the stream cannot accept all data.
+- The destructor is `protected`, so instances must be destroyed through the owning concrete type, not deleted directly through a `Writable*`.
 
 <!-- ink:api-end name="Writable" -->

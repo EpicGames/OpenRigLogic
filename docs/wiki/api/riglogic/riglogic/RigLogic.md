@@ -2,147 +2,106 @@
 
 ---
 
-<!-- ink:api name="Configuration" module="riglogic/riglogic/RigLogic" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="Configuration" module="riglogic/riglogic/RigLogic" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
-## `Configuration`
+## `RigLogic::Configuration`
 
-Controls which algorithm implementation `RigLogic` uses for rig evaluation and which submodules are loaded into memory.
-
-### Why this exists
-
-Separating configuration from the `RigLogic` instance allows callers to tune memory allocation and computation strategy at construction time without changing the evaluation API. The alias re-exports `rl4::Configuration` so callers do not need to include a separate header for the most common construction path.
+An alias, inside `RigLogic`, for `rl4::Configuration` — the options struct used to create and inspect a `RigLogic` instance.
 
 ### Relationships
 
-- `RigLogic::create` — accepts `Configuration` as its second parameter
-- `RigLogic::getConfiguration` — returns the `Configuration` active on a live instance
-- `rl4::Configuration` — the authoritative definition; this is a type alias
+- `Configuration` (riglogic/riglogic/Configuration) — *the underlying type this alias refers to.*
+- `RigLogic` — *`RigLogic::create` accepts one, and `RigLogic::getConfiguration` returns one.*
 
 <!-- ink:api-end name="Configuration" -->
 
-<!-- ink:api name="DefaultInstanceCreator" module="riglogic/riglogic/RigLogic" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="DefaultInstanceCreator" module="riglogic/riglogic/RigLogic" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
-## `DefaultInstanceCreator<rl4::RigLogic>`
+## `DefaultInstanceCreator`
 
-Template specialization that wires `rl4::RigLogic` into the `pma` smart-pointer and factory infrastructure using `FactoryCreate` as the creation strategy.
+A `pma` trait specialization that tells the memory management utilities how to construct a `RigLogic` by default.
 
 ### Why this exists
 
-The `pma` allocator framework uses `DefaultInstanceCreator` and `DefaultInstanceDestroyer` trait types to decouple object construction from ownership management. By specializing these traits for `rl4::RigLogic`, the library allows `pma`-managed handles to call the correct factory entry points (`RigLogic::create` / `RigLogic::destroy`) automatically, rather than requiring every call site to manage raw pointer lifetime manually.
-
-### Fields
-
-| Name | Type | Description |
-|------|------|-------------|
-| `type` | `FactoryCreate<rl4::RigLogic>` | The creation-strategy type used by `pma` machinery to construct `RigLogic` instances |
+Like the `RigInstance` specialization, this routes construction of `RigLogic` through `FactoryCreate<rl4::RigLogic>`, which calls `RigLogic::create` rather than a raw constructor, respecting the custom allocation strategy and DNA-loading initialization `RigLogic` requires.
 
 ### Relationships
 
-- `DefaultInstanceDestroyer<rl4::RigLogic>` — paired destroyer specialization
-- `RigLogic::create` — the underlying factory function invoked via this trait
+- `RigLogic` — *the type this specialization creates, via `RigLogic::create`.*
+- `DefaultInstanceDestroyer` — *the paired trait that destroys the same type.*
 
 <!-- ink:api-end name="DefaultInstanceCreator" -->
 
-<!-- ink:api name="DefaultInstanceDestroyer" module="riglogic/riglogic/RigLogic" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="DefaultInstanceDestroyer" module="riglogic/riglogic/RigLogic" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
-## `DefaultInstanceDestroyer<rl4::RigLogic>`
+## `DefaultInstanceDestroyer`
 
-Template specialization that wires `rl4::RigLogic` into the `pma` ownership infrastructure using `FactoryDestroy` as the destruction strategy.
+A `pma` trait specialization that tells the memory management utilities how to destroy a `RigLogic` by default.
 
 ### Why this exists
 
-Paired with `DefaultInstanceCreator<rl4::RigLogic>`, this specialization ensures that `pma`-managed handles release `RigLogic` instances through the correct `RigLogic::destroy` factory path rather than a direct `delete`. This enforces the ownership contract documented on `RigLogic::create`.
-
-### Fields
-
-| Name | Type | Description |
-|------|------|-------------|
-| `type` | `FactoryDestroy<rl4::RigLogic>` | The destruction-strategy type invoked by `pma` machinery when a managed `RigLogic` handle goes out of scope |
+Pairs with `DefaultInstanceCreator` to route destruction of `RigLogic` through `FactoryDestroy<rl4::RigLogic>`, which calls `RigLogic::destroy` rather than a raw `delete`, since the destructor is protected.
 
 ### Relationships
 
-- `DefaultInstanceCreator<rl4::RigLogic>` — paired creator specialization
-- `RigLogic::destroy` — the underlying factory function invoked via this trait
+- `RigLogic` — *the type this specialization destroys, via `RigLogic::destroy`.*
+- `DefaultInstanceCreator` — *the paired trait that creates the same type.*
 
 <!-- ink:api-end name="DefaultInstanceDestroyer" -->
 
-<!-- ink:api name="RigInstance" module="riglogic/riglogic/RigLogic" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="RigInstance" module="riglogic/riglogic/RigLogic" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `RigInstance`
+## `class RigInstance` (forward declaration)
 
-Holds the per-rig evaluation state driven by a `RigLogic` instance.
-
-### Why this exists
-
-`RigLogic` is intentionally stateless so that one solver instance can drive many characters simultaneously. `RigInstance` is the counterpart that carries the per-character data (control values, output buffers) that must remain isolated between rigs. By separating these concerns, the same compiled rig logic can be shared across threads without locking.
-
-### Relationships
-
-- `RigLogic` — creates and evaluates `RigInstance` objects; call `RigLogic::create` first
+Forward-declared here as the counterpart type that `RigLogic` creates and evaluates instances of; see the `RigInstance` entry in `riglogic/riglogic/RigInstance` for its full interface.
 
 <!-- ink:api-end name="RigInstance" -->
 
-<!-- ink:api name="RigLogic" module="riglogic/riglogic/RigLogic" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="RigLogic" module="riglogic/riglogic/RigLogic" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `class RigLogic`
+## `class RLAPI RigLogic`
 
-Evaluate rig output values from input control values. A single instance is stateless and can drive any number of `RigInstance` objects concurrently.
+Loads and optimizes DNA rig data, then calculates rig output values for any number of `RigInstance` objects based on their input control values.
 
 ### When to use this
 
-Use `RigLogic` when you need to evaluate a character rig at runtime — translating animator control values into joint transforms, blend shapes, and corrective outputs. Because `RigLogic` carries no per-character mutable state, it is safe to share one instance across threads, each operating on a distinct `RigInstance`.
+Create a single `RigLogic` instance per DNA/rig definition, then create one `RigInstance` per character instance that needs evaluating. Because `RigLogic` holds no instance-specific state, it is safe to share and use from multiple threads concurrently to evaluate different `RigInstance` objects.
 
 ### Method groups
 
 | Group | Methods |
 |-------|---------|
-| Lifecycle | `create`, `destroy`, `restore`, `dump` |
-| Configuration | `getConfiguration` |
-| LOD | `getLODCount`, `getRBFSolverIndicesForLOD`, `getMLIndicesForLOD` |
+| Lifecycle | create, destroy, restore, dump |
+| Configuration | getConfiguration |
+| LOD | getLODCount, getRBFSolverIndicesForLOD |
 
 ### Example
 
 ```cpp
-// Create RigLogic from a DNA reader
-rl4::Configuration config{};
-rl4::RigLogic* rl = rl4::RigLogic::create(reader, config, memRes);
-
-// Query LOD count and get solver indices for LOD 0
-std::uint16_t lodCount = rl->getLODCount();
-auto rbfIndices = rl->getRBFSolverIndicesForLOD(0);
-auto mlIndices  = rl->getMLIndicesForLOD(0);
-
-// Snapshot state for fast re-instantiation later
-rl->dump(outputStream);
-
-// Release when done
-rl4::RigLogic::destroy(rl);
+rl4::Configuration config;
+rl4::RigLogic* rigLogic = rl4::RigLogic::create(dnaReader, config);
+rl4::RigInstance* instance = rl4::RigInstance::create(rigLogic);
+// ... evaluate instance ...
+rl4::RigLogic::destroy(rigLogic);
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `reader` | `const dna::Reader*` | required — source from which DNA data is copied and optimized for rig evaluation |
-| `config` | `const Configuration&` | optional — selects algorithm implementation and controls which submodules are loaded; defaults to `{}` |
-| `memRes` | `MemoryResource*` | optional — custom allocator; if `nullptr`, a default allocator is used |
+| `reader` | `const dna::Reader*` | Source from which to copy and optimize DNA data used for rig evaluation. |
+| `config` | `const Configuration&` | optional. Determines which algorithm implementation is used and which submodules to load; defaults to `{}`. |
+| `memRes` | `MemoryResource*` | optional. Custom memory resource for allocations; if not given, a default allocation mechanism is used. |
+
+### Returns
+
+`RigLogic*` — A newly created `RigLogic` instance; the caller is responsible for releasing it via `destroy`.
 
 ### Watch out for
 
+- The destructor is protected — instances must be released through `RigLogic::destroy`, not `delete`.
+- `restore` loads a previously `dump`ed state and is faster than `create` because it skips the storage optimization phase.
 - Ownership of the returned pointer belongs to the caller. You must call `RigLogic::destroy(instance)` when done; deleting the pointer directly is undefined.
 - `restore` skips the storage-optimization phase that `create` performs. Use `restore` when startup time matters and you have a previously `dump`ed stream; use `create` when loading a DNA for the first time.
 
 <!-- ink:api-end name="RigLogic" -->
-
-<!-- ink:api name="type" module="riglogic/riglogic/RigLogic" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
-
-## `type`
-
-Type alias member within the `DefaultInstanceCreator` and `DefaultInstanceDestroyer` specializations for `rl4::RigLogic`; resolves to the factory strategy type used by the `pma` ownership infrastructure.
-
-### Relationships
-
-- `DefaultInstanceCreator<rl4::RigLogic>` — defines `type = FactoryCreate<rl4::RigLogic>`
-- `DefaultInstanceDestroyer<rl4::RigLogic>` — defines `type = FactoryDestroy<rl4::RigLogic>`
-
-<!-- ink:api-end name="type" -->

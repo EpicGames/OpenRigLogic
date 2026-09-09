@@ -2,32 +2,35 @@
 
 ---
 
-<!-- ink:api name="VersionInfo" module="dna/version/VersionInfo" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="VersionInfo" module="dna/version/VersionInfo" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
 
-## `VersionInfo`
+## `struct DNAAPI VersionInfo`
 
-Query the compiled version of the DNA library at runtime.
+Query the version of the DNA library that the current binary was built against.
 
-### Why this exists
+### When to use this
 
-The DNA library exposes its version through a single grouped struct rather than free functions or preprocessor macros, keeping version symbols consistently namespaced under `dna::`. All accessors are static, so no instance is required — call them directly without constructing a `VersionInfo` object. This makes version-guard checks straightforward in both C++ consumers and language bindings that import the `dna` namespace.
+Use this to check library compatibility at runtime — for example, verifying a loaded DNA file or plugin was produced against a compatible library version before trusting its data layout.
 
-### Construction
+### Method groups
+
+| Group | Methods |
+|-------|---------|
+| Version components | getMajorVersion, getMinorVersion, getPatchVersion |
+| Version string | getVersionString |
+
+### Example
 
 ```cpp
-// No instantiation needed — all methods are static.
-
-// Numeric components for programmatic version checks:
-int major = dna::VersionInfo::getMajorVersion();
-int minor = dna::VersionInfo::getMinorVersion();
-int patch = dna::VersionInfo::getPatchVersion();
-
-// Human-readable string for logging or diagnostics:
-dna::StringView version = dna::VersionInfo::getVersionString();
+auto major = dna::VersionInfo::getMajorVersion();
+auto minor = dna::VersionInfo::getMinorVersion();
+auto patch = dna::VersionInfo::getPatchVersion();
+auto versionStr = dna::VersionInfo::getVersionString();
+// e.g. compare major/minor against the version this integration was built for
 ```
 
-### Relationships
+### Returns
 
-- `StringView` — returned by `getVersionString()`; defined in `dna/types/Aliases.h`
+`int` — the major, minor, or patch version number. `StringView` — the full version string.
 
 <!-- ink:api-end name="VersionInfo" -->

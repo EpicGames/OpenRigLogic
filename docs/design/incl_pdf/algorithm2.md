@@ -1,4 +1,3 @@
-{% raw %}
 \begin{algorithm}
 \DontPrintSemicolon
 \KwIn{Linear matrix non-zero values $Mat[]$}
@@ -23,4 +22,3 @@ $offset \gets 0$\;
 \caption{{\sc EvalLinear} Evaluate Linear Outputs - See Appendix A}
 \label{algo:EvalLinear}
 \end{algorithm}
-{% endraw %}

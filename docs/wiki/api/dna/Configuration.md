@@ -2,154 +2,126 @@
 
 ---
 
-<!-- ink:api name="Configuration" module="dna/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="Configuration" module="dna/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `Configuration`
 
-Aggregate load-time options for a DNA reader — controls which layers load, which LODs are included, and how coordinates are converted.
+Bundles all the load-time options for reading a DNA file — which layers, which LODs, and which coordinate/unit conventions to apply.
 
 ### Why this exists
 
-DNA assets can contain many optional data layers and multiple levels of detail. Without a configuration object, every call site would need to pass a growing list of independent parameters, and cross-field constraints (e.g., `lods` overrides `maxLOD`/`minLOD`) would be invisible. `Configuration` gathers all read-time options into one zero-argument-constructible struct whose defaults (load all layers, all LODs, preserve transforms) are safe for the common case. Pass a customised instance when you need partial loads or coordinate conversion.
+Reader construction had a growing list of independent load options (layer selection, LOD filtering, coordinate transform policy). `Configuration` collects them into one struct with sensible defaults so callers only need to set the fields relevant to their use case, instead of threading many separate parameters through reader APIs.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `layer` | `DataLayer` | optional — which data layers to load; defaults to `DataLayer::All` |
-| `unknownLayerPolicy` | `UnknownLayerPolicy` | optional — whether to preserve or discard unrecognised layer data; defaults to `Preserve` |
-| `lods` | `ConstArrayView<uint16_t>` | optional — explicit list of LOD indices to load; when non-empty, overrides `maxLOD`/`minLOD`; all values must be less than `getLODCount()` |
-| `maxLOD` | `uint16_t` | optional — highest-detail LOD index to load (0 = most detailed); defaults to `0`; ignored when `lods` is non-empty; must be less than `getLODCount()` |
-| `minLOD` | `uint16_t` | optional — lowest-detail LOD index to load; defaults to `UINT16_MAX` (load all); ignored when `lods` is non-empty; must be less than `getLODCount()` |
-| `coordinateSystemTransformPolicy` | `CoordinateSystemTransformPolicy` | optional — whether to convert coordinates to `coordinateSystem` at load time; defaults to `Preserve` |
-| `coordinateSystem` | `CoordinateSystem` | optional — target coordinate frame; only active when policy is `Transform` |
-| `rotationSequence` | `RotationSequence` | optional — Euler rotation order applied globally during conversion; defaults to `xyz` |
-| `rotationSign` | `RotationSign` | optional — per-axis rotation sign during conversion; defaults to all-positive |
-| `faceWindingOrder` | `FaceWindingOrder` | optional — target face winding; normalised to `ccw` during conversion; defaults to `ccw` |
+| `layer` | `DataLayer` | optional — layer up to which data is loaded; defaults to `DataLayer::All` |
+| `unknownLayerPolicy` | `UnknownLayerPolicy` | optional — whether unknown layers are preserved or ignored; defaults to `Preserve` |
+| `lods` | `ConstArrayView<std::uint16_t>` | optional — exact LODs to load; when used, `maxLOD`/`minLOD` are ignored. All values must be less than the value returned by `getLODCount` |
+| `maxLOD` | `std::uint16_t` | optional — maximum level of detail to load; must be less than `getLODCount` |
+| `minLOD` | `std::uint16_t` | optional — minimum level of detail to load; must be less than `getLODCount` |
+| `coordinateSystemTransformPolicy` | `CoordinateSystemTransformPolicy` | optional — whether to convert to `coordinateSystem`; defaults to `Preserve` |
+| `coordinateSystem` | `CoordinateSystem` | optional — destination axis directions used when transforming |
+| `rotationSequence` | `RotationSequence` | optional — global rotation composition order; defaults to `xyz` |
+| `rotationSign` | `RotationSign` | optional — per-axis rotation sign convention; defaults to all-positive |
+| `faceWindingOrder` | `FaceWindingOrder` | optional — target face winding order; defaults to `ccw` |
 
 ### Construction
 
 ```cpp
-// Default: load everything, no coordinate conversion
-dna::Configuration cfg;
-
-// Load only descriptor and joint definition data for a preview
-dna::Configuration preview;
-preview.layer = dna::DataLayer::Definition;
-
-// Load specific LODs 0 and 2 only
-std::array<std::uint16_t, 2> lodList = {0, 2};
-dna::Configuration lodCfg;
-lodCfg.lods = dna::ConstArrayView<std::uint16_t>{lodList.data(), lodList.size()};
-
-// Load all layers, convert to a right-handed Y-up coordinate system
-dna::Configuration engineCfg;
-engineCfg.coordinateSystemTransformPolicy = dna::CoordinateSystemTransformPolicy::Transform;
-engineCfg.coordinateSystem = dna::CoordinateSystem{/* tdm::coord_sys for target engine */};
+Configuration config;
+config.layer = DataLayer::Geometry;
+config.maxLOD = 0;
+config.minLOD = 3;
+config.coordinateSystemTransformPolicy = CoordinateSystemTransformPolicy::Transform;
 ```
 
 ### Constraints
 
-- When `lods` is non-empty, the values set for `maxLOD` and `minLOD` are ignored entirely.
-- All values in `lods` must be less than the value returned by `getLODCount()` on the reader; violation is undefined behaviour.
-- `maxLOD` and `minLOD` must each be less than `getLODCount()` when `lods` is empty.
-- Coordinate conversion (rotation, winding, system) applies only when `coordinateSystemTransformPolicy == Transform`.
-
-### Relationships
-
-- `DataLayer` — selects which data layers to load
-- `UnknownLayerPolicy` — controls handling of unrecognised layers
-- `CoordinateSystemTransformPolicy` / `CoordinateSystem` — coordinate conversion settings
-- `FaceWindingOrder` — face winding normalisation during conversion
+- Using `lods` causes `maxLOD`/`minLOD` to be ignored.
+- All values in `lods`, and both `maxLOD` and `minLOD`, must be less than `getLODCount`.
 
 <!-- ink:api-end name="Configuration" -->
 
-<!-- ink:api name="CoordinateSystem" module="dna/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="CoordinateSystem" module="dna/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `CoordinateSystem`
 
-Complete spatial coordinate frame type from TDM, aliased into the `dna` namespace.
+Alias for `tdm::coord_sys`, describing the axis directions for all coordinate axes.
 
 ### Why this exists
 
-`CoordinateSystem` is `tdm::coord_sys` re-exported under `dna::`. It encapsulates the full description of a spatial frame — axis directions, handedness, and up convention — as a typed object rather than a loose collection of booleans or an implicit enum. Using a typed coordinate frame prevents silent mismatches where a right-handed Y-up frame is accidentally interpreted as a left-handed Z-up frame. Set `Configuration::coordinateSystem` to the target frame, then set `coordinateSystemTransformPolicy = Transform` to activate conversion at load time.
+`CoordinateSystem` makes the target coordinate convention explicit and inspectable, rather than baking an implicit convention into conversion code. `Configuration::coordinateSystem` uses it as the destination system when `coordinateSystemTransformPolicy` is set to `Transform`.
 
 ### Relationships
 
-- `Direction` — axis direction values used to build a `CoordinateSystem`
-- `Configuration` — the `coordinateSystem` field holds the target frame
-- `CoordinateSystemTransformPolicy` — must be `Transform` for the frame to be applied
+- `Configuration` — *the `coordinateSystem` field specifies the destination convention*
+- `CoordinateSystemTransformPolicy` — *governs whether conversion to this system happens*
+- `Direction` — *the per-axis component type*
 
 <!-- ink:api-end name="CoordinateSystem" -->
 
-<!-- ink:api name="CoordinateSystemTransformPolicy" module="dna/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="CoordinateSystemTransformPolicy" module="dna/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `CoordinateSystemTransformPolicy`
 
-Decide whether the reader converts loaded data into a target coordinate system or passes it through unchanged.
+Controls whether loaded rig data is converted into a destination coordinate system or left as authored.
 
 ### Why this exists
 
-DNA assets are authored in a specific coordinate frame, but downstream engines (Unreal, Maya, custom renderers) may use different conventions. `Transform` enables in-place conversion at load time so the rest of the pipeline can assume a consistent frame. `Preserve` is the safe default for read-back fidelity — use it when the consuming code handles its own coordinate transforms, or when round-tripping a file back to disk without modification.
-
-### Fields
-
-| Name | Description |
-|------|-------------|
-| `Preserve` | Pass coordinate data through without any conversion. Default. |
-| `Transform` | Convert to the coordinate system specified in `Configuration::coordinateSystem` at load time, unless the data is already in that system. |
-
-### Relationships
-
-- `Configuration` — set via `coordinateSystemTransformPolicy`; works with `coordinateSystem`, `rotationSequence`, `rotationSign`, and `faceWindingOrder` fields
-- `CoordinateSystem` — the target frame used when policy is `Transform`
-- `FaceWindingOrder` — face winding is normalised to `ccw` when policy is `Transform`
-
-<!-- ink:api-end name="CoordinateSystemTransformPolicy" -->
-
-<!-- ink:api name="DataLayer" module="dna/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
-
-## `DataLayer`
-
-Select which data layers to load from a DNA asset — pay only for the data your pipeline needs.
-
-### Why this exists
-
-Loading an entire DNA asset when only descriptor or joint data is needed wastes memory and I/O time. `DataLayer` is a bitmask enum that lets callers request exactly the layers they need, while encoding implicit load-order dependencies directly in the enumerator values — `Behavior = 4 | Definition` makes it self-evident that loading behaviour also loads definition. The `operator|` overload lets you compose custom subsets without casting.
+Rigs can be authored in different coordinate conventions than the engine consuming them expects. `Preserve` performs no conversion at all, while `Transform` converts to the `Configuration::coordinateSystem` unless the data is already in that system — avoiding redundant transforms when the source already matches.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `Descriptor` | `uint32_t = 1` | optional — base identity and metadata only; no joint or geometry data |
-| `Definition` | `uint32_t = 2 \| Descriptor` | optional — joint definitions; implicitly loads `Descriptor` |
-| `Behavior` | `uint32_t = 4 \| Definition` | optional — joint behaviour data; implicitly loads `Definition` |
-| `Geometry` | `uint32_t = 8 \| Definition` | optional — full mesh geometry including blend shapes; implicitly loads `Definition` |
-| `GeometryWithoutBlendShapes` | `uint32_t = 16 \| Definition` | optional — mesh geometry without blend shapes; implicitly loads `Definition` |
-| `MachineLearnedBehavior` | `uint32_t = 32 \| Definition` | optional — ML-driven behaviour layer; implicitly loads `Definition` |
-| `RBFBehavior` | `uint32_t = 64 \| Behavior` | optional — RBF behaviour layer; implicitly loads `Behavior` (and thus `Definition`) |
-| `JointBehaviorMetadata` | `uint32_t = 128 \| Definition` | optional — per-joint behaviour metadata; implicitly loads `Definition` |
-| `TwistSwingBehavior` | `uint32_t = 256 \| Definition` | optional — twist/swing constraint behaviour; implicitly loads `Definition` |
-| `All` | `uint32_t` | optional — composite of `RBFBehavior`, `Geometry`, `MachineLearnedBehavior`, `JointBehaviorMetadata`, and `TwistSwingBehavior`; the default for `Configuration::layer` |
+| `Preserve` | `CoordinateSystemTransformPolicy` | perform no coordinate conversion |
+| `Transform` | `CoordinateSystemTransformPolicy` | convert to `Configuration::coordinateSystem` unless already matching |
+
+### Relationships
+
+- `Configuration` — *the `coordinateSystemTransformPolicy` field controls this behavior*
+- `CoordinateSystem` — *the destination system used when transforming*
+
+<!-- ink:api-end name="CoordinateSystemTransformPolicy" -->
+
+<!-- ink:api name="DataLayer" module="dna/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+## `DataLayer`
+
+Bitmask enum identifying the loadable layers of a DNA rig, from the lightweight `Descriptor` up through `All`.
+
+### Why this exists
+
+DNA files are structured in dependent layers — geometry and behavior data implicitly require the definition layer to make sense, for instance. `DataLayer` encodes those dependencies directly in the enum values (each higher layer ORs in the layers it depends on) so that requesting `Geometry` automatically pulls in `Definition` without the caller having to enumerate every prerequisite.
+
+### Fields
+
+| Name | Type | Description |
+|------|------|-------------|
+| `Descriptor` | `DataLayer` | base metadata layer |
+| `Definition` | `DataLayer` | rig topology/definition; implicitly loads `Descriptor` |
+| `Behavior` | `DataLayer` | rig behavior; implicitly loads `Definition` |
+| `Geometry` | `DataLayer` | mesh geometry; implicitly loads `Definition` |
+| `GeometryWithoutBlendShapes` | `DataLayer` | mesh geometry excluding blend shapes; implicitly loads `Definition` |
+| `MachineLearnedBehavior` | `DataLayer` | ML behavior data; implicitly loads `Definition` |
+| `RBFBehavior` | `DataLayer` | RBF behavior data; implicitly loads `Behavior` |
+| `JointBehaviorMetadata` | `DataLayer` | joint behavior metadata; implicitly loads `Definition` |
+| `TwistSwingBehavior` | `DataLayer` | twist/swing behavior; implicitly loads `Definition` |
+| `All` | `DataLayer` | union of every layer |
 
 ### Construction
 
 ```cpp
-// Load only joint behaviour (implicitly includes Definition + Descriptor)
-dna::Configuration cfg;
-cfg.layer = dna::DataLayer::Behavior;
-
-// Load behaviour and geometry together via operator|
-cfg.layer = dna::DataLayer::Behavior | dna::DataLayer::Geometry;
-
-// Load everything (default)
-cfg.layer = dna::DataLayer::All;
+Configuration config;
+config.layer = DataLayer::Geometry;  // also implicitly loads Definition
 ```
 
 ### Relationships
 
-- `Configuration` — the `layer` field holds a `DataLayer` value
-- `UnknownLayerPolicy` — companion enum controlling what happens to unrecognised layer data
+- `Configuration` — *stores the `DataLayer` value selecting how much of the DNA to load*
+- `Reader::unload` — *takes a `DataLayer` to unload a layer and everything dependent on it*
 
 ### Constraints
 
@@ -158,174 +130,144 @@ cfg.layer = dna::DataLayer::All;
 
 <!-- ink:api-end name="DataLayer" -->
 
-<!-- ink:api name="Direction" module="dna/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="Direction" module="dna/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `Direction`
 
-Axis direction type from the TDM math library, aliased into the `dna` namespace.
-
-### Why this exists
-
-`Direction` is `tdm::axis_dir` re-exported under `dna::` so client code configuring coordinate systems does not need to import TDM headers directly. It represents the signed direction of a single spatial axis (e.g., positive X, negative Y) and is used to build a `CoordinateSystem` frame.
+Alias for `tdm::axis_dir`, representing a signed direction along a coordinate axis.
 
 ### Relationships
 
-- `CoordinateSystem` (`tdm::coord_sys`) — composed from `Direction` values per axis
-- `Configuration` — `coordinateSystem` field accepts a `CoordinateSystem` built from `Direction` values
+- `CoordinateSystem` — *composed of `Direction` values, one per axis*
+- `RotationDirection` — *related axis-direction alias used for rotation sign*
 
 <!-- ink:api-end name="Direction" -->
 
-<!-- ink:api name="FaceWindingOrder" module="dna/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="FaceWindingOrder" module="dna/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `FaceWindingOrder`
 
-Declare the vertex winding convention for geometry faces — counter-clockwise (OpenGL/Maya) or clockwise (DirectX/left-handed).
+Face vertex winding order of the geometry data, viewed along the outward surface normal.
 
 ### Why this exists
 
-DNA geometry is authored with CCW winding (the cross product of consecutive face vertices points along the outward surface normal). Engines using a left-handed coordinate system (DirectX, Unreal by default) expect CW winding, and submitting CCW faces to them causes inverted normals and back-face culling errors. Setting `faceWindingOrder = FaceWindingOrder::cw` in `Configuration` together with `CoordinateSystemTransformPolicy::Transform` instructs the reader to reverse winding at load time so the rest of the pipeline sees correctly oriented faces.
+Different renderers and DCC tools expect different winding conventions. Authored DNAs use CCW (right-handed), while some engines expect CW (left-handed, DirectX-style). Converters normalize geometry to this value when `CoordinateSystemTransformPolicy::Transform` is active, so downstream consumers get consistently wound faces regardless of source convention.
 
 ### Fields
 
 | Name | Type | Description |
 |------|------|-------------|
-| `ccw` | `uint8_t = 0` | Counter-clockwise winding. Authored default; cross product of consecutive vertices agrees with stored normals. |
-| `cw` | `uint8_t = 1` | Clockwise winding. Left-handed / DirectX style; cross product opposes stored normals. |
+| `ccw` | `FaceWindingOrder` | counter-clockwise; cross product of consecutive face vertices agrees with stored normals |
+| `cw` | `FaceWindingOrder` | clockwise; cross product opposes stored normals (left-handed/DirectX style) |
+
+### Relationships
+
+- `Configuration` — *the `faceWindingOrder` field selects the target winding order*
+- `CoordinateSystemTransformPolicy` — *winding normalization only occurs when set to `Transform`*
 
 ### Constraints
 
 - Winding conversion is applied only when `Configuration::coordinateSystemTransformPolicy` is `Transform`. Setting `faceWindingOrder` alone under `Preserve` policy has no effect.
 
-### Relationships
-
-- `Configuration` — set via the `faceWindingOrder` field
-- `CoordinateSystemTransformPolicy` — must be `Transform` for winding conversion to take effect
-
 <!-- ink:api-end name="FaceWindingOrder" -->
 
-<!-- ink:api name="RotationDirection" module="dna/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="RotationDirection" module="dna/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `RotationDirection`
 
-Per-axis rotation direction type from TDM, aliased into the `dna` namespace.
-
-### Why this exists
-
-`RotationDirection` is `tdm::rot_dir` re-exported under `dna::` to avoid requiring TDM imports in user code. It encodes the sign of rotation for a single axis — `positive` (right-hand rule) or `negative` (left-hand / inverted). Three `RotationDirection` values compose `RotationSign`, which is held by `Configuration::rotationSign`.
+Alias for `tdm::rot_dir`, representing the sign of rotation (positive/negative) about an axis.
 
 ### Relationships
 
-- `RotationSign` — three `RotationDirection` values (one per axis) form a `RotationSign`
-- `Configuration` — `rotationSign` field uses this type
+- `RotationSign` — *a per-axis triple of `RotationDirection` values*
+- `Direction` — *related axis-direction alias used for translation*
 
 <!-- ink:api-end name="RotationDirection" -->
 
-<!-- ink:api name="RotationSequence" module="dna/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="RotationSequence" module="dna/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `RotationSequence`
 
-Euler rotation application order (e.g., XYZ, ZYX), aliased from TDM into the `dna` namespace.
-
-### Why this exists
-
-Euler angle decomposition is order-dependent — the same three angles produce different orientations under XYZ vs ZYX ordering. `RotationSequence` makes the intended order explicit rather than leaving it as an undocumented convention. The default in `Configuration` is `RotationSequence::xyz`, matching common DCC tool convention.
+Alias for `tdm::rot_seq`, representing the order in which axis rotations are composed (e.g. XYZ).
 
 ### Relationships
 
-- `Configuration` — set via `rotationSequence`; applied globally to all joint rotations during coordinate conversion
-- `RotationSign` — companion type controlling per-axis sign
+- `Configuration` — *the `rotationSequence` field defaults to `RotationSequence::xyz`*
 
 <!-- ink:api-end name="RotationSequence" -->
 
-<!-- ink:api name="RotationSign" module="dna/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="RotationSign" module="dna/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `RotationSign`
 
-Per-axis rotation sign aggregate from TDM, aliased into the `dna` namespace.
-
-### Why this exists
-
-`RotationSign` is `tdm::rot_sign` re-exported under `dna::`. It bundles three `RotationDirection` values — one for each spatial axis — into a single object, making the handedness of each axis explicit rather than encoded in a sign-bit convention. The default in `Configuration` sets all axes to `RotationDirection::positive`.
+Alias for `tdm::rot_sign`, a per-axis triple of `RotationDirection` values specifying the sign convention for rotation on each axis.
 
 ### Construction
 
 ```cpp
-// Default: all axes positive (right-hand convention)
-dna::RotationSign sign = {dna::RotationDirection::positive,
-                          dna::RotationDirection::positive,
-                          dna::RotationDirection::positive};
-
-// Invert Y axis (common when converting to a left-handed Y-up frame)
-dna::RotationSign signInvertY = {dna::RotationDirection::positive,
-                                  dna::RotationDirection::negative,
-                                  dna::RotationDirection::positive};
+Configuration config;
+config.rotationSign = {RotationDirection::positive, RotationDirection::positive, RotationDirection::positive};
 ```
 
 ### Relationships
 
-- `RotationDirection` — the element type; three of these compose a `RotationSign`
-- `Configuration` — held by `rotationSign`; applied during coordinate conversion
+- `RotationDirection` — *the per-axis component type*
+- `Configuration` — *the `rotationSign` field applies this convention globally*
 
 <!-- ink:api-end name="RotationSign" -->
 
-<!-- ink:api name="RotationUnit" module="dna/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="RotationUnit" module="dna/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `RotationUnit`
 
-Specify the unit for rotation data — degrees or radians.
+Unit of measurement (degrees or radians) used for rotation values in the rig.
 
 ### Fields
 
-| Name | Description |
-|------|-------------|
-| `degrees` | Rotation expressed in degrees. Common in DCC tools and human-readable exports. |
-| `radians` | Rotation expressed in radians. Common for real-time math libraries. |
-
-### Relationships
-
-- `Configuration` — paired with `rotationSequence` and `rotationSign` when `CoordinateSystemTransformPolicy::Transform` is active
+| Name | Type | Description |
+|------|------|-------------|
+| `degrees` | `RotationUnit` | degrees |
+| `radians` | `RotationUnit` | radians |
 
 <!-- ink:api-end name="RotationUnit" -->
 
-<!-- ink:api name="TranslationUnit" module="dna/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="TranslationUnit" module="dna/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `TranslationUnit`
 
-Specify the unit of measurement for positional data — centimetres or metres.
+Unit of measurement (centimeters or meters) used for translation values in the rig.
 
 ### Fields
 
-| Name | Description |
-|------|-------------|
-| `cm` | Centimetres. Common for DCC tools (Maya default scene unit). |
-| `m` | Metres. Common for real-time engines (Unreal default world unit). |
-
-### Relationships
-
-- `Configuration` — used alongside `CoordinateSystemTransformPolicy` when converting spatial data between DCC and engine conventions
+| Name | Type | Description |
+|------|------|-------------|
+| `cm` | `TranslationUnit` | centimeters |
+| `m` | `TranslationUnit` | meters |
 
 <!-- ink:api-end name="TranslationUnit" -->
 
-<!-- ink:api name="UnknownLayerPolicy" module="dna/Configuration" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="UnknownLayerPolicy" module="dna/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
 
 ## `UnknownLayerPolicy`
 
-Control whether unrecognised DNA layers are kept intact or silently dropped during load.
+Controls whether layers the reader/writer doesn't recognize are kept or discarded.
 
 ### Why this exists
 
-DNA assets may contain layer data introduced by a newer writer than the reader understands. Silently discarding that data is safe for read-only inspection but catastrophic in a round-trip pipeline where the file is re-saved — it causes permanent data loss. `Preserve` (the default) prevents that by retaining opaque layer blobs verbatim. `Ignore` is the opt-in choice for pipelines that will never re-write the file and want a smaller in-memory footprint.
+DNA files can be produced by newer tooling that adds layers this version of the library doesn't understand. `UnknownLayerPolicy` lets callers decide whether to round-trip that unknown data untouched (`Preserve`) or drop it (`Ignore`), which matters for forward-compatibility when re-serializing a file.
 
 ### Fields
 
-| Name | Description |
-|------|-------------|
-| `Preserve` | Keep all unrecognised layer data in memory unchanged. Use this in any pipeline that may re-save the DNA file. |
-| `Ignore` | Discard unrecognised layer data on load. Safe only for read-only consumers. |
+| Name | Type | Description |
+|------|------|-------------|
+| `Preserve` | `UnknownLayerPolicy` | keep unrecognized layer data as-is |
+| `Ignore` | `UnknownLayerPolicy` | discard unrecognized layer data |
 
-### Relationships
+### Construction
 
-- `Configuration` — set via the `unknownLayerPolicy` field
-- `DataLayer` — companion enum that selects which known layers to load
+```cpp
+Configuration config;
+config.unknownLayerPolicy = UnknownLayerPolicy::Preserve;
+```
 
 <!-- ink:api-end name="UnknownLayerPolicy" -->
