@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://epicgames.github.io/OpenRigLogic/api/tdm/Mat/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Mat - OpenRigLogic</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Mat";
+        var mkdocs_page_input_path = "api/tdm/Mat.md";
+        var mkdocs_page_url = "/OpenRigLogic/api/tdm/Mat/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> OpenRigLogic
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../release_notes/">Release Notes</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >arrayview</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/ArrayView/">ArrayView</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/StringView/">StringView</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >dna</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/BinaryStreamReader/">BinaryStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/BinaryStreamWriter/">BinaryStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/JSONStreamReader/">JSONStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/JSONStreamWriter/">JSONStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Reader/">Reader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/StreamReader/">StreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/StreamWriter/">StreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Writer/">Writer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/BehaviorReader/">BehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/BehaviorWriter/">BehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DefinitionReader/">DefinitionReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DefinitionWriter/">DefinitionWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Descriptor/">Descriptor</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DescriptorReader/">DescriptorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DescriptorWriter/">DescriptorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Geometry/">Geometry</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/GeometryReader/">GeometryReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/GeometryWriter/">GeometryWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/HeaderReader/">HeaderReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/HeaderWriter/">HeaderWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadata/">JointBehaviorMetadata</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadataReader/">JointBehaviorMetadataReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadataWriter/">JointBehaviorMetadataWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehavior/">MachineLearnedBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorExt</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExtReader/">MachineLearnedBehaviorExtReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExtWriter/">MachineLearnedBehaviorExtWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorReader/">MachineLearnedBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorWriter/">MachineLearnedBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehavior/">RBFBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehaviorReader/">RBFBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehaviorWriter/">RBFBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Twist/">Twist</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/TwistSwingBehaviorReader/">TwistSwingBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/TwistSwingBehaviorWriter/">TwistSwingBehaviorWriter</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/types/Vector3/">Vector3</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >pma</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/MemoryResource/">MemoryResource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/PolyAllocator/">PolyAllocator</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/ScopedPtr/">ScopedPtr</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/TypeDefs/">TypeDefs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >resources</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/AlignedMemoryResource/">AlignedMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/ArenaMemoryResource/">ArenaMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/DefaultMemoryResource/">DefaultMemoryResource</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/utils/ManagedInstance/">ManagedInstance</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >riglogic</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigInstance/">RigInstance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigLogic/">RigLogic</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Stats/">Stats</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/types/Aliases/">Aliases</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >status</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/Provider/">Provider</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/Status/">Status</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/StatusCode/">StatusCode</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >tdm</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Ang/">Ang</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Computations/">Computations</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../CoordSys/">CoordSys</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Mat</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#templatedim_t-r-dim_t-c-typename-t-typename-f-matr-c-t-appliedconst-matr-c-t-lhs-f-func">template&lt;dim_t R, dim_t C, typename T, typename F&gt; mat&lt;R, C, T&gt; applied(const mat&lt;R, C, T&gt;&amp; lhs, F func)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns">Returns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templatedim_t-n-typename-t-matn-n-t-inverseconst-matn-n-t-m">template&lt;dim_t N, typename T&gt; mat&lt;N, N, T&gt; inverse(const mat&lt;N, N, T&gt;&amp; m)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_1">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#constraints">Constraints</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#is_all_scalar">is_all_scalar</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#constraints_1">Constraints</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#mat">mat</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_1">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields_1">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#construction">Construction</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships">Relationships</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#constraints_2">Constraints</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templatedim_t-r-dim_t-c-typename-t-matc-r-t-transposeconst-matr-c-t-m">template&lt;dim_t R, dim_t C, typename T&gt; mat&lt;C, R, T&gt; transpose(const mat&lt;R, C, T&gt;&amp; m)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_2">When to use this</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Quat/">Quat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Transforms/">Transforms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Types/">Types</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Vec/">Vec</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >trio</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/Concepts/">Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/Stream/">Stream</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >streams</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/FileStream/">FileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/MemoryMappedFileStream/">MemoryMappedFileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/MemoryStream/">MemoryStream</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/types/Parameters/">Parameters</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/utils/StreamScope/">StreamScope</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">OpenRigLogic</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+          <li class="breadcrumb-item">tdm</li>
+      <li class="breadcrumb-item active">Mat</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="api-reference-tdmmat">API Reference — <code>tdm/Mat</code></h1>
+<hr />
+<!-- ink:api name="applied" module="tdm/Mat" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatedim_t-r-dim_t-c-typename-t-typename-f-matr-c-t-appliedconst-matr-c-t-lhs-f-func"><code>template&lt;dim_t R, dim_t C, typename T, typename F&gt; mat&lt;R, C, T&gt; applied(const mat&lt;R, C, T&gt;&amp; lhs, F func)</code></h2>
+<p>Apply a function to every element of a matrix, returning a new matrix with the results — the source matrix is left unchanged.</p>
+<h3 id="when-to-use-this">When to use this</h3>
+<p>Use this when you need an element-wise transform (e.g. clamping, rounding, or a custom per-component operation) without mutating the original matrix. If mutating in place is acceptable, call <code>apply</code> directly on the matrix instead.</p>
+<h3 id="example">Example</h3>
+<pre><code class="language-cpp">mat3&lt;float&gt; m = mat3&lt;float&gt;::identity();
+mat3&lt;float&gt; doubled = applied(m, [](float&amp; value, dim_t /*unused*/) { value *= 2.0f; });
+// doubled now holds the element-wise result; m is untouched
+</code></pre>
+<h3 id="parameters">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lhs</code></td>
+<td><code>const mat&lt;R, C, T&gt;&amp;</code></td>
+<td>required — the source matrix; copied before the function is applied.</td>
+</tr>
+<tr>
+<td><code>func</code></td>
+<td><code>F</code></td>
+<td>required — a callable invoked per element (and, depending on <code>apply</code>'s contract, per row) to transform the value in place on the copy.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns">Returns</h3>
+<p><code>mat&lt;R, C, T&gt;</code> — a new matrix holding the result of applying <code>func</code> to every element of <code>lhs</code>.</p>
+<!-- ink:api-end name="applied" -->
+
+<!-- ink:api name="inverse" module="tdm/Mat" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatedim_t-n-typename-t-matn-n-t-inverseconst-matn-n-t-m"><code>template&lt;dim_t N, typename T&gt; mat&lt;N, N, T&gt; inverse(const mat&lt;N, N, T&gt;&amp; m)</code></h2>
+<p>Forward declaration of the matrix inverse operation.</p>
+<h3 id="when-to-use-this_1">When to use this</h3>
+<p>This forward declaration lets <code>mat</code>-related code reference <code>tdm::inverse</code> before its full definition is visible. Call the fully-defined <code>inverse</code> (documented under <code>tdm/Computations</code>) for actual use.</p>
+<h3 id="constraints">Constraints</h3>
+<ul>
+<li>Only callable on square matrices (<code>N×N</code>). Rectangular matrices do not have an overload — the template parameter forces this at compile time.</li>
+<li>Behavior is undefined (or numerically degenerate) for singular matrices (determinant = 0). Check invertibility with a determinant check before calling if the input is not guaranteed to be non-singular.</li>
+</ul>
+<!-- ink:api-end name="inverse" -->
+
+<!-- ink:api name="is_all_scalar" module="tdm/Mat" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="is_all_scalar"><code>is_all_scalar</code></h2>
+<p>A compile-time trait that checks whether a parameter pack consists entirely of the same scalar type.</p>
+<h3 id="why-this-exists">Why this exists</h3>
+<p><code>is_all_scalar</code> exists to validate, at compile time, that the variadic scalar constructor of <code>mat</code> (<code>mat(Us... scalars)</code>) is only enabled when every argument is a scalar of a single consistent type — preventing accidental construction from a mismatched or non-scalar argument list without a confusing template error deep in <code>mat</code>'s internals.</p>
+<h3 id="fields">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(trait, no data members)</td>
+<td>—</td>
+<td>Inherits from <code>std::true_type</code> or <code>std::false_type</code> depending on whether the pack <code>Us...</code> is all the same scalar type <code>T</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="constraints_1">Constraints</h3>
+<ul>
+<li>Resides in <code>tdm::impl</code> — treat as internal. Do not specialize or depend on it directly.</li>
+<li>Empty pack specialization (<code>is_all_scalar&lt;&gt;</code>) always yields <code>false_type</code> — zero arguments are not considered all-scalar.</li>
+</ul>
+<!-- ink:api-end name="is_all_scalar" -->
+
+<!-- ink:api name="mat" module="tdm/Mat" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="mat"><code>mat</code></h2>
+<p>A fixed-size, generic <code>R</code>×<code>C</code> matrix template parameterized on element type, used throughout <code>tdm</code> for linear transforms.</p>
+<h3 id="why-this-exists_1">Why this exists</h3>
+<p><code>mat</code> exists to give the library a single, generically-sized matrix type instead of separate hand-written 2x2/3x3/4x4 types, while still supporting row-based storage, scalar/list construction, and conversion between element types. Storing data as an array of <code>row_type</code> vectors (rather than a flat array) lets row access and per-row <code>apply</code> operations stay type-safe and simple.</p>
+<h3 id="fields_1">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>values</code></td>
+<td><code>row_type[R]</code> (private)</td>
+<td>Row-major storage; each element is a <code>vec&lt;C, T&gt;</code> representing one row</td>
+</tr>
+</tbody>
+</table>
+<h3 id="construction">Construction</h3>
+<pre><code class="language-cpp">tdm::mat&lt;3, 3, float&gt; identity = tdm::mat&lt;3, 3, float&gt;::diagonal(1.0f);
+tdm::mat&lt;2, 2, float&gt; m{1.0f, 2.0f, 3.0f, 4.0f};  // row-major scalar list
+tdm::vec2&lt;float&gt; row0{1.0f, 0.0f}, row1{0.0f, 1.0f};
+tdm::mat&lt;2, 2, float&gt; fromRows = tdm::mat&lt;2, 2, float&gt;::from_rows(row0, row1);
+</code></pre>
+<h3 id="relationships">Relationships</h3>
+<ul>
+<li><code>transpose</code> — <em>used by <code>from_columns</code> to build a matrix from column vectors instead of rows</em></li>
+<li><code>is_all_scalar</code> — <em>gates the variadic scalar constructor to a single consistent scalar type</em></li>
+<li><code>inverse</code> — <em>forward-declared here, defined in <code>tdm/Computations</code> for inverting square instances</em></li>
+</ul>
+<h3 id="constraints_2">Constraints</h3>
+<ul>
+<li><code>diagonal()</code> and <code>inverse()</code> are only available for square matrices (<code>R == C</code>). The compiler enforces this via <code>std::enable_if&lt;H == W&gt;</code>.</li>
+<li>The variadic scalar constructor requires exactly <code>R * C</code> arguments all of the same scalar type. Passing the wrong count or mixed types is a compile error.</li>
+</ul>
+<!-- ink:api-end name="mat" -->
+
+<!-- ink:api name="transpose" module="tdm/Mat" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatedim_t-r-dim_t-c-typename-t-matc-r-t-transposeconst-matr-c-t-m"><code>template&lt;dim_t R, dim_t C, typename T&gt; mat&lt;C, R, T&gt; transpose(const mat&lt;R, C, T&gt;&amp; m)</code></h2>
+<p>Forward declaration of the matrix transpose operation, used internally by <code>mat::from_columns</code>.</p>
+<h3 id="when-to-use-this_2">When to use this</h3>
+<p>This forward declaration exists so <code>mat</code> can call <code>tdm::transpose</code> from within <code>from_columns</code> before the full definition (in <code>Computations.h</code>) is visible. Call the fully-defined <code>transpose</code> (documented under <code>tdm/Computations</code>) rather than relying on this declaration directly.</p>
+<!-- ink:api-end name="transpose" -->
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../CoordSys/" class="btn btn-neutral float-left" title="CoordSys"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../Quat/" class="btn btn-neutral float-right" title="Quat">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../CoordSys/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../Quat/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

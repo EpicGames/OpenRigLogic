@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://epicgames.github.io/OpenRigLogic/api/riglogic/riglogic/Configuration/" />
+      <link rel="shortcut icon" href="../../../../img/favicon.ico" />
+    <title>Configuration - OpenRigLogic</title>
+    <link rel="stylesheet" href="../../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Configuration";
+        var mkdocs_page_input_path = "api/riglogic/riglogic/Configuration.md";
+        var mkdocs_page_url = "/OpenRigLogic/api/riglogic/riglogic/Configuration/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../../.." class="icon icon-home"> OpenRigLogic
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../../release_notes/">Release Notes</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >arrayview</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../arrayview/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../arrayview/ArrayView/">ArrayView</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../arrayview/StringView/">StringView</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >dna</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/BinaryStreamReader/">BinaryStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/BinaryStreamWriter/">BinaryStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/JSONStreamReader/">JSONStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/JSONStreamWriter/">JSONStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/Reader/">Reader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/StreamReader/">StreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/StreamWriter/">StreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/Writer/">Writer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/BehaviorReader/">BehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/BehaviorWriter/">BehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/DefinitionReader/">DefinitionReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/DefinitionWriter/">DefinitionWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/Descriptor/">Descriptor</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/DescriptorReader/">DescriptorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/DescriptorWriter/">DescriptorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/Geometry/">Geometry</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/GeometryReader/">GeometryReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/GeometryWriter/">GeometryWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/HeaderReader/">HeaderReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/HeaderWriter/">HeaderWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/JointBehaviorMetadata/">JointBehaviorMetadata</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/JointBehaviorMetadataReader/">JointBehaviorMetadataReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/JointBehaviorMetadataWriter/">JointBehaviorMetadataWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/MachineLearnedBehavior/">MachineLearnedBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorExt</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/MachineLearnedBehaviorExtReader/">MachineLearnedBehaviorExtReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/MachineLearnedBehaviorExtWriter/">MachineLearnedBehaviorExtWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/MachineLearnedBehaviorReader/">MachineLearnedBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/MachineLearnedBehaviorWriter/">MachineLearnedBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/RBFBehavior/">RBFBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/RBFBehaviorReader/">RBFBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/RBFBehaviorWriter/">RBFBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/Twist/">Twist</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/TwistSwingBehaviorReader/">TwistSwingBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/TwistSwingBehaviorWriter/">TwistSwingBehaviorWriter</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/types/Vector3/">Vector3</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >pma</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../pma/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../pma/MemoryResource/">MemoryResource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../pma/PolyAllocator/">PolyAllocator</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../pma/ScopedPtr/">ScopedPtr</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../pma/TypeDefs/">TypeDefs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >resources</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../pma/resources/AlignedMemoryResource/">AlignedMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../pma/resources/ArenaMemoryResource/">ArenaMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../pma/resources/DefaultMemoryResource/">DefaultMemoryResource</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../pma/utils/ManagedInstance/">ManagedInstance</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >riglogic</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../../">Overview</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Configuration</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#calculationtype">CalculationType</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships">Relationships</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for">Watch out for</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_1">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields_1">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#construction">Construction</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_1">Relationships</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for_1">Watch out for</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#floatingpointtype">FloatingPointType</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_2">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields_2">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_2">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#rotationtype">RotationType</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_3">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields_3">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_3">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#scaletype">ScaleType</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#fields_4">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_4">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#translationtype">TranslationType</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#fields_5">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_5">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../RigInstance/">RigInstance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../RigLogic/">RigLogic</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Stats/">Stats</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../types/Aliases/">Aliases</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >status</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../status/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../status/Provider/">Provider</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../status/Status/">Status</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../status/StatusCode/">StatusCode</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >tdm</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/Ang/">Ang</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/Computations/">Computations</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/CoordSys/">CoordSys</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/Mat/">Mat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/Quat/">Quat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/Transforms/">Transforms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/Types/">Types</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/Vec/">Vec</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >trio</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../trio/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../trio/Concepts/">Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../trio/Stream/">Stream</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >streams</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../trio/streams/FileStream/">FileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../trio/streams/MemoryMappedFileStream/">MemoryMappedFileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../trio/streams/MemoryStream/">MemoryStream</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../trio/types/Parameters/">Parameters</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../trio/utils/StreamScope/">StreamScope</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../..">OpenRigLogic</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+          <li class="breadcrumb-item">riglogic</li>
+      <li class="breadcrumb-item active">Configuration</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="api-reference-riglogicriglogicconfiguration">API Reference — <code>riglogic/riglogic/Configuration</code></h1>
+<hr />
+<!-- ink:api name="CalculationType" module="riglogic/riglogic/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="calculationtype"><code>CalculationType</code></h2>
+<p>Selects which CPU algorithm implementation RigLogic uses to evaluate a rig.</p>
+<h3 id="why-this-exists">Why this exists</h3>
+<p>Different hardware supports different vectorization instruction sets, and RigLogic needs a way to pick (or auto-select) the fastest available path without the caller having to know the build's capabilities. <code>AnyVector</code> lets RigLogic pick whichever vectorized path is available, while the explicit values let a caller pin a specific implementation for testing or platform-specific tuning.</p>
+<h3 id="fields">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Scalar</code></td>
+<td>enum value</td>
+<td>Scalar CPU algorithm; always available.</td>
+</tr>
+<tr>
+<td><code>SSE</code></td>
+<td>enum value</td>
+<td>Vectorized CPU algorithm using SSE instructions.</td>
+</tr>
+<tr>
+<td><code>AVX</code></td>
+<td>enum value</td>
+<td>Vectorized CPU algorithm using AVX instructions; requires RigLogic built with AVX support, otherwise falls back to <code>Scalar</code>.</td>
+</tr>
+<tr>
+<td><code>NEON</code></td>
+<td>enum value</td>
+<td>Vectorized CPU algorithm using NEON instructions; requires RigLogic built with NEON support, otherwise falls back to <code>Scalar</code>.</td>
+</tr>
+<tr>
+<td><code>AnyVector</code></td>
+<td>enum value</td>
+<td>Picks any available vectorization automatically.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships">Relationships</h3>
+<ul>
+<li><code>Configuration</code> — <em>stores a <code>CalculationType</code> in its <code>calculationType</code> field.</em></li>
+</ul>
+<h3 id="watch-out-for">Watch out for</h3>
+<ul>
+<li><code>AVX</code> and <code>NEON</code> silently fall back to <code>Scalar</code> when the library was not built with the corresponding support — no error or warning is raised. Confirm the build configuration before relying on a specific SIMD path in performance-critical code.</li>
+</ul>
+<!-- ink:api-end name="CalculationType" -->
+
+<!-- ink:api name="Configuration" module="riglogic/riglogic/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="configuration"><code>Configuration</code></h2>
+<p>The set of options that determines how RigLogic loads DNA data and evaluates a rig.</p>
+<h3 id="why-this-exists_1">Why this exists</h3>
+<p>Loading and evaluating a rig involves several independent choices — which algorithm to run, which floating point precision to use, which behavior submodules to load, and which output conventions to emit — that would otherwise require a long list of separate constructor parameters. <code>Configuration</code> groups all of these into a single value with sensible defaults, so callers only need to override the fields that matter to them. Loading fewer submodules (e.g. setting <code>loadRBFBehavior</code> to <code>false</code>) reduces the memory allocated for a <code>RigLogic</code> instance.</p>
+<h3 id="fields_1">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>calculationType</code></td>
+<td><code>CalculationType</code></td>
+<td>optional. Algorithm implementation to use; defaults to <code>AnyVector</code>.</td>
+</tr>
+<tr>
+<td><code>floatingPointType</code></td>
+<td><code>FloatingPointType</code></td>
+<td>optional. Precision for vectorized calculations; defaults to <code>HalfFloat</code>.</td>
+</tr>
+<tr>
+<td><code>loadJoints</code></td>
+<td><code>bool</code></td>
+<td>optional. Whether to load joint behavior; defaults to <code>true</code>.</td>
+</tr>
+<tr>
+<td><code>loadBlendShapes</code></td>
+<td><code>bool</code></td>
+<td>optional. Whether to load blend shape behavior; defaults to <code>true</code>.</td>
+</tr>
+<tr>
+<td><code>loadAnimatedMaps</code></td>
+<td><code>bool</code></td>
+<td>optional. Whether to load animated map behavior; defaults to <code>true</code>.</td>
+</tr>
+<tr>
+<td><code>loadMachineLearnedBehavior</code></td>
+<td><code>bool</code></td>
+<td>optional. Whether to load ML behavior; defaults to <code>true</code>.</td>
+</tr>
+<tr>
+<td><code>loadRBFBehavior</code></td>
+<td><code>bool</code></td>
+<td>optional. Whether to load RBF behavior; defaults to <code>true</code>.</td>
+</tr>
+<tr>
+<td><code>loadTwistSwingBehavior</code></td>
+<td><code>bool</code></td>
+<td>optional. Whether to load twist/swing behavior; defaults to <code>true</code>.</td>
+</tr>
+<tr>
+<td><code>translationType</code></td>
+<td><code>TranslationType</code></td>
+<td>optional. Output representation for translation; defaults to <code>Vector</code>.</td>
+</tr>
+<tr>
+<td><code>rotationType</code></td>
+<td><code>RotationType</code></td>
+<td>optional. Output representation for rotation; defaults to <code>EulerAngles</code>.</td>
+</tr>
+<tr>
+<td><code>scaleType</code></td>
+<td><code>ScaleType</code></td>
+<td>optional. Output representation for scale; defaults to <code>Vector</code>.</td>
+</tr>
+<tr>
+<td><code>translationPruningThreshold</code></td>
+<td><code>float</code></td>
+<td>optional. Threshold below which translation deltas are pruned; defaults to <code>0.0f</code> (comment suggests <code>0.0001f</code> is reasonably safe to try).</td>
+</tr>
+<tr>
+<td><code>rotationPruningThreshold</code></td>
+<td><code>float</code></td>
+<td>optional. Threshold below which rotation deltas are pruned; defaults to <code>0.0f</code> (comment suggests <code>0.1f</code> is reasonably safe to try).</td>
+</tr>
+<tr>
+<td><code>scalePruningThreshold</code></td>
+<td><code>float</code></td>
+<td>optional. Threshold below which scale deltas are pruned; defaults to <code>0.0f</code> (comment suggests <code>0.001f</code> is reasonably safe to try).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="construction">Construction</h3>
+<pre><code class="language-cpp">rl4::Configuration config;
+config.calculationType = rl4::CalculationType::AVX;
+config.loadRBFBehavior = false;
+auto* rigLogic = rl4::RigLogic::create(reader, config);
+</code></pre>
+<h3 id="relationships_1">Relationships</h3>
+<ul>
+<li><code>RigLogic</code> — <em><code>RigLogic::create</code> takes a <code>Configuration</code> and <code>RigLogic::getConfiguration</code> returns the one it was built with.</em></li>
+<li><code>CalculationType</code>, <code>FloatingPointType</code>, <code>TranslationType</code>, <code>RotationType</code>, <code>ScaleType</code> — <em>enum types held by this struct's fields.</em></li>
+</ul>
+<h3 id="watch-out-for_1">Watch out for</h3>
+<ul>
+<li>Pruning thresholds are <code>0.0f</code> by default (disabled). Any non-zero value silently discards transform components below that magnitude — start at <code>0.0f</code> and increase incrementally while checking for visible artefacts on subtle joint motions before committing to a non-zero value.</li>
+<li>Setting <code>loadJoints = false</code> while leaving <code>loadBlendShapes = true</code> is valid, but some rigs assume joint data is present; verify with your specific DNA asset before shipping a partial-load configuration.</li>
+</ul>
+<!-- ink:api-end name="Configuration" -->
+
+<!-- ink:api name="FloatingPointType" module="riglogic/riglogic/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="floatingpointtype"><code>FloatingPointType</code></h2>
+<p>Selects the floating point precision used in RigLogic's vectorized calculations.</p>
+<h3 id="why-this-exists_2">Why this exists</h3>
+<p>Vectorized rig evaluation can trade precision for memory and bandwidth. <code>FloatingPointType</code> makes that trade-off an explicit, per-<code>Configuration</code> choice rather than a compile-time constant, so callers can pick <code>HalfFloat</code> for reduced memory footprint or <code>Float</code> for full precision.</p>
+<h3 id="fields_2">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Float</code></td>
+<td>enum value</td>
+<td>Full-precision floating point calculations.</td>
+</tr>
+<tr>
+<td><code>HalfFloat</code></td>
+<td>enum value</td>
+<td>Reduced-precision (half float) calculations; the default in <code>Configuration</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_2">Relationships</h3>
+<ul>
+<li><code>Configuration</code> — <em>stores a <code>FloatingPointType</code> in its <code>floatingPointType</code> field.</em></li>
+</ul>
+<!-- ink:api-end name="FloatingPointType" -->
+
+<!-- ink:api name="RotationType" module="riglogic/riglogic/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="rotationtype"><code>RotationType</code></h2>
+<p>Selects the representation RigLogic uses for rotation output values.</p>
+<h3 id="why-this-exists_3">Why this exists</h3>
+<p>Rig consumers may expect rotations either as Euler angles or as quaternions depending on the downstream engine or rig rig binding. <code>RotationType</code> lets <code>Configuration</code> pick the representation without RigLogic needing separate evaluation code paths per convention.</p>
+<h3 id="fields_3">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>EulerAngles</code></td>
+<td>enum value = 3</td>
+<td>3-component Euler angle representation of rotation; the default in <code>Configuration</code>.</td>
+</tr>
+<tr>
+<td><code>Quaternions</code></td>
+<td>enum value = 4</td>
+<td>4-component quaternion representation of rotation.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_3">Relationships</h3>
+<ul>
+<li><code>Configuration</code> — <em>stores a <code>RotationType</code> in its <code>rotationType</code> field.</em></li>
+</ul>
+<!-- ink:api-end name="RotationType" -->
+
+<!-- ink:api name="ScaleType" module="riglogic/riglogic/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="scaletype"><code>ScaleType</code></h2>
+<p>Selects the representation RigLogic uses for scale output values.</p>
+<h3 id="fields_4">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Vector</code></td>
+<td>enum value = 3</td>
+<td>3-component vector representation of scale.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_4">Relationships</h3>
+<ul>
+<li><code>Configuration</code> — <em>stores a <code>ScaleType</code> in its <code>scaleType</code> field.</em></li>
+</ul>
+<!-- ink:api-end name="ScaleType" -->
+
+<!-- ink:api name="TranslationType" module="riglogic/riglogic/Configuration" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="translationtype"><code>TranslationType</code></h2>
+<p>Selects the representation RigLogic uses for translation output values.</p>
+<h3 id="fields_5">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Vector</code></td>
+<td>enum value = 3</td>
+<td>3-component vector representation of translation.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_5">Relationships</h3>
+<ul>
+<li><code>Configuration</code> — <em>stores a <code>TranslationType</code> in its <code>translationType</code> field.</em></li>
+</ul>
+<!-- ink:api-end name="TranslationType" -->
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../" class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../RigInstance/" class="btn btn-neutral float-right" title="RigInstance">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../../" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../RigInstance/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../../..";</script>
+    <script src="../../../../js/theme_extra.js"></script>
+    <script src="../../../../js/theme.js"></script>
+      <script src="../../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

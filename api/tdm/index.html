@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://epicgames.github.io/OpenRigLogic/api/tdm/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Overview - OpenRigLogic</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Overview";
+        var mkdocs_page_input_path = "api/tdm/index.md";
+        var mkdocs_page_url = "/OpenRigLogic/api/tdm/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> OpenRigLogic
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../release_notes/">Release Notes</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >arrayview</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../arrayview/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../arrayview/ArrayView/">ArrayView</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../arrayview/StringView/">StringView</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >dna</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../dna/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../dna/BinaryStreamReader/">BinaryStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../dna/BinaryStreamWriter/">BinaryStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../dna/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../dna/JSONStreamReader/">JSONStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../dna/JSONStreamWriter/">JSONStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../dna/Reader/">Reader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../dna/StreamReader/">StreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../dna/StreamWriter/">StreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../dna/Writer/">Writer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/BehaviorReader/">BehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/BehaviorWriter/">BehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/DefinitionReader/">DefinitionReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/DefinitionWriter/">DefinitionWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/Descriptor/">Descriptor</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/DescriptorReader/">DescriptorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/DescriptorWriter/">DescriptorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/Geometry/">Geometry</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/GeometryReader/">GeometryReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/GeometryWriter/">GeometryWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/HeaderReader/">HeaderReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/HeaderWriter/">HeaderWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/JointBehaviorMetadata/">JointBehaviorMetadata</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/JointBehaviorMetadataReader/">JointBehaviorMetadataReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/JointBehaviorMetadataWriter/">JointBehaviorMetadataWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/MachineLearnedBehavior/">MachineLearnedBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorExt</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/MachineLearnedBehaviorExtReader/">MachineLearnedBehaviorExtReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/MachineLearnedBehaviorExtWriter/">MachineLearnedBehaviorExtWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/MachineLearnedBehaviorReader/">MachineLearnedBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/MachineLearnedBehaviorWriter/">MachineLearnedBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/RBFBehavior/">RBFBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/RBFBehaviorReader/">RBFBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/RBFBehaviorWriter/">RBFBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/Twist/">Twist</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/TwistSwingBehaviorReader/">TwistSwingBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/layers/TwistSwingBehaviorWriter/">TwistSwingBehaviorWriter</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/types/Vector3/">Vector3</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../dna/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >pma</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../pma/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../pma/MemoryResource/">MemoryResource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../pma/PolyAllocator/">PolyAllocator</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../pma/ScopedPtr/">ScopedPtr</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../pma/TypeDefs/">TypeDefs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >resources</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../pma/resources/AlignedMemoryResource/">AlignedMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../pma/resources/ArenaMemoryResource/">ArenaMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../pma/resources/DefaultMemoryResource/">DefaultMemoryResource</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../pma/utils/ManagedInstance/">ManagedInstance</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >riglogic</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../riglogic/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../riglogic/riglogic/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../riglogic/riglogic/RigInstance/">RigInstance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../riglogic/riglogic/RigLogic/">RigLogic</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../riglogic/riglogic/Stats/">Stats</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../riglogic/types/Aliases/">Aliases</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../riglogic/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >status</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../status/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../status/Provider/">Provider</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../status/Status/">Status</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../status/StatusCode/">StatusCode</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >tdm</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Overview</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#by-task">By Task</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#vector-and-quaternion-math">Vector and quaternion math</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#rotation-representation-and-conversion">Rotation representation and conversion</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#rotation-interpolation">Rotation interpolation</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quaternion-and-matrix-inversion">Quaternion and matrix inversion</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#matrix-construction-and-manipulation">Matrix construction and manipulation</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#matrix-decomposition-and-linear-systems">Matrix decomposition and linear systems</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#angle-representation-and-conversion">Angle representation and conversion</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#coordinate-system-definitions">Coordinate system definitions</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#rotations">Rotations</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#coordinate-system-conversion">Coordinate system conversion</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#transform-matrices">Transform matrices</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#vectors-and-matrices">Vectors and matrices</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fast-math">Fast math</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#vectors">Vectors</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#matrices">Matrices</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#rotations-and-angles">Rotations and angles</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#all-modules">All Modules</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="Ang/">Ang</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="Computations/">Computations</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="CoordSys/">CoordSys</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="Mat/">Mat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="Quat/">Quat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="Transforms/">Transforms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="Types/">Types</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="Vec/">Vec</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >trio</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../trio/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../trio/Concepts/">Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../trio/Stream/">Stream</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >streams</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../trio/streams/FileStream/">FileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../trio/streams/MemoryMappedFileStream/">MemoryMappedFileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../trio/streams/MemoryStream/">MemoryStream</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../trio/types/Parameters/">Parameters</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../trio/utils/StreamScope/">StreamScope</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">OpenRigLogic</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+          <li class="breadcrumb-item">tdm</li>
+      <li class="breadcrumb-item active">Overview</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="api-reference-tdm">API Reference — <code>tdm</code></h1>
+<p><em>93 entries across 8 modules.</em></p>
+<h2 id="by-task">By Task</h2>
+<h3 id="vector-and-quaternion-math">Vector and quaternion math</h3>
+<p>Compute vector and quaternion operations including dot and cross products, magnitude, normalization, and quaternion conjugates</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Computations/">conjugate</a></td>
+<td>Computations</td>
+<td>Compute the conjugate of a quaternion by negating its vector (imaginary) components.</td>
+</tr>
+<tr>
+<td><a href="Computations/">cross</a></td>
+<td>Computations</td>
+<td>Compute the cross product of two 3D vectors, producing a vector perpendicular to both.</td>
+</tr>
+<tr>
+<td><a href="Computations/">dot</a></td>
+<td>Computations</td>
+<td>Compute the dot product of two vectors or quaternions, a scalar measure of how aligned they are.</td>
+</tr>
+<tr>
+<td><a href="Computations/">length</a></td>
+<td>Computations</td>
+<td>Compute the magnitude (length) of a vector or quaternion.</td>
+</tr>
+<tr>
+<td><a href="Computations/">negate</a></td>
+<td>Computations</td>
+<td>Compute the negation of a vector, matrix, or quaternion, flipping the sign of every component.</td>
+</tr>
+<tr>
+<td><a href="Computations/">normalize</a></td>
+<td>Computations</td>
+<td>Scale a vector or quaternion to unit length while preserving its direction.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rotation-representation-and-conversion">Rotation representation and conversion</h3>
+<p>Create and convert between quaternions and Euler angles for representing 3D rotations</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Quat/">euler_to_quat</a></td>
+<td>Quat</td>
+<td>Build a rotation quaternion from Euler angles in a specific axis order, without going through an intermediate rotation matrix.</td>
+</tr>
+<tr>
+<td><a href="Quat/">quat</a></td>
+<td>Quat</td>
+<td>A quaternion representing a rotation in 3D space, stored as <code>x</code>, <code>y</code>, <code>z</code>, <code>w</code> components.</td>
+</tr>
+<tr>
+<td><a href="Types/">quat</a></td>
+<td>Types</td>
+<td>Generic quaternion template used to represent 3D rotations without the gimbal-lock and interpolation problems of Euler angles.</td>
+</tr>
+<tr>
+<td><a href="Quat/">quat_to_euler</a></td>
+<td>Quat</td>
+<td>Recover Euler angles from a quaternion in a specific axis order — the inverse of <code>euler_to_quat</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rotation-interpolation">Rotation interpolation</h3>
+<p>Smoothly interpolate between rotations using linear and spherical interpolation methods</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Computations/">lerp</a></td>
+<td>Computations</td>
+<td>Linearly interpolate between two quaternions.</td>
+</tr>
+<tr>
+<td><a href="Computations/">slerp</a></td>
+<td>Computations</td>
+<td>Spherically interpolate between two rotations, moving at a constant angular velocity.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="quaternion-and-matrix-inversion">Quaternion and matrix inversion</h3>
+<p>Compute inverses of quaternions and matrices to undo their transforms</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Computations/">inverse</a></td>
+<td>Computations</td>
+<td>Compute the inverse of a quaternion or a square matrix, undoing its transform.</td>
+</tr>
+<tr>
+<td><a href="Mat/">inverse</a></td>
+<td>Mat</td>
+<td>Forward declaration of the matrix inverse operation.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="matrix-construction-and-manipulation">Matrix construction and manipulation</h3>
+<p>Create, transform, and inspect matrix properties including transpose, determinant, trace, and element-wise operations</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Computations/">adjoint</a></td>
+<td>Computations</td>
+<td>Compute the adjoint (adjugate) matrix, the transpose of the cofactor matrix.</td>
+</tr>
+<tr>
+<td><a href="Mat/">applied</a></td>
+<td>Mat</td>
+<td>Apply a function to every element of a matrix, returning a new matrix with the results — the source matrix is left unchanged.</td>
+</tr>
+<tr>
+<td><a href="Computations/">determinant</a></td>
+<td>Computations</td>
+<td>Compute the determinant of a square matrix.</td>
+</tr>
+<tr>
+<td><a href="Mat/">is_all_scalar</a></td>
+<td>Mat</td>
+<td>A compile-time trait that checks whether a parameter pack consists entirely of the same scalar type.</td>
+</tr>
+<tr>
+<td><a href="Mat/">mat</a></td>
+<td>Mat</td>
+<td>A fixed-size, generic <code>R</code>×<code>C</code> matrix template parameterized on element type, used throughout <code>tdm</code> for linear transforms.</td>
+</tr>
+<tr>
+<td><a href="Types/">mat</a></td>
+<td>Types</td>
+<td>Generic matrix template parameterized by row count, column count, and element type.</td>
+</tr>
+<tr>
+<td><a href="Computations/">minor</a></td>
+<td>Computations</td>
+<td>Extract the minor matrix formed by removing row <code>i</code> and column <code>j</code> from a square matrix.</td>
+</tr>
+<tr>
+<td><a href="Computations/">trace</a></td>
+<td>Computations</td>
+<td>Compute the trace of a square matrix, the sum of its diagonal elements.</td>
+</tr>
+<tr>
+<td><a href="Computations/">transpose</a></td>
+<td>Computations</td>
+<td>Flip a matrix's rows and columns.</td>
+</tr>
+<tr>
+<td><a href="Mat/">transpose</a></td>
+<td>Mat</td>
+<td>Forward declaration of the matrix transpose operation, used internally by <code>mat::from_columns</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="matrix-decomposition-and-linear-systems">Matrix decomposition and linear systems</h3>
+<p>Decompose matrices and solve linear systems using LU decomposition with partial pivoting</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Computations/">decompose</a></td>
+<td>Computations</td>
+<td>Perform an in-place LU decomposition of a square matrix with partial pivoting, based on the algorithm in <em>Numerical Recipes in C</em>.</td>
+</tr>
+<tr>
+<td><a href="Computations/">substitute</a></td>
+<td>Computations</td>
+<td>Solve a linear system in place using the LU-decomposed matrix and permutation produced by <code>decompose</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="angle-representation-and-conversion">Angle representation and conversion</h3>
+<p>Work with strongly-typed angle values and convert between degrees and radians</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Ang/">ang</a></td>
+<td>Ang</td>
+<td>A strongly-typed angle value tagged with its unit (degrees or radians) at compile time.</td>
+</tr>
+<tr>
+<td><a href="Types/">ang</a></td>
+<td>Types</td>
+<td>Generic angle type parameterized by numeric type and angle unit (radians or degrees).</td>
+</tr>
+<tr>
+<td><a href="Ang/">degrees</a></td>
+<td>Ang</td>
+<td>Convert an angle expressed in radians to degrees.</td>
+</tr>
+<tr>
+<td><a href="Types/">degrees</a></td>
+<td>Types</td>
+<td>Internal tag type used to mark an <code>ang&lt;T, TUnit&gt;</code> instantiation as holding a degree value.</td>
+</tr>
+<tr>
+<td><a href="Ang/">pi</a></td>
+<td>Ang</td>
+<td>Get the value of π as a compile-time constant for use in angle conversions and trigonometric calculations.</td>
+</tr>
+<tr>
+<td><a href="Ang/">radians</a></td>
+<td>Ang</td>
+<td>Convert an angle expressed in degrees to radians.</td>
+</tr>
+<tr>
+<td><a href="Types/">radians</a></td>
+<td>Types</td>
+<td>Internal tag type used to mark an <code>ang&lt;T, TUnit&gt;</code> instantiation as holding a radian value.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="coordinate-system-definitions">Coordinate system definitions</h3>
+<p>Define and query 3D coordinate system orientations by naming axis directions</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Types/">axis_dir</a></td>
+<td>Types</td>
+<td>Enumerates the six named spatial directions (left, right, up, down, front, back) used to describe how a coordinate system's axes map onto real-world directions.</td>
+</tr>
+<tr>
+<td><a href="CoordSys/">axis_vector</a></td>
+<td>CoordSys</td>
+<td>Convert a named axis direction (<code>right</code>, <code>up</code>, <code>front</code>, etc.) into its unit vector in the canonical coordinate system.</td>
+</tr>
+<tr>
+<td><a href="Types/">chirality</a></td>
+<td>Types</td>
+<td>Enumerates the handedness (left- or right-handed) of a coordinate system.</td>
+</tr>
+<tr>
+<td><a href="CoordSys/">coord_sys</a></td>
+<td>CoordSys</td>
+<td>Describes a 3D coordinate system by naming what each of its X, Y, and Z axes points toward (e.g. right, up, front).</td>
+</tr>
+<tr>
+<td><a href="Types/">coord_sys</a></td>
+<td>Types</td>
+<td>Forward-declared type describing a coordinate system's axis directions, handedness, and rotation conventions as a single value.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rotations">Rotations</h3>
+<p>Create, convert, and compose rotations using Euler angles, quaternions, or rotation matrices</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Transforms/">euler2mat</a></td>
+<td>Transforms</td>
+<td>Dispatch to the correct <code>euler_to_mat</code> specialization based on a runtime <code>rot_seq</code> value.</td>
+</tr>
+<tr>
+<td><a href="Transforms/">euler_to_mat</a></td>
+<td>Transforms</td>
+<td>Build a per-axis rotation matrix from Euler angles by composing <code>rotx</code>, <code>roty</code>, <code>rotz</code> and <code>rot_mat</code> for a rotation order fixed at compile time via the <code>order</code> template parameter.</td>
+</tr>
+<tr>
+<td><a href="Transforms/">mat2euler</a></td>
+<td>Transforms</td>
+<td>Dispatch to the correct <code>mat_to_euler</code> specialization based on a runtime <code>rot_seq</code> value.</td>
+</tr>
+<tr>
+<td><a href="Transforms/">mat_to_euler</a></td>
+<td>Transforms</td>
+<td>Decompose a rotation matrix into Euler angles for a rotation order fixed at compile time — the inverse of <code>euler_to_mat</code>.</td>
+</tr>
+<tr>
+<td><a href="Types/">rad3</a></td>
+<td>Types</td>
+<td>A 3-component vector of radian-unit angles, used for Euler rotations expressed in radians.</td>
+</tr>
+<tr>
+<td><a href="Types/">rot_dir</a></td>
+<td>Types</td>
+<td>Enumerates whether a rotation is applied in the positive or negative direction around an axis.</td>
+</tr>
+<tr>
+<td><a href="Transforms/">rot_mat</a></td>
+<td>Transforms</td>
+<td>Multiply three per-axis rotation matrices together in the order dictated by a <code>rot_seq</code> specialization.</td>
+</tr>
+<tr>
+<td><a href="Types/">rot_seq</a></td>
+<td>Types</td>
+<td>Enumerates the six orderings in which Euler-angle rotations around the X, Y, and Z axes can be composed.</td>
+</tr>
+<tr>
+<td><a href="Types/">rot_sign</a></td>
+<td>Types</td>
+<td>Bundles the rotation direction convention for all three axes (x, y, z) of a coordinate system.</td>
+</tr>
+<tr>
+<td><a href="Transforms/">rotate</a></td>
+<td>Transforms</td>
+<td>Build a 4x4 rotation transform, either from an arbitrary axis and angle (Rodrigues' rotation formula) or from Euler angles via <code>impl::euler2mat</code>, and optionally compose it onto an existing <code>mat4</code>.</td>
+</tr>
+<tr>
+<td><a href="Transforms/">rotx</a></td>
+<td>Transforms</td>
+<td>Build the elementary rotation matrix for a rotation about the X axis.</td>
+</tr>
+<tr>
+<td><a href="Transforms/">roty</a></td>
+<td>Transforms</td>
+<td>Build the elementary rotation matrix for a rotation about the Y axis.</td>
+</tr>
+<tr>
+<td><a href="Transforms/">rotz</a></td>
+<td>Transforms</td>
+<td>Build the elementary rotation matrix for a rotation about the Z axis.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="coordinate-system-conversion">Coordinate system conversion</h3>
+<p>Transform vectors and transforms between different coordinate systems and bases</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Transforms/">change_of_basis</a></td>
+<td>Transforms</td>
+<td>Build the 3x3 matrix <code>C</code> such that <code>v_dst = v_src * C</code> for row-vectors, converting between two coordinate systems' bases.</td>
+</tr>
+<tr>
+<td><a href="Transforms/">convert_direction</a></td>
+<td>Transforms</td>
+<td>Reorient a direction vector (normal, tangent, velocity) into a different coordinate space — not a position. For positions, use <code>convert_position</code>.</td>
+</tr>
+<tr>
+<td><a href="Transforms/">convert_position</a></td>
+<td>Transforms</td>
+<td>Apply a change-of-basis matrix to a position (or translation) vector to move it into a different coordinate system.</td>
+</tr>
+<tr>
+<td><a href="Transforms/">convert_rotation</a></td>
+<td>Transforms</td>
+<td>Convert a rotation expressed as Euler angles in one coordinate system and rotation convention into Euler angles in another, by round-tripping through a rotation matrix and applying a similarity transform.</td>
+</tr>
+<tr>
+<td><a href="Transforms/">convert_scale</a></td>
+<td>Transforms</td>
+<td>Convert a scale vector between coordinate systems, permuting components by the change-of-basis matrix and applying <code>sign_policy</code> to decide whether to keep or discard each component's sign.</td>
+</tr>
+<tr>
+<td><a href="Transforms/">sign_policy</a></td>
+<td>Transforms</td>
+<td>An enum controlling how <code>convert_scale</code> treats the sign of each scale component when converting between coordinate systems.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="transform-matrices">Transform matrices</h3>
+<p>Build translation, rotation, and scaling matrices</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Transforms/">scale</a></td>
+<td>Transforms</td>
+<td>Build a diagonal scaling matrix from per-axis factors, or apply that scale to an existing matrix.</td>
+</tr>
+<tr>
+<td><a href="Transforms/">translate</a></td>
+<td>Transforms</td>
+<td>Build an <code>(L+1)x(L+1)</code> homogeneous translation matrix, writing the position components into the last row of the identity matrix.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="vectors-and-matrices">Vectors and matrices</h3>
+<p>Fundamental fixed-size vector and matrix types for 3D computations</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Types/">mat3</a></td>
+<td>Types</td>
+<td>A generic 3x3 matrix, parameterized only by element type <code>T</code>.</td>
+</tr>
+<tr>
+<td><a href="Types/">mat4</a></td>
+<td>Types</td>
+<td>A generic 4x4 matrix, parameterized only by element type <code>T</code>.</td>
+</tr>
+<tr>
+<td><a href="Types/">rad</a></td>
+<td>Types</td>
+<td>Alias for an angle value held in radians, <code>ang&lt;T, impl::radians&gt;</code>.</td>
+</tr>
+<tr>
+<td><a href="Types/">vec</a></td>
+<td>Types</td>
+<td>The base fixed-size vector template, parameterized on component count <code>L</code> and scalar type <code>T</code>.</td>
+</tr>
+<tr>
+<td><a href="Vec/">vec</a></td>
+<td>Vec</td>
+<td>Fixed-size, dimension-generic vector type used throughout <code>tdm</code> for positions, directions, and other L-dimensional float/int data.</td>
+</tr>
+<tr>
+<td><a href="Types/">vec2</a></td>
+<td>Types</td>
+<td>A 2-component vector, for values like 2D coordinates or UVs.</td>
+</tr>
+<tr>
+<td><a href="Types/">vec3</a></td>
+<td>Types</td>
+<td>A 3-component vector, used throughout <code>tdm</code> for positions, directions, and scale factors.</td>
+</tr>
+<tr>
+<td><a href="Types/">vec4</a></td>
+<td>Types</td>
+<td>A 4-component vector, used for homogeneous coordinates (e.g. <code>[x, y, z, w]</code>) and quaternion-adjacent storage.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fast-math">Fast math</h3>
+<p>Optimized mathematical approximations for performance-critical operations</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Transforms/">fastasin</a></td>
+<td>Transforms</td>
+<td>Compute an approximate <code>asin(value)</code> using a 7-degree minimax polynomial, trading a small amount of accuracy for speed versus <code>std::asin</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="vectors">Vectors</h3>
+<p>Vector types ranging from 2 to 4 components in floating-point and integer variants, plus generic templates and dimension utilities</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Types/">dim_t</a></td>
+<td>Types</td>
+<td>An alias for <code>std::size_t</code>, used as the dimension/index type for <code>vec</code> and <code>mat</code> templates.</td>
+</tr>
+<tr>
+<td><a href="Types/">fvec</a></td>
+<td>Types</td>
+<td>Generic alias template for a floating-point vector of a given dimension.</td>
+</tr>
+<tr>
+<td><a href="Types/">fvec2</a></td>
+<td>Types</td>
+<td>A 2-component floating-point vector.</td>
+</tr>
+<tr>
+<td><a href="Types/">fvec3</a></td>
+<td>Types</td>
+<td>A 3-component floating-point vector.</td>
+</tr>
+<tr>
+<td><a href="Types/">fvec4</a></td>
+<td>Types</td>
+<td>A 4-component floating-point vector.</td>
+</tr>
+<tr>
+<td><a href="Types/">ivec</a></td>
+<td>Types</td>
+<td>Generic alias template for an integer vector of a given dimension.</td>
+</tr>
+<tr>
+<td><a href="Types/">ivec2</a></td>
+<td>Types</td>
+<td>A 2-component integer vector.</td>
+</tr>
+<tr>
+<td><a href="Types/">ivec3</a></td>
+<td>Types</td>
+<td>A 3-component integer vector.</td>
+</tr>
+<tr>
+<td><a href="Types/">ivec4</a></td>
+<td>Types</td>
+<td>A 4-component integer vector.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="matrices">Matrices</h3>
+<p>Matrix types ranging from 2x2 to 4x4 in floating-point and integer variants, plus generic templates</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Types/">fmat</a></td>
+<td>Types</td>
+<td>Generic alias template for a floating-point matrix of given row and column counts.</td>
+</tr>
+<tr>
+<td><a href="Types/">fmat2</a></td>
+<td>Types</td>
+<td>A 2x2 floating-point matrix.</td>
+</tr>
+<tr>
+<td><a href="Types/">fmat3</a></td>
+<td>Types</td>
+<td>A 3x3 floating-point matrix.</td>
+</tr>
+<tr>
+<td><a href="Types/">fmat4</a></td>
+<td>Types</td>
+<td>A 4x4 floating-point matrix, the standard type for affine transforms.</td>
+</tr>
+<tr>
+<td><a href="Types/">imat</a></td>
+<td>Types</td>
+<td>Generic alias template for an integer matrix of given row and column counts.</td>
+</tr>
+<tr>
+<td><a href="Types/">imat2</a></td>
+<td>Types</td>
+<td>A 2x2 integer matrix.</td>
+</tr>
+<tr>
+<td><a href="Types/">imat3</a></td>
+<td>Types</td>
+<td>A 3x3 integer matrix.</td>
+</tr>
+<tr>
+<td><a href="Types/">imat4</a></td>
+<td>Types</td>
+<td>A 4x4 integer matrix.</td>
+</tr>
+<tr>
+<td><a href="Types/">mat2</a></td>
+<td>Types</td>
+<td>A generic 2x2 matrix, parameterized only by element type <code>T</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rotations-and-angles">Rotations and angles</h3>
+<p>Angle types, quaternions, and Euler rotation vectors for representing 3D orientations in radians or degrees</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Types/">deg</a></td>
+<td>Types</td>
+<td>Alias for an angle value held in degrees, <code>ang&lt;T, impl::degrees&gt;</code>.</td>
+</tr>
+<tr>
+<td><a href="Types/">deg3</a></td>
+<td>Types</td>
+<td>A 3-component vector of degree-unit angles, used for Euler rotations expressed in degrees.</td>
+</tr>
+<tr>
+<td><a href="Types/">fdeg</a></td>
+<td>Types</td>
+<td>Single-precision degree-based angle alias, used wherever rotations are expressed in degrees instead of radians.</td>
+</tr>
+<tr>
+<td><a href="Types/">fdeg3</a></td>
+<td>Types</td>
+<td>A 3-component vector of single-precision degree angles, typically used to represent Euler-angle rotations (pitch/yaw/roll) in degrees.</td>
+</tr>
+<tr>
+<td><a href="Types/">fquat</a></td>
+<td>Types</td>
+<td>Single-precision quaternion type, the standard rotation representation used throughout <code>tdm</code> for 3D orientation.</td>
+</tr>
+<tr>
+<td><a href="Types/">frad</a></td>
+<td>Types</td>
+<td>Single-precision radian-based angle alias, used wherever rotations are expressed in radians instead of degrees.</td>
+</tr>
+<tr>
+<td><a href="Types/">frad3</a></td>
+<td>Types</td>
+<td>A 3-component vector of single-precision radian angles, typically used to represent Euler-angle rotations in radians.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="all-modules">All Modules</h2>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>File</th>
+<th>Entries</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ang</td>
+<td><a href="Ang/">Ang.md</a></td>
+<td>4</td>
+</tr>
+<tr>
+<td>Computations</td>
+<td><a href="Computations/">Computations.md</a></td>
+<td>16</td>
+</tr>
+<tr>
+<td>CoordSys</td>
+<td><a href="CoordSys/">CoordSys.md</a></td>
+<td>2</td>
+</tr>
+<tr>
+<td>Mat</td>
+<td><a href="Mat/">Mat.md</a></td>
+<td>5</td>
+</tr>
+<tr>
+<td>Quat</td>
+<td><a href="Quat/">Quat.md</a></td>
+<td>3</td>
+</tr>
+<tr>
+<td>Transforms</td>
+<td><a href="Transforms/">Transforms.md</a></td>
+<td>18</td>
+</tr>
+<tr>
+<td>Types</td>
+<td><a href="Types/">Types.md</a></td>
+<td>44</td>
+</tr>
+<tr>
+<td>Vec</td>
+<td><a href="Vec/">Vec.md</a></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../status/StatusCode/" class="btn btn-neutral float-left" title="StatusCode"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="Ang/" class="btn btn-neutral float-right" title="Ang">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../status/StatusCode/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="Ang/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

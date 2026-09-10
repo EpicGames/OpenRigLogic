@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://epicgames.github.io/OpenRigLogic/release_notes/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Release Notes - OpenRigLogic</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Release Notes";
+        var mkdocs_page_input_path = "release_notes.md";
+        var mkdocs_page_url = "/OpenRigLogic/release_notes/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> OpenRigLogic
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Release Notes</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#release-v1325">Release v13.2.5</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#highlights">Highlights</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#features">Features</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#breaking-changes">Breaking Changes</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#migration-guide">Migration Guide</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#infrastructure">Infrastructure</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#other-changes">Other Changes</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#release-v1327">Release v13.2.7</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#highlights_1">Highlights</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#features_1">Features</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#examples_1">Examples</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#bug-fixes">Bug Fixes</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#infrastructure_1">Infrastructure</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#other-changes_1">Other Changes</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#release-v1328">Release v13.2.8</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#highlights_2">Highlights</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#features_2">Features</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#examples_2">Examples</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#bug-fixes_1">Bug Fixes</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#breaking-changes_1">Breaking Changes</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#migration-guide_1">Migration Guide</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#other-changes_2">Other Changes</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#release-v1329">Release v13.2.9</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#highlights_3">Highlights</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#bug-fixes_2">Bug Fixes</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#infrastructure_2">Infrastructure</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../api/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >arrayview</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../api/arrayview/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/arrayview/ArrayView/">ArrayView</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/arrayview/StringView/">StringView</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >dna</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../api/dna/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/dna/BinaryStreamReader/">BinaryStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/dna/BinaryStreamWriter/">BinaryStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/dna/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/dna/JSONStreamReader/">JSONStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/dna/JSONStreamWriter/">JSONStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/dna/Reader/">Reader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/dna/StreamReader/">StreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/dna/StreamWriter/">StreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/dna/Writer/">Writer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/BehaviorReader/">BehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/BehaviorWriter/">BehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/DefinitionReader/">DefinitionReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/DefinitionWriter/">DefinitionWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/Descriptor/">Descriptor</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/DescriptorReader/">DescriptorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/DescriptorWriter/">DescriptorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/Geometry/">Geometry</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/GeometryReader/">GeometryReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/GeometryWriter/">GeometryWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/HeaderReader/">HeaderReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/HeaderWriter/">HeaderWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/JointBehaviorMetadata/">JointBehaviorMetadata</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/JointBehaviorMetadataReader/">JointBehaviorMetadataReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/JointBehaviorMetadataWriter/">JointBehaviorMetadataWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/MachineLearnedBehavior/">MachineLearnedBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorExt</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/MachineLearnedBehaviorExtReader/">MachineLearnedBehaviorExtReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/MachineLearnedBehaviorExtWriter/">MachineLearnedBehaviorExtWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/MachineLearnedBehaviorReader/">MachineLearnedBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/MachineLearnedBehaviorWriter/">MachineLearnedBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/RBFBehavior/">RBFBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/RBFBehaviorReader/">RBFBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/RBFBehaviorWriter/">RBFBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/Twist/">Twist</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/TwistSwingBehaviorReader/">TwistSwingBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/layers/TwistSwingBehaviorWriter/">TwistSwingBehaviorWriter</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/types/Vector3/">Vector3</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../api/dna/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >pma</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../api/pma/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/pma/MemoryResource/">MemoryResource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/pma/PolyAllocator/">PolyAllocator</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/pma/ScopedPtr/">ScopedPtr</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/pma/TypeDefs/">TypeDefs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >resources</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../api/pma/resources/AlignedMemoryResource/">AlignedMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/pma/resources/ArenaMemoryResource/">ArenaMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/pma/resources/DefaultMemoryResource/">DefaultMemoryResource</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../api/pma/utils/ManagedInstance/">ManagedInstance</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >riglogic</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../api/riglogic/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/riglogic/riglogic/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/riglogic/riglogic/RigInstance/">RigInstance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/riglogic/riglogic/RigLogic/">RigLogic</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/riglogic/riglogic/Stats/">Stats</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../api/riglogic/types/Aliases/">Aliases</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../api/riglogic/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >status</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../api/status/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/status/Provider/">Provider</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/status/Status/">Status</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/status/StatusCode/">StatusCode</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >tdm</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../api/tdm/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/tdm/Ang/">Ang</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/tdm/Computations/">Computations</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/tdm/CoordSys/">CoordSys</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/tdm/Mat/">Mat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/tdm/Quat/">Quat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/tdm/Transforms/">Transforms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/tdm/Types/">Types</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/tdm/Vec/">Vec</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >trio</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../api/trio/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/trio/Concepts/">Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../api/trio/Stream/">Stream</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >streams</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../api/trio/streams/FileStream/">FileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/trio/streams/MemoryMappedFileStream/">MemoryMappedFileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../api/trio/streams/MemoryStream/">MemoryStream</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../api/trio/types/Parameters/">Parameters</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../api/trio/utils/StreamScope/">StreamScope</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OpenRigLogic</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Release Notes</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="release-notes">Release Notes</h1>
+<!-- This file is managed by the Ink plugin. Do not edit anchor tags manually. -->
+
+<!-- ink:start id=3f24d88d type=release_notes conflict_score=1.0 last_confirmed=2026-06-10 created=2026-06-10 -->
+<h2 id="release-v1325">Release v13.2.5</h2>
+<p>This release includes changes across 16 modules, with the heaviest activity in <code>include/dna</code> (5 items), <code>include/riglogic</code> (4 items), and <code>src/riglogic</code> (4 items). It introduces 11 new features including a consolidated <code>dna::Configuration</code> struct, an extended ML behavior API, and new TDM math types. This release contains 6 breaking changes that require call-site updates.</p>
+<h3 id="highlights">Highlights</h3>
+<ul>
+<li><strong>include/dna</strong>: New <code>dna::Configuration</code> struct consolidates all DNA reader parameters; <code>BinaryStreamReader::create()</code> now accepts a single config struct; <code>MachineLearnedBehaviorExt</code> API added for structured ML model introspection</li>
+<li><strong>include/riglogic</strong>: ML API renamed (<code>calculateMLControls</code>), neural-network index APIs replaced by structured ML type/operation-set model, <code>AnyVector</code>/<code>HalfFloat</code> set as new defaults, raw control buffer now mutable</li>
+<li><strong>include/tdm</strong>: New strongly-typed angle type (<code>tdm::Ang</code>), comprehensive math computation utilities, and typed coordinate system types added</li>
+<li><strong>cmake/install</strong>: New <code>install_application()</code> macro and <code>Uninstall</code> target added for executable install support</li>
+<li><strong>src/riglogic</strong>: Internal ML behavior storage restructured to flat <code>meshRegionCounts</code> vector aligned with the new ML operation set model</li>
+</ul>
+<h3 id="features">Features</h3>
+<ul>
+<li><strong>cmake/install</strong>: Added <code>install_application()</code> CMake macro and <code>ConfigApplication.cmake.in</code> for installing executable targets alongside libraries, plus a new <code>Uninstall</code> target</li>
+<li><strong>include/dna</strong>: Added <code>dna::Configuration</code> struct consolidating all DNA reader parameters (layer, LOD range, coordinate system transform policy, rotation sequence/sign, translation unit, face winding order)</li>
+<li><strong>include/dna</strong>: Added <code>BinaryStreamReader::create(stream, config, memRes)</code> single-struct factory as the new primary creation path</li>
+<li><strong>include/dna</strong>: Added <code>MachineLearnedBehaviorExt</code> API: <code>MachineLearnedBehaviorOperationType</code> and <code>MachineLearnedBehaviorParameterKey</code> enums for fine-grained ML model introspection</li>
+<li><strong>include/riglogic</strong>: Added <code>RigLogic::getMLTypeCount()</code> and <code>getMLOperationSetCount()</code> for structured ML model introspection replacing flat neural-network index lists</li>
+<li><strong>include/riglogic</strong>: Added <code>FloatingPointType::HalfFloat</code> to <code>rl4::Configuration</code> with half-float as the new default floating-point representation</li>
+<li><strong>include/riglogic</strong>: Added <code>CalculationType::AnyVector</code> as a new default that selects the best available SIMD path at runtime</li>
+<li><strong>include/riglogic</strong>: <code>RigInstance::getRawControlValues()</code> now returns a mutable <code>ArrayView&lt;float&gt;</code> enabling direct zero-copy buffer writes</li>
+<li><strong>include/tdm</strong>: Added <code>tdm::Ang&lt;T,TUnit&gt;</code> strongly-typed angle value with degree/radian specialisations, conversion constructors, and <code>_fdeg</code>/<code>_frad</code> user-defined literals</li>
+<li><strong>include/tdm</strong>: Added <code>tdm::Computations.h</code>: free-function math utilities including <code>cross</code>, <code>dot</code>, <code>lerp</code>, <code>slerp</code>, <code>normalize</code>, <code>conjugate</code>, <code>inverse</code>, <code>transpose</code>, and <code>determinant</code></li>
+<li><strong>include/tdm</strong>: Added <code>tdm::CoordSys</code> typed coordinate system and axis direction types (<code>Direction</code>, <code>RotationDirection</code>, <code>RotationSequence</code>, <code>RotationSign</code>)</li>
+</ul>
+<h3 id="examples">Examples</h3>
+<p><strong>examples</strong> — Creating a BinaryStreamReader using the new dna::Configuration struct</p>
+<pre><code class="language-cpp">dna::Configuration dnacfg = {};
+dnacfg.layer = rl4::DataLayer::All;
+dnacfg.unknownLayerPolicy = rl4::UnknownLayerPolicy::Ignore;
+dnacfg.maxLOD = 2;
+auto reader = rl4::makeScoped&lt;rl4::BinaryStreamReader&gt;(stream.get(), dnacfg, &amp;memRes);
+</code></pre>
+<p><strong>examples</strong> — Writing controls directly into the mutable raw control buffer returned by getRawControlValues()</p>
+<pre><code class="language-cpp">rl4::ArrayView&lt;float&gt; rawControlBuffer = rigInstance-&gt;getRawControlValues();
+for (std::uint16_t ctrlIndex = 0u; ctrlIndex &lt; rigInstance-&gt;getRawControlCount(); ++ctrlIndex) {
+    if (ctrlIndex == controlToManipulate) {
+        const float val = std::fabs(std::sin(frame / 1000.0f));
+        rawControlBuffer[ctrlIndex] = val;
+    }
+}
+</code></pre>
+<h3 id="breaking-changes">Breaking Changes</h3>
+<ul>
+<li><strong>include/dna</strong>: <code>BinaryStreamReader::create()</code> multi-parameter overloads removed; all call sites must migrate to <code>dna::Configuration</code> struct</li>
+<li><strong>include/riglogic</strong>: <code>rl4::RotationOrder</code> enum and <code>Configuration::rotationOrder</code> field removed; rotation order is now expressed via <code>dna::Configuration::rotationSequence</code> and <code>rotationSign</code></li>
+<li><strong>include/riglogic</strong>: <code>calculateMachineLearnedBehaviorControls()</code> renamed to <code>calculateMLControls()</code> on <code>RigLogic</code></li>
+<li><strong>include/riglogic</strong>: <code>RigLogic::getNeuralNetworkIndicesForLOD()</code> and <code>getNeuralNetworkCount()</code> removed; replaced by <code>getMLTypeCount()</code>/<code>getMLOperationSetCount()</code></li>
+<li><strong>include/riglogic</strong>: <code>RigInstance::getNeuralNetworkMask()</code>/<code>setNeuralNetworkMask()</code> removed along with <code>getNeuralNetworkCount()</code> on <code>RigInstance</code></li>
+<li><strong>include/riglogic</strong>: <code>rl4::Configuration</code> default <code>calculationType</code> changed from <code>SSE</code> to <code>AnyVector</code>; new <code>floatingPointType</code> field defaults to <code>HalfFloat</code> — may change numerical output on existing callers</li>
+</ul>
+<h3 id="migration-guide">Migration Guide</h3>
+<p><strong>include/dna — BinaryStreamReader::create() multi-parameter overloads removed; replaced by single dna::Configuration struct</strong></p>
+<p>Replace positional arguments with a <code>dna::Configuration</code> struct: set <code>cfg.layer</code>, <code>cfg.unknownLayerPolicy</code>, <code>cfg.maxLOD</code>, <code>cfg.minLOD</code>, then pass <code>cfg</code> as the second argument.</p>
+<p>Before:</p>
+<pre><code>static BinaryStreamReader* create(BoundedIOStream* stream, DataLayer layer = DataLayer::All, UnknownLayerPolicy policy = UnknownLayerPolicy::Preserve, std::uint16_t maxLOD = 0u, MemoryResource* memRes = nullptr);
+</code></pre>
+<p>After:</p>
+<pre><code>static BinaryStreamReader* create(BoundedIOStream* stream, const Configuration&amp; config = {}, MemoryResource* memRes = nullptr);
+</code></pre>
+<p><strong>include/riglogic — RotationOrder enum and Configuration::rotationOrder field removed</strong></p>
+<p>Remove any assignment to <code>config.rotationOrder</code>. Specify rotation sequence via <code>dna::Configuration::rotationSequence</code> (e.g. <code>rotationSequence = RotationSequence::xyz</code>) and <code>rotationSign</code> if needed.</p>
+<p>Before:</p>
+<pre><code>    RotationOrder rotationOrder = RotationOrder::XYZ;
+</code></pre>
+<p><strong>include/riglogic — calculateMachineLearnedBehaviorControls() renamed to calculateMLControls()</strong></p>
+<p>Rename all call sites from <code>calculateMachineLearnedBehaviorControls()</code> to <code>calculateMLControls()</code>.</p>
+<p>Before:</p>
+<pre><code>virtual void calculateMachineLearnedBehaviorControls(RigInstance* instance) const = 0;
+</code></pre>
+<p>After:</p>
+<pre><code>virtual void calculateMLControls(RigInstance* instance) const = 0;
+</code></pre>
+<p><strong>include/riglogic — getNeuralNetworkIndicesForLOD() and getNeuralNetworkCount() removed from RigLogic</strong></p>
+<p>Replace with <code>getMLTypeCount()</code> / <code>getMLOperationSetCount(mlTypeIndex)</code> / <code>getMLOperationCount(mlTypeIndex, mlOperationSetIndex)</code> for structured ML model traversal.</p>
+<p>Before:</p>
+<pre><code>virtual ConstArrayView&lt;std::uint32_t&gt; getNeuralNetworkIndicesForLOD(std::uint16_t lod) const = 0;
+</code></pre>
+<p><strong>include/riglogic — RigInstance getNeuralNetworkMask/setNeuralNetworkMask removed</strong></p>
+<p>Remove usage; neural network masking API has been removed. Use the new ML operation set structure for selective evaluation.</p>
+<p>Before:</p>
+<pre><code>virtual float getNeuralNetworkMask(std::uint16_t neuralNetIndex) const = 0;
+</code></pre>
+<p><strong>include/riglogic — rl4::Configuration defaults changed: calculationType SSE→AnyVector, new floatingPointType defaulting to HalfFloat</strong></p>
+<p>If full-precision output is required, explicitly set <code>config.floatingPointType = FloatingPointType::Float32</code>. If SSE-only computation is required, set <code>config.calculationType = CalculationType::SSE</code>.</p>
+<p>Before:</p>
+<pre><code>    CalculationType calculationType = CalculationType::SSE;
+</code></pre>
+<p>After:</p>
+<pre><code>    CalculationType calculationType = CalculationType::AnyVector;
+    FloatingPointType floatingPointType = FloatingPointType::HalfFloat;
+</code></pre>
+<h3 id="infrastructure">Infrastructure</h3>
+<ul>
+<li><strong>(root)</strong>: Code formatting migrated from uncrustify (<code>.uncrustify.cfg</code> removed) to clang-format (<code>.clang-format</code> added)</li>
+<li><strong>cmake/install</strong>: <code>cmake/install/Config.cmake.in</code> renamed to <code>ConfigLibrary.cmake.in</code> to disambiguate from the new <code>ConfigApplication.cmake.in</code></li>
+<li><strong>docs/uml</strong>: Removed UML architecture diagram and all sequence diagrams from <code>docs/uml/</code></li>
+<li><strong>python/dna</strong>: Python SWIG bindings updated to reflect new <code>dna::Configuration</code> API and <code>MachineLearnedBehaviorExt</code> types</li>
+</ul>
+<h3 id="other-changes">Other Changes</h3>
+<ul>
+<li><strong>(other)</strong>: Minor changes across benchmarks, cmake dependency scripts, and sanitizer configuration</li>
+<li><strong>include/pma</strong>: Reformatted access specifiers across all pma and trio headers (indentation style change only, no behavioral change)</li>
+<li><strong>src/riglogic</strong>: ML behavior internal storage changed from <code>neuralNetworkIndicesPerMeshRegion</code> (<code>Vector&lt;Matrix&lt;uint16_t&gt;&gt;</code>) to flat <code>meshRegionCounts</code> (<code>Vector&lt;uint16_t&gt;</code>)</li>
+</ul>
+<p><strong>Tags</strong>: release, v13.2.5, dna, riglogic, tdm, pma, trio, cmake</p>
+<!-- ink:end id=3f24d88d -->
+
+<!-- ink:start id=74910689 type=release_notes conflict_score=1.0 last_confirmed=2026-07-31 created=2026-07-31 -->
+<h2 id="release-v1327">Release v13.2.7</h2>
+<p>This release spans four modules, with most of the work in <code>dna</code> (5 changes), the build root (3), and <code>include</code> (2). It adds two features and four bug fixes, all centred on coordinate system conversion fidelity. There are no breaking changes; tdm moves from 6.0.0 to 6.0.1.</p>
+<h3 id="highlights_1">Highlights</h3>
+<ul>
+<li><strong>dna</strong>: Twist and swing axes are now remapped during coordinate system conversion, and RBF pose quaternions are conjugated directly rather than through an euler roundtrip</li>
+<li><strong>dna</strong>: Layers are explicitly indexed so converted data survives raw-copy serialization of v2.1 and pre-v2.7 sources</li>
+<li><strong>include</strong>: Six gimbal-lock sign corrections in <code>mat_to_euler</code> across four rotation sequences</li>
+<li><strong>cmake</strong>: Registered a new exhaustive matrix/euler round-trip test suite</li>
+<li><strong>(root)</strong>: Benchmark targets are now sanitized alongside the benchmark runner</li>
+</ul>
+<h3 id="features_1">Features</h3>
+<ul>
+<li><strong>dna</strong>: Added <code>CoordinateSystemConverter::convertTwistAxes</code>, which remaps twist, swing, and RBF-solver twist axes to the dominant destination axis during coordinate system conversion</li>
+<li><strong>dna</strong>: Added <code>DNA::ensureLayerIndexed</code> to create a layer index entry when one is absent</li>
+</ul>
+<h3 id="examples_1">Examples</h3>
+<p><strong>dna</strong> — after a Maya-to-UE conversion, twist, swing, and RBF-solver axes are remapped to the dominant destination axis</p>
+<pre><code class="language-cpp">ASSERT_EQ(reader-&gt;getTwistSetupTwistAxis(0), TwistAxis::Z);
+ASSERT_EQ(reader-&gt;getTwistSetupTwistAxis(1), TwistAxis::X);
+ASSERT_EQ(reader-&gt;getTwistSetupTwistAxis(2), TwistAxis::Y);
+ASSERT_EQ(reader-&gt;getSwingSetupTwistAxis(0), TwistAxis::Z);
+ASSERT_EQ(reader-&gt;getSwingSetupTwistAxis(1), TwistAxis::X);
+ASSERT_EQ(reader-&gt;getSwingSetupTwistAxis(2), TwistAxis::Y);
+</code></pre>
+<p><strong>include</strong> — the new round-trip check: euler angles need not match, but the rotation they encode must</p>
+<pre><code class="language-cpp">float roundTripError(tdm::rot_seq seq, tdm::rot_sign signs, const tdm::frad3&amp; euler) {
+    const tdm::mat3&lt;float&gt; m = tdm::impl::euler2mat&lt;float&gt;(euler, seq, signs);
+    const tdm::frad3 extracted = tdm::impl::mat2euler&lt;float&gt;(m, seq, signs);
+    const tdm::mat3&lt;float&gt; reconstructed = tdm::impl::euler2mat&lt;float&gt;(extracted, seq, signs);
+    return maxMatrixDiff(m, reconstructed);
+}
+</code></pre>
+<h3 id="bug-fixes">Bug Fixes</h3>
+<ul>
+<li><strong>dna</strong>: RBF pose quaternions are now conjugated directly as <code>q' = (det(C) * (v * C), w)</code> instead of via an euler roundtrip, preserving the q versus -q distinction that half-rotation RBF solvers rely on to track driver rotations beyond 180 degrees</li>
+<li><strong>dna</strong>: v2.1 monolithic DNAs now explicitly index the descriptor, definition, behavior, and geometry layers before the format upgrade, so they are not silently dropped when serializing with <code>UpgradeFormatPolicy::Disallowed</code></li>
+<li><strong>dna</strong>: The DescriptorExt layer is now explicitly indexed so converted rotation and winding conventions survive raw-copy serialization from sources older than v2.7</li>
+<li><strong>include</strong>: Corrected the <code>atan2</code> sign in six <code>mat_to_euler</code> gimbal-lock branches across rotation sequences xyz, xzy, yzx, and zxy</li>
+</ul>
+<h3 id="infrastructure_1">Infrastructure</h3>
+<ul>
+<li><strong>(root)</strong>: CMake now collects benchmark targets into <code>RL_BENCHMARK_TARGETS</code> and passes them to <code>sanitize_targets</code>, so the bundled <code>benchmark</code> target is sanitized alongside the runner</li>
+<li><strong>(root)</strong>: Added <code>/.clang-format-tool</code> to <code>.gitignore</code></li>
+<li><strong>cmake</strong>: Registered <code>tests/tdmtests/TestMatEulerConverter.cpp</code> in the test source list</li>
+</ul>
+<h3 id="other-changes_1">Other Changes</h3>
+<ul>
+<li><strong>(root)</strong>: <code>CMakeLists.txt</code> <code>RL_VERSION</code> raised from 13.2.5 to 13.2.7</li>
+<li><strong>include</strong>: Version bumps: RigLogic 13.2.5 to 13.2.7, DNA 10.1.3 to 10.1.5, tdm 6.0.0 to 6.0.1</li>
+</ul>
+<p><strong>Tags</strong>: release, v13.2.7, include, dna, root, cmake</p>
+<!-- ink:end id=74910689 -->
+
+<!-- ink:start id=f250a654 type=release_notes conflict_score=1.0 last_confirmed=2026-07-31 created=2026-07-31 -->
+<h2 id="release-v1328">Release v13.2.8</h2>
+<p>This release is a focused change to how scale is converted between coordinate systems, touching three modules. It contains one breaking change: <code>tdm::convert_scale</code> now requires an explicit <code>sign_policy</code> argument, moving tdm from 6.0.1 to 7.0.0. Two call sites in <code>dna</code> and <code>riglogic</code> adopt <code>sign_policy::preserve</code> so signed scale deltas keep their sign through an axis permutation.</p>
+<h3 id="highlights_2">Highlights</h3>
+<ul>
+<li><strong>include</strong>: <code>tdm::convert_scale</code> gains a required <code>sign_policy</code> argument — a breaking change, reflected in the tdm 6.0.1 to 7.0.0 major bump</li>
+<li><strong>include</strong>: New <code>tdm::sign_policy</code> enum distinguishes absolute scale magnitudes from signed scale deltas</li>
+<li><strong>dna</strong>: Joint scale deltas now preserve their sign through coordinate system conversion</li>
+<li><strong>riglogic</strong>: Machine-learned scale deltas now preserve their sign through coordinate system conversion</li>
+</ul>
+<h3 id="features_2">Features</h3>
+<ul>
+<li><strong>include</strong>: Added the <code>tdm::sign_policy</code> enum (<code>discard</code>, <code>preserve</code>) to control whether a change of basis preserves per-component scale signs</li>
+</ul>
+<h3 id="examples_2">Examples</h3>
+<p><strong>include</strong> — <code>sign_policy::preserve</code> permutes the axes but keeps each component's own sign</p>
+<pre><code class="language-cpp">const tdm::fvec3 maya_delta{-0.5f, 0.5f, -0.25f};  // Maya (mx, my, mz) -&gt; UE (mz, mx, my)
+
+const auto preserved = tdm::convert_scale(maya_delta, maya_cs, ue_cs, tdm::sign_policy::preserve);
+ASSERT_NEAR(preserved[0], -0.25f, 0.001f);  // mz
+ASSERT_NEAR(preserved[1], -0.5f, 0.001f);   // mx
+ASSERT_NEAR(preserved[2], 0.5f, 0.001f);    // my
+</code></pre>
+<p><strong>include</strong> — <code>sign_policy::discard</code> reproduces the pre-7.0.0 absolute-value behaviour</p>
+<pre><code class="language-cpp">const tdm::fvec3 ue_scale{1.0f, 3.0f, 2.0f};
+const auto maya_scale = tdm::convert_scale(ue_scale, ue_cs, maya_cs, tdm::sign_policy::discard);
+
+ASSERT_NEAR(maya_scale[0], 3.0f, 0.001f);  // uy
+ASSERT_NEAR(maya_scale[1], 2.0f, 0.001f);  // uz
+ASSERT_NEAR(maya_scale[2], 1.0f, 0.001f);  // ux
+</code></pre>
+<h3 id="bug-fixes_1">Bug Fixes</h3>
+<ul>
+<li><strong>dna</strong>: Joint scale deltas now convert with <code>sign_policy::preserve</code>, so negative deltas are no longer corrupted by an absolute value</li>
+<li><strong>riglogic</strong>: Machine-learned scale deltas now convert with <code>sign_policy::preserve</code>, so negative deltas survive the axis permutation</li>
+</ul>
+<h3 id="breaking-changes_1">Breaking Changes</h3>
+<ul>
+<li><strong>include</strong>: <code>tdm::convert_scale</code> now requires an explicit <code>sign_policy</code> argument on both the <code>mat3</code> and <code>coord_sys</code> overloads; tdm major version bumped from 6.0.1 to 7.0.0</li>
+</ul>
+<h3 id="migration-guide_1">Migration Guide</h3>
+<p><strong>include — <code>tdm::convert_scale</code> now requires an explicit <code>sign_policy</code> argument</strong></p>
+<p>Pass <code>tdm::sign_policy::discard</code> at existing call sites to keep the previous absolute-value behaviour, or <code>sign_policy::preserve</code> when the vector is a signed scale delta.</p>
+<p>Before:</p>
+<pre><code>inline vec3&lt;T&gt; convert_scale(const vec3&lt;T&gt;&amp; scale, const mat3&lt;T&gt;&amp; c) {
+</code></pre>
+<p>After:</p>
+<pre><code>inline vec3&lt;T&gt; convert_scale(const vec3&lt;T&gt;&amp; scale, const mat3&lt;T&gt;&amp; c, sign_policy policy) {
+</code></pre>
+<h3 id="other-changes_2">Other Changes</h3>
+<ul>
+<li><strong>include</strong>: Version bumps: RigLogic 13.2.7 to 13.2.8, DNA 10.1.5 to 10.1.6, tdm 6.0.1 to 7.0.0</li>
+</ul>
+<p><strong>Tags</strong>: release, v13.2.8, include, dna, riglogic</p>
+<!-- ink:end id=f250a654 -->
+
+<!-- ink:start id=d0f5e815 type=release_notes conflict_score=1.0 last_confirmed=2026-09-09 created=2026-09-09 -->
+<h2 id="release-v1329">Release v13.2.9</h2>
+<p>This release includes changes across three modules, with all functional work in the riglogic ML CPU evaluator (three bug fixes) plus the version bump to 13.2.9. Single upstream snapshot import (UE5.8.3); no breaking changes.</p>
+<h3 id="highlights_3">Highlights</h3>
+<ul>
+<li><strong>riglogic</strong>: ML CPU evaluator correctness fixes — operation indices stay aligned with the DNA when ops are skipped, and WeightedSum consumers can no longer read past a dependency's output buffer</li>
+<li><strong>(root)</strong>: RigLogic version bumped from 13.2.7 to 13.2.9</li>
+</ul>
+<h3 id="bug-fixes_2">Bug Fixes</h3>
+<ul>
+<li><strong>riglogic</strong>: Skipped ML operations (non-MLP type or layer-less networks) are now kept as inert, layer-less placeholder entries so op indices remain aligned with the DNA — LOD lists and cross-op dependency indices reference original op indices; <code>execute()</code> skips layer-less ops so placeholders contribute nothing at runtime</li>
+<li><strong>riglogic</strong>: When a WeightedSum op reads more elements from a dependency buffer than the dependency's true output width, the dependency's buffer is now grown so the read stays in bounds, and MLP dependencies mark the over-read tail via the new <code>tailZeroCount</code> field (zeroed padding floats)</li>
+<li><strong>riglogic</strong>: Masked-op default-value scatter now uses the per-LOD output count (<code>outputCountsPerLOD[lod]</code>) as its limit instead of the full <code>defaultValues</code> size</li>
+</ul>
+<h3 id="infrastructure_2">Infrastructure</h3>
+<ul>
+<li><strong>(root)</strong>: Bumped <code>RL_VERSION</code> from 13.2.7 to 13.2.9 in CMakeLists.txt</li>
+<li><strong>include/riglogic</strong>: Updated version constants and <code>RL_VERSION_STRING</code> to 13.2.9 in Version.h</li>
+</ul>
+<p><strong>Tags</strong>: release, v13.2.9, riglogic, ml, cpu, cmake, include</p>
+<!-- ink:end id=d0f5e815 -->
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../api/" class="btn btn-neutral float-right" title="Overview">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../api/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

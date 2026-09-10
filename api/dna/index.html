@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://epicgames.github.io/OpenRigLogic/api/dna/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Overview - OpenRigLogic</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Overview";
+        var mkdocs_page_input_path = "api/dna/index.md";
+        var mkdocs_page_url = "/OpenRigLogic/api/dna/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> OpenRigLogic
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../release_notes/">Release Notes</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >arrayview</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../arrayview/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../arrayview/ArrayView/">ArrayView</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../arrayview/StringView/">StringView</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >dna</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Overview</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#by-task">By Task</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#binary-dna-stream-io">Binary DNA stream I/O</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#json-dna-stream-io">JSON DNA stream I/O</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#load-and-save-configuration">Load and save configuration</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#abstract-dna-reader-interface">Abstract DNA reader interface</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#abstract-dna-writer-interface">Abstract DNA writer interface</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#behavioral-layer-read-and-write">Behavioral layer read and write</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#definition-layer-read-and-write">Definition layer read and write</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#character-and-rig-metadata">Character and rig metadata</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#mesh-geometry">Mesh geometry</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#joint-transform-representations">Joint transform representations</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#pose-and-deformation-behaviors">Pose and deformation behaviors</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#foundation-types">Foundation types</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#all-modules">All Modules</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="BinaryStreamReader/">BinaryStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="BinaryStreamWriter/">BinaryStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="JSONStreamReader/">JSONStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="JSONStreamWriter/">JSONStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="Reader/">Reader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="StreamReader/">StreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="StreamWriter/">StreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="Writer/">Writer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="layers/BehaviorReader/">BehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/BehaviorWriter/">BehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/DefinitionReader/">DefinitionReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/DefinitionWriter/">DefinitionWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/Descriptor/">Descriptor</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/DescriptorReader/">DescriptorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/DescriptorWriter/">DescriptorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/Geometry/">Geometry</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/GeometryReader/">GeometryReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/GeometryWriter/">GeometryWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/HeaderReader/">HeaderReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/HeaderWriter/">HeaderWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/JointBehaviorMetadata/">JointBehaviorMetadata</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/JointBehaviorMetadataReader/">JointBehaviorMetadataReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/JointBehaviorMetadataWriter/">JointBehaviorMetadataWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/MachineLearnedBehavior/">MachineLearnedBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorExt</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/MachineLearnedBehaviorExtReader/">MachineLearnedBehaviorExtReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/MachineLearnedBehaviorExtWriter/">MachineLearnedBehaviorExtWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/MachineLearnedBehaviorReader/">MachineLearnedBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/MachineLearnedBehaviorWriter/">MachineLearnedBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/RBFBehavior/">RBFBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/RBFBehaviorReader/">RBFBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/RBFBehaviorWriter/">RBFBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/Twist/">Twist</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/TwistSwingBehaviorReader/">TwistSwingBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="layers/TwistSwingBehaviorWriter/">TwistSwingBehaviorWriter</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="types/Vector3/">Vector3</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >pma</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../pma/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../pma/MemoryResource/">MemoryResource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../pma/PolyAllocator/">PolyAllocator</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../pma/ScopedPtr/">ScopedPtr</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../pma/TypeDefs/">TypeDefs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >resources</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../pma/resources/AlignedMemoryResource/">AlignedMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../pma/resources/ArenaMemoryResource/">ArenaMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../pma/resources/DefaultMemoryResource/">DefaultMemoryResource</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../pma/utils/ManagedInstance/">ManagedInstance</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >riglogic</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../riglogic/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../riglogic/riglogic/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../riglogic/riglogic/RigInstance/">RigInstance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../riglogic/riglogic/RigLogic/">RigLogic</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../riglogic/riglogic/Stats/">Stats</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../riglogic/types/Aliases/">Aliases</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../riglogic/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >status</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../status/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../status/Provider/">Provider</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../status/Status/">Status</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../status/StatusCode/">StatusCode</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >tdm</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../tdm/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tdm/Ang/">Ang</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tdm/Computations/">Computations</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tdm/CoordSys/">CoordSys</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tdm/Mat/">Mat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tdm/Quat/">Quat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tdm/Transforms/">Transforms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tdm/Types/">Types</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../tdm/Vec/">Vec</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >trio</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../trio/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../trio/Concepts/">Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../trio/Stream/">Stream</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >streams</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../trio/streams/FileStream/">FileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../trio/streams/MemoryMappedFileStream/">MemoryMappedFileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../trio/streams/MemoryStream/">MemoryStream</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../trio/types/Parameters/">Parameters</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../trio/utils/StreamScope/">StreamScope</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">OpenRigLogic</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+          <li class="breadcrumb-item">dna</li>
+      <li class="breadcrumb-item active">Overview</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="api-reference-dna">API Reference — <code>dna</code></h1>
+<p><em>75 entries across 38 modules.</em></p>
+<h2 id="by-task">By Task</h2>
+<h3 id="binary-dna-stream-io">Binary DNA stream I/O</h3>
+<p>Read and write DNA rig data in the compact binary format, with control over which layers and detail levels to load</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="BinaryStreamReader/">BinaryStreamReader</a></td>
+<td>BinaryStreamReader</td>
+<td>Reads DNA rig data from a binary stream, with factory methods that let callers control which data layers and levels of detail get loaded.</td>
+</tr>
+<tr>
+<td><a href="BinaryStreamWriter/">BinaryStreamReader</a></td>
+<td>BinaryStreamWriter</td>
+<td>A forward-declared reader type that <code>BinaryStreamWriter</code> accepts as a data source when copying DNA content between streams.</td>
+</tr>
+<tr>
+<td><a href="JSONStreamWriter/">BinaryStreamReader</a></td>
+<td>JSONStreamWriter</td>
+<td>Forward-declared peer type used as a data source when copying binary DNA data into a <code>JSONStreamWriter</code> via <code>setFrom</code>.</td>
+</tr>
+<tr>
+<td><a href="BinaryStreamWriter/">BinaryStreamWriter</a></td>
+<td>BinaryStreamWriter</td>
+<td>Write DNA rig data to a binary stream, and optionally populate it directly from an existing <code>BinaryStreamReader</code> or <code>JSONStreamReader</code> instance.</td>
+</tr>
+<tr>
+<td><a href="BinaryStreamReader/">DefaultInstanceCreator</a></td>
+<td>BinaryStreamReader</td>
+<td>A <code>pma</code> framework specialization that tells the generic instance-creation machinery how to construct a <code>BinaryStreamReader</code> by default.</td>
+</tr>
+<tr>
+<td><a href="BinaryStreamWriter/">DefaultInstanceCreator</a></td>
+<td>BinaryStreamWriter</td>
+<td>Template specialization that tells generic <code>pma</code> factory code to use <code>BinaryStreamWriter::create</code> when constructing instances of this type.</td>
+</tr>
+<tr>
+<td><a href="JSONStreamReader/">DefaultInstanceCreator</a></td>
+<td>JSONStreamReader</td>
+<td>Template specialization that tells generic <code>pma</code> factory code to use <code>JSONStreamReader::create</code> when constructing instances of this type.</td>
+</tr>
+<tr>
+<td><a href="JSONStreamWriter/">DefaultInstanceCreator</a></td>
+<td>JSONStreamWriter</td>
+<td>Template specialization that tells generic <code>pma</code> factory code to use <code>JSONStreamWriter::create</code> when constructing instances of this type.</td>
+</tr>
+<tr>
+<td><a href="BinaryStreamReader/">DefaultInstanceDestroyer</a></td>
+<td>BinaryStreamReader</td>
+<td>A <code>pma</code> framework specialization that tells the generic instance-destruction machinery how to release a <code>BinaryStreamReader</code> created via the factory pattern.</td>
+</tr>
+<tr>
+<td><a href="BinaryStreamWriter/">DefaultInstanceDestroyer</a></td>
+<td>BinaryStreamWriter</td>
+<td>Template specialization that tells generic <code>pma</code> factory code to use <code>BinaryStreamWriter::destroy</code> when releasing instances of this type.</td>
+</tr>
+<tr>
+<td><a href="JSONStreamReader/">DefaultInstanceDestroyer</a></td>
+<td>JSONStreamReader</td>
+<td>Template specialization that tells generic <code>pma</code> factory code to use <code>JSONStreamReader::destroy</code> when releasing instances of this type.</td>
+</tr>
+<tr>
+<td><a href="JSONStreamWriter/">DefaultInstanceDestroyer</a></td>
+<td>JSONStreamWriter</td>
+<td>Template specialization that tells generic <code>pma</code> factory code to use <code>JSONStreamWriter::destroy</code> when releasing instances of this type.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="json-dna-stream-io">JSON DNA stream I/O</h3>
+<p>Read and write DNA rig data in human-readable JSON format, with support for format conversion</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="BinaryStreamWriter/">JSONStreamReader</a></td>
+<td>BinaryStreamWriter</td>
+<td>A forward-declared reader type that <code>BinaryStreamWriter</code> accepts as a data source when the build supports JSON, letting a writer be populated from JSON-formatted DNA data.</td>
+</tr>
+<tr>
+<td><a href="JSONStreamReader/">JSONStreamReader</a></td>
+<td>JSONStreamReader</td>
+<td>Read DNA rig data from a stream that holds the human-readable JSON representation instead of the compact binary format.</td>
+</tr>
+<tr>
+<td><a href="JSONStreamWriter/">JSONStreamReader</a></td>
+<td>JSONStreamWriter</td>
+<td>Forward-declared peer type used as a data source when copying JSON DNA data into a <code>JSONStreamWriter</code> via <code>setFrom</code>.</td>
+</tr>
+<tr>
+<td><a href="JSONStreamWriter/">JSONStreamWriter</a></td>
+<td>JSONStreamWriter</td>
+<td>Write DNA rig data out as human-readable JSON, and optionally populate it directly from an existing <code>BinaryStreamReader</code> or <code>JSONStreamReader</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="load-and-save-configuration">Load and save configuration</h3>
+<p>Configure coordinate systems, units, data layers, and transform policies for DNA I/O operations</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Configuration/">Configuration</a></td>
+<td>Configuration</td>
+<td>Bundles all the load-time options for reading a DNA file — which layers, which LODs, and which coordinate/unit conventions to apply.</td>
+</tr>
+<tr>
+<td><a href="Configuration/">CoordinateSystem</a></td>
+<td>Configuration</td>
+<td>Alias for <code>tdm::coord_sys</code>, describing the axis directions for all coordinate axes.</td>
+</tr>
+<tr>
+<td><a href="Configuration/">CoordinateSystemTransformPolicy</a></td>
+<td>Configuration</td>
+<td>Controls whether loaded rig data is converted into a destination coordinate system or left as authored.</td>
+</tr>
+<tr>
+<td><a href="Configuration/">DataLayer</a></td>
+<td>Configuration</td>
+<td>Bitmask enum identifying the loadable layers of a DNA rig, from the lightweight <code>Descriptor</code> up through <code>All</code>.</td>
+</tr>
+<tr>
+<td><a href="Configuration/">Direction</a></td>
+<td>Configuration</td>
+<td>Alias for <code>tdm::axis_dir</code>, representing a signed direction along a coordinate axis.</td>
+</tr>
+<tr>
+<td><a href="Configuration/">FaceWindingOrder</a></td>
+<td>Configuration</td>
+<td>Face vertex winding order of the geometry data, viewed along the outward surface normal.</td>
+</tr>
+<tr>
+<td><a href="Configuration/">RotationDirection</a></td>
+<td>Configuration</td>
+<td>Alias for <code>tdm::rot_dir</code>, representing the sign of rotation (positive/negative) about an axis.</td>
+</tr>
+<tr>
+<td><a href="Configuration/">RotationSequence</a></td>
+<td>Configuration</td>
+<td>Alias for <code>tdm::rot_seq</code>, representing the order in which axis rotations are composed (e.g. XYZ).</td>
+</tr>
+<tr>
+<td><a href="Configuration/">RotationSign</a></td>
+<td>Configuration</td>
+<td>Alias for <code>tdm::rot_sign</code>, a per-axis triple of <code>RotationDirection</code> values specifying the sign convention for rotation on each axis.</td>
+</tr>
+<tr>
+<td><a href="Configuration/">RotationUnit</a></td>
+<td>Configuration</td>
+<td>Unit of measurement (degrees or radians) used for rotation values in the rig.</td>
+</tr>
+<tr>
+<td><a href="Configuration/">TranslationUnit</a></td>
+<td>Configuration</td>
+<td>Unit of measurement (centimeters or meters) used for translation values in the rig.</td>
+</tr>
+<tr>
+<td><a href="Configuration/">UnknownLayerPolicy</a></td>
+<td>Configuration</td>
+<td>Controls whether layers the reader/writer doesn't recognize are kept or discarded.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="abstract-dna-reader-interface">Abstract DNA reader interface</h3>
+<p>Unified and stream-based interfaces for reading complete DNA documents and individual layers</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Reader/">Reader</a></td>
+<td>Reader</td>
+<td>Aggregate reader interface combining every DNA layer's reader interface into one type.</td>
+</tr>
+<tr>
+<td><a href="Writer/">Reader</a></td>
+<td>Writer</td>
+<td>A forward-declared reader type that <code>Writer::setFrom</code> accepts as the source when copying an entire DNA document into a writer.</td>
+</tr>
+<tr>
+<td><a href="StreamReader/">StreamReader</a></td>
+<td>StreamReader</td>
+<td>Extends <code>Reader</code> with the ability to actually pull rig data from a stream into internal structures.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="abstract-dna-writer-interface">Abstract DNA writer interface</h3>
+<p>Unified and stream-based interfaces for writing complete DNA documents and individual layers</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="StreamWriter/">StreamWriter</a></td>
+<td>StreamWriter</td>
+<td>Abstract base defining the interface for writing DNA data to an output stream. Obtain a concrete instance via <code>BinaryStreamWriter</code> or <code>JSONStreamWriter</code> rather than subclassing directly.</td>
+</tr>
+<tr>
+<td><a href="Writer/">Writer</a></td>
+<td>Writer</td>
+<td>Abstract unified write interface for all DNA data layers. Use this as the base type when you need to write a complete DNA asset — it combines geometry, behavior, machine-learned behavior, RBF, joint metadata, and twist/swing writing into a single entry point.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="behavioral-layer-read-and-write">Behavioral layer read and write</h3>
+<p>Access and modify behavior data including GUI-to-control mappings, PSD expressions, and joint matrices</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="layers/BehaviorReader/">BehaviorReader</a></td>
+<td>BehaviorReader</td>
+<td>Access the behavioral data layer of a DNA file — GUI-to-raw control mappings, PSD expressions, and joint matrix structure — in read-only mode.</td>
+</tr>
+<tr>
+<td><a href="layers/BehaviorWriter/">BehaviorWriter</a></td>
+<td>BehaviorWriter</td>
+<td>Write rig evaluation behavior data into a DNA asset — GUI-to-raw control mapping, PSD expressions, joint group matrices, blend shape channels, and animated maps. Do not subclass this directly; inherit from <code>Writer</code> instead.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="definition-layer-read-and-write">Definition layer read and write</h3>
+<p>Access and modify static rig definition data including controls, joints, blend shapes, and mesh metadata</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="layers/DefinitionReader/">DefinitionReader</a></td>
+<td>DefinitionReader</td>
+<td>Read-only interface to the rig's static definition data — controls, joints, blend shape channels, animated maps, meshes, and neutral joint transforms.</td>
+</tr>
+<tr>
+<td><a href="layers/DefinitionWriter/">DefinitionWriter</a></td>
+<td>DefinitionWriter</td>
+<td>Write static rig definition data — control names, joint hierarchy, blend shape channels, animated maps, and meshes — into a DNA asset. Implement via <code>Writer</code>, not directly from this class.</td>
+</tr>
+<tr>
+<td><a href="layers/DefinitionReader/">MeshBlendShapeChannelMapping</a></td>
+<td>DefinitionReader</td>
+<td>Maps a blend shape channel to its owning mesh by pairing a mesh index with a blend shape channel index.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="character-and-rig-metadata">Character and rig metadata</h3>
+<p>Query and configure character identity, demographic archetype, rig version, and file format information</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="layers/Descriptor/">Archetype</a></td>
+<td>Descriptor</td>
+<td>Classifies a character's demographic archetype for DNA rig selection.</td>
+</tr>
+<tr>
+<td><a href="layers/DescriptorReader/">DescriptorReader</a></td>
+<td>DescriptorReader</td>
+<td>Query character identity, rig configuration, coordinate conventions, LOD range, and database provenance from a loaded DNA asset.</td>
+</tr>
+<tr>
+<td><a href="layers/DescriptorWriter/">DescriptorWriter</a></td>
+<td>DescriptorWriter</td>
+<td>Write character and rig metadata — identity, coordinate conventions, LOD range, and database provenance — into a DNA asset.</td>
+</tr>
+<tr>
+<td><a href="layers/Descriptor/">Gender</a></td>
+<td>Descriptor</td>
+<td>Specifies the gender of a character for DNA rig selection.</td>
+</tr>
+<tr>
+<td><a href="layers/HeaderReader/">HeaderReader</a></td>
+<td>HeaderReader</td>
+<td>Read the file format generation and version numbers from a DNA rig's header block.</td>
+</tr>
+<tr>
+<td><a href="layers/HeaderWriter/">HeaderWriter</a></td>
+<td>HeaderWriter</td>
+<td>Set the file format generation and version fields in a rig's DNA header during a write pass.</td>
+</tr>
+<tr>
+<td><a href="version/VersionInfo/">VersionInfo</a></td>
+<td>VersionInfo</td>
+<td>Query the version of the DNA library that the current binary was built against.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mesh-geometry">Mesh geometry</h3>
+<p>Access and modify vertex positions, normals, texture coordinates, and mesh structure</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="layers/Geometry/">Delta</a></td>
+<td>Geometry</td>
+<td>Semantic alias for <code>Vector3</code> that marks a value as a blend-shape displacement rather than a position or direction.</td>
+</tr>
+<tr>
+<td><a href="layers/GeometryReader/">GeometryReader</a></td>
+<td>GeometryReader</td>
+<td>Access all geometry data — vertex positions, texture coordinates, and related mesh data — for a rig's meshes. This is the read-only side of the geometry layer; pair it with <code>GeometryWriter</code> when you need to modify mesh data.</td>
+</tr>
+<tr>
+<td><a href="layers/GeometryWriter/">GeometryWriter</a></td>
+<td>GeometryWriter</td>
+<td>Write geometry data (meshes, vertex positions, normals, texture coordinates, and layouts) into a rig DNA structure.</td>
+</tr>
+<tr>
+<td><a href="layers/Geometry/">Normal</a></td>
+<td>Geometry</td>
+<td>Semantic alias for <code>Vector3</code> that marks a value as a surface normal direction rather than a position or displacement.</td>
+</tr>
+<tr>
+<td><a href="layers/Geometry/">Position</a></td>
+<td>Geometry</td>
+<td>Semantic alias for <code>Vector3</code> that marks a value as a spatial position rather than a direction or displacement.</td>
+</tr>
+<tr>
+<td><a href="layers/Geometry/">TextureCoordinate</a></td>
+<td>Geometry</td>
+<td>A UV pair that locates a point in 2D texture space for a mesh vertex.</td>
+</tr>
+<tr>
+<td><a href="layers/Geometry/">VertexLayout</a></td>
+<td>Geometry</td>
+<td>Index triple that assembles a logical mesh vertex from three separate attribute arrays — position, texture coordinate, and normal.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="joint-transform-representations">Joint transform representations</h3>
+<p>Query and configure how joint rotations, scales, and translations are encoded in the DNA file</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="layers/JointBehaviorMetadataReader/">JointBehaviorMetadataReader</a></td>
+<td>JointBehaviorMetadataReader</td>
+<td>Query the internal representation hints that govern how each joint's translation, rotation, and scale components are evaluated during rig execution.</td>
+</tr>
+<tr>
+<td><a href="layers/JointBehaviorMetadataWriter/">JointBehaviorMetadataWriter</a></td>
+<td>JointBehaviorMetadataWriter</td>
+<td>Configure per-joint internal representation metadata that controls how each joint's translation, rotation, and scale components are evaluated during rig execution.</td>
+</tr>
+<tr>
+<td><a href="layers/JointBehaviorMetadata/">RotationRepresentation</a></td>
+<td>JointBehaviorMetadata</td>
+<td>Identifies whether joint rotation data is stored as Euler angles or as a quaternion in a DNA file.</td>
+</tr>
+<tr>
+<td><a href="layers/JointBehaviorMetadata/">ScaleRepresentation</a></td>
+<td>JointBehaviorMetadata</td>
+<td>Identifies the storage format used for joint scale data in a DNA file.</td>
+</tr>
+<tr>
+<td><a href="layers/JointBehaviorMetadata/">TranslationRepresentation</a></td>
+<td>JointBehaviorMetadata</td>
+<td>Identifies the storage format used for joint translation data in a DNA file.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pose-and-deformation-behaviors">Pose and deformation behaviors</h3>
+<p>Configure and access radial basis function poses, machine-learned neural networks, and twist-swing transformations</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="layers/MachineLearnedBehavior/">ActivationFunction</a></td>
+<td>MachineLearnedBehavior</td>
+<td>Specify the nonlinear activation function applied at each neuron layer in a machine-learned rig behavior network.</td>
+</tr>
+<tr>
+<td><a href="layers/RBFBehavior/">AutomaticRadius</a></td>
+<td>RBFBehavior</td>
+<td>Toggles whether an RBF target's radius of influence is computed automatically rather than set explicitly.</td>
+</tr>
+<tr>
+<td><a href="layers/MachineLearnedBehaviorExtReader/">MachineLearnedBehaviorExtReader</a></td>
+<td>MachineLearnedBehaviorExtReader</td>
+<td>Read-only accessors to the neural network extension data associated with a rig — the per-model operation graph (operation sets, operation types, static parameters, and dependency indices) that <code>MachineLearnedBehaviorReader</code> itself does not expose.</td>
+</tr>
+<tr>
+<td><a href="layers/MachineLearnedBehaviorExtWriter/">MachineLearnedBehaviorExtWriter</a></td>
+<td>MachineLearnedBehaviorExtWriter</td>
+<td>Write-only accessors for the operation instance data associated with a rig — building up the same per-model operation graph that <code>MachineLearnedBehaviorExtReader</code> exposes for reading.</td>
+</tr>
+<tr>
+<td><a href="layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorOperationType</a></td>
+<td>MachineLearnedBehaviorExt</td>
+<td>Enumerates the kind of computation a single ML operation performs within a neural network layer.</td>
+</tr>
+<tr>
+<td><a href="layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorParameterKey</a></td>
+<td>MachineLearnedBehaviorExt</td>
+<td>Enumerates the static parameter keys an ML operation can reference, covering joint transform types, coordinate axes, rotation signs, and rotation sequence.</td>
+</tr>
+<tr>
+<td><a href="layers/MachineLearnedBehaviorReader/">MachineLearnedBehaviorReader</a></td>
+<td>MachineLearnedBehaviorReader</td>
+<td>Read-only accessors to the neural network data associated with a rig — ML control names, neural network counts, which networks are active at each LOD, and which networks drive which mesh region.</td>
+</tr>
+<tr>
+<td><a href="layers/MachineLearnedBehaviorWriter/">MachineLearnedBehaviorWriter</a></td>
+<td>MachineLearnedBehaviorWriter</td>
+<td>Write-only accessors for the neural network data associated with a rig — defining ML control names, the neural-network index lists, which networks run at each LOD, and mesh-region associations.</td>
+</tr>
+<tr>
+<td><a href="layers/RBFBehaviorReader/">RBFBehaviorReader</a></td>
+<td>RBFBehaviorReader</td>
+<td>Read-only accessors to the RBF (radial basis function) pose data associated with a rig — pose names, their driven joint/blend-shape/animated-map outputs, output values, scale, and the controls that feed them.</td>
+</tr>
+<tr>
+<td><a href="layers/RBFBehaviorWriter/">RBFBehaviorWriter</a></td>
+<td>RBFBehaviorWriter</td>
+<td>Write-only accessors for the RBF pose data associated with a rig — pose names, scale, control names, and the input/output control indices that connect poses to the rest of the rig.</td>
+</tr>
+<tr>
+<td><a href="layers/RBFBehavior/">RBFDistanceMethod</a></td>
+<td>RBFBehavior</td>
+<td>Selects how the distance between an input and an RBF pose target is measured.</td>
+</tr>
+<tr>
+<td><a href="layers/RBFBehavior/">RBFFunctionType</a></td>
+<td>RBFBehavior</td>
+<td>Selects the radial falloff function applied to distance when computing an RBF target's contribution weight.</td>
+</tr>
+<tr>
+<td><a href="layers/RBFBehavior/">RBFNormalizeMethod</a></td>
+<td>RBFBehavior</td>
+<td>Selects when contribution weights from an RBF solve are normalized to sum to a consistent total.</td>
+</tr>
+<tr>
+<td><a href="layers/RBFBehavior/">RBFSolverType</a></td>
+<td>RBFBehavior</td>
+<td>Selects the algorithm used to combine RBF (radial basis function) pose target contributions into a final weight.</td>
+</tr>
+<tr>
+<td><a href="layers/Twist/">TwistAxis</a></td>
+<td>Twist</td>
+<td>Identifies which local axis (X, Y, or Z) a twist or swing transformation is measured around.</td>
+</tr>
+<tr>
+<td><a href="layers/TwistSwingBehaviorReader/">TwistSwingBehaviorReader</a></td>
+<td>TwistSwingBehaviorReader</td>
+<td>Read-only accessors to the swing and twist data associated with a rig — which joint rotations drive twist/swing transformations, which joints they output to, and the blend weights applied.</td>
+</tr>
+<tr>
+<td><a href="layers/TwistSwingBehaviorWriter/">TwistSwingBehaviorWriter</a></td>
+<td>TwistSwingBehaviorWriter</td>
+<td>Write-only accessors to the swing and twist data associated with a rig — defining twist/swing parameter groups, their axis, driver control indices, driven joints, and blend weights.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="foundation-types">Foundation types</h3>
+<p>Basic mathematical and utility types used throughout the DNA API</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Module</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="types/Vector3/">Vector3</a></td>
+<td>Vector3</td>
+<td>A plain 3-component float vector (x, y, z) with the standard set of component-wise arithmetic operators.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="all-modules">All Modules</h2>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>File</th>
+<th>Entries</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BinaryStreamReader</td>
+<td><a href="BinaryStreamReader/">BinaryStreamReader.md</a></td>
+<td>3</td>
+</tr>
+<tr>
+<td>BinaryStreamWriter</td>
+<td><a href="BinaryStreamWriter/">BinaryStreamWriter.md</a></td>
+<td>5</td>
+</tr>
+<tr>
+<td>Configuration</td>
+<td><a href="Configuration/">Configuration.md</a></td>
+<td>12</td>
+</tr>
+<tr>
+<td>JSONStreamReader</td>
+<td><a href="JSONStreamReader/">JSONStreamReader.md</a></td>
+<td>3</td>
+</tr>
+<tr>
+<td>JSONStreamWriter</td>
+<td><a href="JSONStreamWriter/">JSONStreamWriter.md</a></td>
+<td>5</td>
+</tr>
+<tr>
+<td>Reader</td>
+<td><a href="Reader/">Reader.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>StreamReader</td>
+<td><a href="StreamReader/">StreamReader.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>StreamWriter</td>
+<td><a href="StreamWriter/">StreamWriter.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>Writer</td>
+<td><a href="Writer/">Writer.md</a></td>
+<td>2</td>
+</tr>
+<tr>
+<td>BehaviorReader</td>
+<td><a href="layers/BehaviorReader/">layers/BehaviorReader.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>BehaviorWriter</td>
+<td><a href="layers/BehaviorWriter/">layers/BehaviorWriter.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>DefinitionReader</td>
+<td><a href="layers/DefinitionReader/">layers/DefinitionReader.md</a></td>
+<td>2</td>
+</tr>
+<tr>
+<td>DefinitionWriter</td>
+<td><a href="layers/DefinitionWriter/">layers/DefinitionWriter.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>Descriptor</td>
+<td><a href="layers/Descriptor/">layers/Descriptor.md</a></td>
+<td>2</td>
+</tr>
+<tr>
+<td>DescriptorReader</td>
+<td><a href="layers/DescriptorReader/">layers/DescriptorReader.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>DescriptorWriter</td>
+<td><a href="layers/DescriptorWriter/">layers/DescriptorWriter.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>Geometry</td>
+<td><a href="layers/Geometry/">layers/Geometry.md</a></td>
+<td>5</td>
+</tr>
+<tr>
+<td>GeometryReader</td>
+<td><a href="layers/GeometryReader/">layers/GeometryReader.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>GeometryWriter</td>
+<td><a href="layers/GeometryWriter/">layers/GeometryWriter.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>HeaderReader</td>
+<td><a href="layers/HeaderReader/">layers/HeaderReader.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>HeaderWriter</td>
+<td><a href="layers/HeaderWriter/">layers/HeaderWriter.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>JointBehaviorMetadata</td>
+<td><a href="layers/JointBehaviorMetadata/">layers/JointBehaviorMetadata.md</a></td>
+<td>3</td>
+</tr>
+<tr>
+<td>JointBehaviorMetadataReader</td>
+<td><a href="layers/JointBehaviorMetadataReader/">layers/JointBehaviorMetadataReader.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>JointBehaviorMetadataWriter</td>
+<td><a href="layers/JointBehaviorMetadataWriter/">layers/JointBehaviorMetadataWriter.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>MachineLearnedBehavior</td>
+<td><a href="layers/MachineLearnedBehavior/">layers/MachineLearnedBehavior.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>MachineLearnedBehaviorExt</td>
+<td><a href="layers/MachineLearnedBehaviorExt/">layers/MachineLearnedBehaviorExt.md</a></td>
+<td>2</td>
+</tr>
+<tr>
+<td>MachineLearnedBehaviorExtReader</td>
+<td><a href="layers/MachineLearnedBehaviorExtReader/">layers/MachineLearnedBehaviorExtReader.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>MachineLearnedBehaviorExtWriter</td>
+<td><a href="layers/MachineLearnedBehaviorExtWriter/">layers/MachineLearnedBehaviorExtWriter.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>MachineLearnedBehaviorReader</td>
+<td><a href="layers/MachineLearnedBehaviorReader/">layers/MachineLearnedBehaviorReader.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>MachineLearnedBehaviorWriter</td>
+<td><a href="layers/MachineLearnedBehaviorWriter/">layers/MachineLearnedBehaviorWriter.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>RBFBehavior</td>
+<td><a href="layers/RBFBehavior/">layers/RBFBehavior.md</a></td>
+<td>5</td>
+</tr>
+<tr>
+<td>RBFBehaviorReader</td>
+<td><a href="layers/RBFBehaviorReader/">layers/RBFBehaviorReader.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>RBFBehaviorWriter</td>
+<td><a href="layers/RBFBehaviorWriter/">layers/RBFBehaviorWriter.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>Twist</td>
+<td><a href="layers/Twist/">layers/Twist.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>TwistSwingBehaviorReader</td>
+<td><a href="layers/TwistSwingBehaviorReader/">layers/TwistSwingBehaviorReader.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>TwistSwingBehaviorWriter</td>
+<td><a href="layers/TwistSwingBehaviorWriter/">layers/TwistSwingBehaviorWriter.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>Vector3</td>
+<td><a href="types/Vector3/">types/Vector3.md</a></td>
+<td>1</td>
+</tr>
+<tr>
+<td>VersionInfo</td>
+<td><a href="version/VersionInfo/">version/VersionInfo.md</a></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../arrayview/StringView/" class="btn btn-neutral float-left" title="StringView"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="BinaryStreamReader/" class="btn btn-neutral float-right" title="BinaryStreamReader">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../arrayview/StringView/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="BinaryStreamReader/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
