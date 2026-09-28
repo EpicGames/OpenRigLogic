@@ -45,8 +45,7 @@ INSTANTIATE_TEST_SUITE_P(
     LODTestSuite,
     LODRegionTest,
     ::testing::Values(
-        // Matrices passed to LODRegion have already been padded,
-        // so the rowcount must be an integral multiple of 4
+        // Matrices passed to LODRegion are already padded, so rowCount must be an integral multiple of 4
         // {{rows, cols}, lodEndRow, lodEndRowAlignedToLastFullBlock, lodEndRowAlignedToSecondLastFullBlock}
         // SSE test cases
         LODTestSetup{4, 2, 8, 4, 0, 0},      // Mask-off last 2 rows from 1st block-4 (handles block-4 loop)

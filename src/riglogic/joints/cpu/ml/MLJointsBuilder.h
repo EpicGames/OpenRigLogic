@@ -48,6 +48,8 @@ private:
     std::uint16_t inputJointAttrCount;
     std::uint16_t outputJointAttrCount;
     dna::RotationUnit rotationUnit;
+    // True until fillStorage() runs (DNA path only); build() then takes the template discriminators from snapshot metadata.
+    bool isRestore;
     TranslationType mlTranslationType;
     RotationType mlRotationType;
     ScaleType mlScaleType;

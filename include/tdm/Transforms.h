@@ -152,25 +152,6 @@ inline mat3<T> euler_to_mat(const rad3<T>& euler, rot_sign signs) {
     return rot_mat<T, order>()(rx, ry, rz);
 }
 
-template<typename T>
-inline mat3<T> euler2mat(const rad3<T>& euler, rot_seq seq, rot_sign signs) {
-    switch (seq) {
-    case rot_seq::xyz:
-        return euler_to_mat<T, rot_seq::xyz>(euler, signs);
-    case rot_seq::xzy:
-        return euler_to_mat<T, rot_seq::xzy>(euler, signs);
-    case rot_seq::yxz:
-        return euler_to_mat<T, rot_seq::yxz>(euler, signs);
-    case rot_seq::yzx:
-        return euler_to_mat<T, rot_seq::yzx>(euler, signs);
-    case rot_seq::zxy:
-        return euler_to_mat<T, rot_seq::zxy>(euler, signs);
-    case rot_seq::zyx:
-        return euler_to_mat<T, rot_seq::zyx>(euler, signs);
-    }
-    return mat3<T>{};
-}
-
 template<typename T, rot_seq order>
 struct mat_to_euler;
 
@@ -379,30 +360,49 @@ struct mat_to_euler<T, rot_seq::zyx> {
     }
 };
 
-// Dispatcher function for Euler extraction.
-// The rot_sign parameter indicates the rotation direction convention per axis.
-// Negative rotation direction means the sine terms were negated when building the matrix.
-// The sign is applied in the mat_to_euler structs to match the original convention.
+}  // namespace impl
+
+// Euler <-> rotation-matrix bridge under the row-vector convention:
+// per-axis rotations composed in `seq` order, per-axis direction given by
+// `signs` (negative means the sine terms are negated). mat2euler extracts
+// the angles of a matrix built by the same convention.
+template<typename T>
+inline mat3<T> euler2mat(const rad3<T>& euler, rot_seq seq, rot_sign signs) {
+    switch (seq) {
+    case rot_seq::xyz:
+        return impl::euler_to_mat<T, rot_seq::xyz>(euler, signs);
+    case rot_seq::xzy:
+        return impl::euler_to_mat<T, rot_seq::xzy>(euler, signs);
+    case rot_seq::yxz:
+        return impl::euler_to_mat<T, rot_seq::yxz>(euler, signs);
+    case rot_seq::yzx:
+        return impl::euler_to_mat<T, rot_seq::yzx>(euler, signs);
+    case rot_seq::zxy:
+        return impl::euler_to_mat<T, rot_seq::zxy>(euler, signs);
+    case rot_seq::zyx:
+        return impl::euler_to_mat<T, rot_seq::zyx>(euler, signs);
+    }
+    return mat3<T>{};
+}
+
 template<typename T>
 inline rad3<T> mat2euler(const mat3<T>& m, rot_seq seq, rot_sign signs) {
     switch (seq) {
     case rot_seq::xyz:
-        return mat_to_euler<T, rot_seq::xyz>()(m, signs);
+        return impl::mat_to_euler<T, rot_seq::xyz>()(m, signs);
     case rot_seq::xzy:
-        return mat_to_euler<T, rot_seq::xzy>()(m, signs);
+        return impl::mat_to_euler<T, rot_seq::xzy>()(m, signs);
     case rot_seq::yxz:
-        return mat_to_euler<T, rot_seq::yxz>()(m, signs);
+        return impl::mat_to_euler<T, rot_seq::yxz>()(m, signs);
     case rot_seq::yzx:
-        return mat_to_euler<T, rot_seq::yzx>()(m, signs);
+        return impl::mat_to_euler<T, rot_seq::yzx>()(m, signs);
     case rot_seq::zxy:
-        return mat_to_euler<T, rot_seq::zxy>()(m, signs);
+        return impl::mat_to_euler<T, rot_seq::zxy>()(m, signs);
     case rot_seq::zyx:
-        return mat_to_euler<T, rot_seq::zyx>()(m, signs);
+        return impl::mat_to_euler<T, rot_seq::zyx>()(m, signs);
     }
     return rad3<T>{};
 }
-
-}  // namespace impl
 
 inline namespace projective {
 
@@ -437,7 +437,7 @@ inline mat4<T> rotate(const mat4<T>& m, const vec3<T>& axis, rad<T> angle, rot_d
 
 template<typename T>
 inline mat4<T> rotate(rad<T> x, rad<T> y, rad<T> z, rot_seq order, rot_sign signs) {
-    const mat3<T> mat3x3 = impl::euler2mat<T>(rad3<T>{x, y, z}, order, signs);
+    const mat3<T> mat3x3 = euler2mat<T>(rad3<T>{x, y, z}, order, signs);
     mat4<T> m = mat4<T>::identity();
     for (dim_t ri = 0; ri < mat3x3.rows(); ++ri) {
         for (dim_t ci = 0; ci < mat3x3.columns(); ++ci) {
@@ -569,11 +569,11 @@ inline rad3<T> convert_rotation(const rad3<T>& rotation,
                                 rot_seq dst_seq,
                                 const rot_sign& dst_signs) {
     // Build source rotation matrix with src_signs applied per-axis.
-    const mat3<T> r_src = impl::euler2mat<T>(rotation, src_seq, src_signs);
+    const mat3<T> r_src = euler2mat<T>(rotation, src_seq, src_signs);
     // Basis-change into destination coordinate system.
     const mat3<T> r_dst = transpose(c) * r_src * c;
     // Extract Euler angles with dst_signs applied per-axis.
-    return impl::mat2euler<T>(r_dst, dst_seq, dst_signs);
+    return mat2euler<T>(r_dst, dst_seq, dst_signs);
 }
 
 template<typename T>

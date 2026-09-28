@@ -34,7 +34,7 @@ public:
                    JointsOutputInstance* outputs,
                    std::uint16_t lod,
                    std::uint16_t jointGroupIndex) const override;
-    void load(terse::BinaryInputArchive<BoundedIOStream>& archive) override;
+    void load(BoundedInputArchive& archive) override;
     void save(terse::BinaryOutputArchive<BoundedIOStream>& archive) override;
 
 private:

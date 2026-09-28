@@ -71,14 +71,12 @@ struct Values<std::uint16_t> {
 
 namespace input {
 
-// Calculation input values
 extern const Vector<float> values;
 
 }  // namespace input
 
 namespace output {
 
-// Calculation output values
 extern const Vector<Matrix<float>> valuesPerLODPerConfig;
 
 }  // namespace output
@@ -92,11 +90,23 @@ public:
     }
 
     dna::RotationSequence getRotationSequence() const override {
-        return dna::RotationSequence::zyx;
+        return dna::RotationSequence::xyz;
     }
 
     std::uint16_t getLODCount() const override {
         return unoptimized::lodCount;
+    }
+
+    std::uint16_t getRawControlCount() const override {
+        // controlInputCount (raw + psd + ml + rbf) bounds every deserialized input index on the build() path; the
+        // authored input indices reach 10, so the raw count must cover them (>= 11).
+        return static_cast<std::uint16_t>(16);
+    }
+
+    std::uint16_t getJointCount() const override {
+        // jointAttributeCount = getJointCount() * numAttrsPerJoint (>= 9) bounds every deserialized output index on the
+        // build() path; the authored output indices reach 306, so the attribute span must cover them (>= 307).
+        return static_cast<std::uint16_t>(35);
     }
 
     std::uint16_t getJointRowCount() const override {

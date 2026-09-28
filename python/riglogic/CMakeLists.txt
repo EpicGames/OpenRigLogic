@@ -6,7 +6,10 @@ set(PYRL py3riglogic)
 set_property(SOURCE RigLogic.i PROPERTY CPLUSPLUS ON)
 set_property(SOURCE RigLogic.i PROPERTY SWIG_MODULE_NAME riglogic)
 set_property(SOURCE RigLogic.i PROPERTY SWIG_FLAGS "-doxygen")
-set_property(SOURCE RigLogic.i PROPERTY SWIG_TYPE_TABLE "${PYRL}-${PROJECT_VERSION}")
+# Plain identifier only: SWIG stringifies this into the runtime capsule name and PyCapsule_Import
+# splits that name on '.', so quotes or dots make every type lookup fail (null-deref on bad args).
+set(PYRL_TYPE_TABLE "${PYRL}_${PROJECT_VERSION_MAJOR}_${PROJECT_VERSION_MINOR}_${PROJECT_VERSION_PATCH}")
+set_property(SOURCE RigLogic.i PROPERTY SWIG_TYPE_TABLE "${PYRL_TYPE_TABLE}")
 
 option(TYPEMAP_DEBUG "Debug deducing of typemaps" OFF)
 if(TYPEMAP_DEBUG)
@@ -31,7 +34,7 @@ function(get_swig_type_table_name target_name output_var)
 endfunction()
 
 get_swig_type_table_name(PyDNA::py3dna pydna_type_table)
-list(APPEND SWIG_COMPILE_DEFINITIONS SWIG_TYPE_TABLE="${PYRL}-${PROJECT_VERSION}" PYDNA_SWIG_TYPE_TABLE=${pydna_type_table})
+list(APPEND SWIG_COMPILE_DEFINITIONS SWIG_TYPE_TABLE=${PYRL_TYPE_TABLE} PYDNA_SWIG_TYPE_TABLE=${pydna_type_table})
 set_target_properties(${PYRL} PROPERTIES
     SWIG_USE_TARGET_INCLUDE_DIRECTORIES ON
     SWIG_COMPILE_DEFINITIONS "${SWIG_COMPILE_DEFINITIONS}"

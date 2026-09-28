@@ -22,15 +22,9 @@ OutputInstance::OutputInstance(const Vector<Matrix<std::uint16_t>>& bufferSizes,
     workBufferOffsetsPerOperationSet{memRes},
     maskBuffer{memRes} {
 
-    // All ops across all type/set/op dimensions share one contiguous workBuffer allocation.
-    // workBufferPtrs[typeIdx][flatIdx] points into it, where flatIdx = workBufferOffsetsPerOperationSet[typeIdx][opSetIdx] +
-    // opIdx.
-    // workBufferOffsetsPerOperationSet[typeIdx] tracks the total number of operations up to the selected opSetIdx in it.
-    //   workBufferOffsetsPerOperationSet[0] has 0 operations
-    //   workBufferOffsetsPerOperationSet[1] has operationCountOf(opSet0) operations
-    //   workBufferOffsetsPerOperationSet[N] has sum of all operation counts up to N
-    // workBufferHalfSizes[typeIdx][flatIdx] = bufferSize/2 for ping-pong layer evaluation within each op's buffer.
-    std::uint32_t totalSize = {};
+    // All ops share one contiguous workBuffer; workBufferPtrs[typeIdx][flatIdx] points into it, with
+    // flatIdx = workBufferOffsetsPerOperationSet[typeIdx][opSetIdx] + opIdx (running op counts per set).
+    std::size_t totalSize = {};
     const auto mlTypeCount = bufferSizes.size();
     for (std::size_t typeIdx = {}; typeIdx < mlTypeCount; ++typeIdx) {
         for (std::size_t opSetIdx = {}; opSetIdx < bufferSizes[typeIdx].size(); ++opSetIdx) {
@@ -53,10 +47,10 @@ OutputInstance::OutputInstance(const Vector<Matrix<std::uint16_t>>& bufferSizes,
         workBufferOffsetsPerOperationSet[typeIdx].resize(mlSetCount + 1u);
         workBufferOffsetsPerOperationSet[typeIdx][0] = 0u;
         for (std::size_t opSetIdx = {}; opSetIdx < mlSetCount; ++opSetIdx) {
-            workBufferOffsetsPerOperationSet[typeIdx][opSetIdx + 1u] = static_cast<std::uint16_t>(
+            workBufferOffsetsPerOperationSet[typeIdx][opSetIdx + 1u] = static_cast<std::uint32_t>(
                 workBufferOffsetsPerOperationSet[typeIdx][opSetIdx] + bufferSizes[typeIdx][opSetIdx].size());
         }
-        const auto totalOps = workBufferOffsetsPerOperationSet[typeIdx][mlSetCount];
+        const auto totalOps = static_cast<std::size_t>(workBufferOffsetsPerOperationSet[typeIdx][mlSetCount]);
         workBufferPtrs[typeIdx].resize(totalOps);
         workBufferHalfSizes[typeIdx].resize(totalOps);
 
@@ -64,24 +58,13 @@ OutputInstance::OutputInstance(const Vector<Matrix<std::uint16_t>>& bufferSizes,
             const auto opCount = bufferSizes[typeIdx][opSetIdx].size();
             for (std::size_t opIdx = {}; opIdx < opCount; ++opIdx) {
                 const auto size = bufferSizes[typeIdx][opSetIdx][opIdx];
-                const auto flatIdx = workBufferOffsetsPerOperationSet[typeIdx][opSetIdx] + opIdx;
+                const auto flatIdx = static_cast<std::size_t>(workBufferOffsetsPerOperationSet[typeIdx][opSetIdx]) + opIdx;
                 workBufferPtrs[typeIdx][flatIdx] = cursor;
                 workBufferHalfSizes[typeIdx][flatIdx] = static_cast<std::uint16_t>(size / 2u);
                 cursor += size;
             }
         }
     }
-}
-
-ArrayView<float> OutputInstance::getOutputBuffer(std::uint16_t mlTypeIndex,
-                                                 std::uint16_t mlOperationSetIndex,
-                                                 std::uint16_t mlOperationIndex) {
-    assert(mlTypeIndex < workBufferOffsetsPerOperationSet.size());
-    assert(mlOperationSetIndex + 1u < workBufferOffsetsPerOperationSet[mlTypeIndex].size());
-    const auto flatIdx =
-        static_cast<std::size_t>(workBufferOffsetsPerOperationSet[mlTypeIndex][mlOperationSetIndex]) + mlOperationIndex;
-    return ArrayView<float>{workBufferPtrs[mlTypeIndex][flatIdx],
-                            static_cast<std::size_t>(workBufferHalfSizes[mlTypeIndex][flatIdx]) * 2u};
 }
 
 ArrayView<float> OutputInstance::getMaskBuffer() {

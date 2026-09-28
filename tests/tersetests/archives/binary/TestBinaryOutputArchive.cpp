@@ -18,8 +18,10 @@
     #pragma warning(push)
     #pragma warning(disable : 4365 4987)
 #endif
+#include <cstddef>
 #include <cstdint>
 #include <string>
+#include <utility>
 #include <vector>
 #ifdef _MSC_VER
     #pragma warning(pop)
@@ -147,6 +149,102 @@ TEST(BinaryOutputArchiveTest, LittleEndianDataSerialization) {
     archive(source);
 
     unsigned char expected[sizeof(std::int32_t)] = {0xd2, 0x04, 0x00, 0x00};  // 1234
+    unsigned char bytes[sizeof(expected)];
+    stream.seek(0ul);
+    stream.read(reinterpret_cast<char*>(bytes), sizeof(expected));
+
+    ASSERT_ELEMENTS_EQ(bytes, expected, sizeof(expected));
+}
+
+TEST(BinaryOutputArchiveTest, BoolSerialization) {
+    tersetests::FakeStream stream;
+    terse::BinaryOutputArchive<tersetests::FakeStream> archive(&stream);
+    bool truthy = true;
+    bool falsy = false;
+    archive(truthy, falsy);
+
+    unsigned char expected[2ul] = {0x01, 0x00};
+    unsigned char bytes[sizeof(expected)];
+    stream.seek(0ul);
+    stream.read(reinterpret_cast<char*>(bytes), sizeof(expected));
+
+    ASSERT_ELEMENTS_EQ(bytes, expected, sizeof(expected));
+}
+
+TEST(BinaryOutputArchiveTest, VectorOfBoolSerialization) {
+    tersetests::FakeStream stream;
+    terse::BinaryOutputArchive<tersetests::FakeStream> archive(&stream);
+    std::vector<bool> source{true, false, true};
+    archive(source);
+
+    unsigned char expected[7ul] = {0x00,
+                                   0x00,
+                                   0x00,
+                                   0x03,  // size = 3
+                                   0x01,
+                                   0x00,
+                                   0x01};
+    unsigned char bytes[sizeof(expected)];
+    stream.seek(0ul);
+    stream.read(reinterpret_cast<char*>(bytes), sizeof(expected));
+
+    ASSERT_ELEMENTS_EQ(bytes, expected, sizeof(expected));
+}
+
+namespace {
+
+// Pins extender routing: std::vector<bool> elements must reach the extender's bool overload, not bypass it.
+class BoolCountingOutputArchive : public terse::ExtendableBinaryOutputArchive<BoolCountingOutputArchive,
+                                                                              tersetests::FakeStream,
+                                                                              std::uint32_t,
+                                                                              std::uint32_t,
+                                                                              terse::Endianness::Network> {
+public:
+    using BaseArchive = terse::ExtendableBinaryOutputArchive<BoolCountingOutputArchive,
+                                                             tersetests::FakeStream,
+                                                             std::uint32_t,
+                                                             std::uint32_t,
+                                                             terse::Endianness::Network>;
+    friend terse::Archive<BoolCountingOutputArchive>;
+
+public:
+    explicit BoolCountingOutputArchive(tersetests::FakeStream* stream_) :
+        BaseArchive{this, stream_},
+        boolCount{} {
+    }
+
+public:
+    std::size_t boolCount;
+
+private:
+    void process(const bool& source) {
+        ++boolCount;
+        BaseArchive::process(source);
+    }
+
+    template<typename T>
+    void process(T&& source) {
+        BaseArchive::process(std::forward<T>(source));
+    }
+};
+
+}  // namespace
+
+TEST(BinaryOutputArchiveTest, VectorOfBoolElementsRouteThroughExtender) {
+    tersetests::FakeStream stream;
+    BoolCountingOutputArchive archive(&stream);
+    std::vector<bool> source{true, false, true};
+    archive(source);
+
+    ASSERT_EQ(archive.boolCount, 3ul);
+
+    unsigned char expected[7ul] = {0x00,
+                                   0x00,
+                                   0x00,
+                                   0x03,  // size = 3
+                                   0x01,
+                                   0x00,
+                                   0x01};
     unsigned char bytes[sizeof(expected)];
     stream.seek(0ul);
     stream.read(reinterpret_cast<char*>(bytes), sizeof(expected));

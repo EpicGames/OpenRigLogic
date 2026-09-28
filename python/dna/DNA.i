@@ -104,6 +104,9 @@ else:
 %}
 
 %include <spyus/ExceptionHandling.i>
+%include <spyus/CharPtr.i>
+// setMetaData(key, nullptr) deletes the key (DescriptorWriter.h contract): None stays legal for value.
+%typemap(check) const char* value "";
 
 %include "stdint.i"
 %include <spyus/Caster.i>

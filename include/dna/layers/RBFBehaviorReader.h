@@ -18,9 +18,9 @@ namespace dna {
         Implementors should inherit from Reader itself and not this class.
     @see Reader
 */
-class DNAAPI RBFBehaviorReader : public virtual BehaviorReader {
+class DNAAPI_TYPE RBFBehaviorReader : public virtual BehaviorReader {
 protected:
-    virtual ~RBFBehaviorReader();
+    DNAAPI_MEMBER virtual ~RBFBehaviorReader();
 
 public:
     virtual std::uint16_t getRBFPoseCount() const = 0;

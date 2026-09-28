@@ -32,7 +32,7 @@ public:
         return static_cast<std::uint16_t>(3);
     }
 
-    // DescriptorReader methods start
+    // DescriptorReader methods
     StringView getName() const override {
         return {};
     }

@@ -8,11 +8,21 @@
 #include "riglogic/joints/JointsNullEvaluator.h"
 #include "riglogic/joints/cpu/ml/CoordinateSystemTransformer.h"
 #include "riglogic/joints/cpu/ml/MLJointsEvaluator.h"
+#include "riglogic/joints/cpu/ml/MLJointsValidator.h"
 #include "riglogic/joints/cpu/ml/RotationAdapters.h"
 #include "riglogic/riglogic/Configuration.h"
 #include "riglogic/riglogic/RigMetadata.h"
-#include "riglogic/system/simd/Detect.h"
+#include "riglogic/system/simd/SIMD.h"
 #include "riglogic/utils/Extd.h"
+
+#ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable : 4365 4987)
+#endif
+#include <algorithm>
+#ifdef _MSC_VER
+    #pragma warning(pop)
+#endif
 
 namespace rl4 {
 
@@ -37,6 +47,7 @@ MLJointsBuilder::MLJointsBuilder(const Configuration& config_, RigMetadata* meta
     inputJointAttrCount{},
     outputJointAttrCount{},
     rotationUnit{},
+    isRestore{true},
     mlTranslationType{config.translationType},
     mlRotationType{config.rotationType},
     mlScaleType{config.scaleType} {
@@ -94,9 +105,13 @@ void MLJointsBuilder::remapIndices(std::uint16_t lod) {
 }
 
 void MLJointsBuilder::fillStorage(const JointBehaviorFilter& source) {
+    isRestore = false;
     const auto reader = source.getReader();
     const auto lodCount = reader->getLODCount();
-    rotationUnit = reader->getRotationUnit();
+    // The rotation unit persists into the snapshot as a discriminator RigMetadata::validate() range-checks on restore, so
+    // an out-of-range value here would make create() accept a rig whose own dump() restore() rejects. Normalize it.
+    rotationUnit =
+        (reader->getRotationUnit() == dna::RotationUnit::radians) ? dna::RotationUnit::radians : dna::RotationUnit::degrees;
 
     if (reader->getMLTypeCount() == 0) {
         return;
@@ -105,7 +120,9 @@ void MLJointsBuilder::fillStorage(const JointBehaviorFilter& source) {
     auto findMLRotationType = [this, reader]() {
         const auto paramKeys = reader->getMLJointsParameterKeys();
         const auto paramValues = reader->getMLJointsParameterValues();
-        for (std::size_t i = {}; i < paramKeys.size(); ++i) {
+        // Keys and values are independent DNA arrays; every parameter scan walks only the paired prefix.
+        const auto paramCount = std::min(paramKeys.size(), paramValues.size());
+        for (std::size_t i = {}; i < paramCount; ++i) {
             if (paramKeys[i] == static_cast<std::uint16_t>(dna::MachineLearnedBehaviorParameterKey::JointRotationType)) {
                 const auto rotationType = static_cast<dna::RotationRepresentation>(paramValues[i]);
                 if (rotationType == dna::RotationRepresentation::EulerAngles) {
@@ -122,7 +139,8 @@ void MLJointsBuilder::fillStorage(const JointBehaviorFilter& source) {
         const auto paramKeys = reader->getMLJointsParameterKeys();
         const auto paramValues = reader->getMLJointsParameterValues();
         tdm::coord_sys coordSys = {};
-        for (std::size_t i = {}; i < paramKeys.size(); ++i) {
+        const auto paramCount = std::min(paramKeys.size(), paramValues.size());
+        for (std::size_t i = {}; i < paramCount; ++i) {
             const auto xAxis = static_cast<std::uint16_t>(dna::MachineLearnedBehaviorParameterKey::JointCoordinateSystemAxisX);
             const auto yAxis = static_cast<std::uint16_t>(dna::MachineLearnedBehaviorParameterKey::JointCoordinateSystemAxisY);
             const auto zAxis = static_cast<std::uint16_t>(dna::MachineLearnedBehaviorParameterKey::JointCoordinateSystemAxisZ);
@@ -141,7 +159,8 @@ void MLJointsBuilder::fillStorage(const JointBehaviorFilter& source) {
         const auto paramKeys = reader->getMLJointsParameterKeys();
         const auto paramValues = reader->getMLJointsParameterValues();
         tdm::rot_sign rotSigns = {};
-        for (std::size_t i = {}; i < paramKeys.size(); ++i) {
+        const auto paramCount = std::min(paramKeys.size(), paramValues.size());
+        for (std::size_t i = {}; i < paramCount; ++i) {
             const auto xAxis = static_cast<std::uint16_t>(dna::MachineLearnedBehaviorParameterKey::JointRotationSignAxisX);
             const auto yAxis = static_cast<std::uint16_t>(dna::MachineLearnedBehaviorParameterKey::JointRotationSignAxisY);
             const auto zAxis = static_cast<std::uint16_t>(dna::MachineLearnedBehaviorParameterKey::JointRotationSignAxisZ);
@@ -159,7 +178,8 @@ void MLJointsBuilder::fillStorage(const JointBehaviorFilter& source) {
     auto getRotationSequence = [reader]() {
         const auto paramKeys = reader->getMLJointsParameterKeys();
         const auto paramValues = reader->getMLJointsParameterValues();
-        for (std::size_t i = {}; i < paramKeys.size(); ++i) {
+        const auto paramCount = std::min(paramKeys.size(), paramValues.size());
+        for (std::size_t i = {}; i < paramCount; ++i) {
             if (paramKeys[i] == static_cast<std::uint16_t>(dna::MachineLearnedBehaviorParameterKey::JointRotationSequence)) {
                 return static_cast<tdm::rot_seq>(paramValues[i]);
             }
@@ -169,6 +189,9 @@ void MLJointsBuilder::fillStorage(const JointBehaviorFilter& source) {
 
     const bool isCoordinateSystemSpecified = [reader]() {
         const auto paramKeys = reader->getMLJointsParameterKeys();
+        const auto paramValues = reader->getMLJointsParameterValues();
+        // A key in the unpaired tail has no value; certifying it would run the transform on zero-initialized defaults.
+        const auto pairedKeys = paramKeys.first(std::min(paramKeys.size(), paramValues.size()));
         bool isCoordSysSpecified = true;
         const std::uint16_t expectedKeys[] = {
             static_cast<std::uint16_t>(dna::MachineLearnedBehaviorParameterKey::JointCoordinateSystemAxisX),
@@ -179,7 +202,7 @@ void MLJointsBuilder::fillStorage(const JointBehaviorFilter& source) {
             static_cast<std::uint16_t>(dna::MachineLearnedBehaviorParameterKey::JointRotationSignAxisZ),
             static_cast<std::uint16_t>(dna::MachineLearnedBehaviorParameterKey::JointRotationSequence)};
         for (std::size_t i = {}; i < sizeof(expectedKeys) / sizeof(*expectedKeys); ++i) {
-            isCoordSysSpecified = isCoordSysSpecified && extd::contains(paramKeys, expectedKeys[i]);
+            isCoordSysSpecified = isCoordSysSpecified && extd::contains(pairedKeys, expectedKeys[i]);
         }
         return isCoordSysSpecified;
     }();
@@ -240,7 +263,6 @@ void MLJointsBuilder::fillStorage(const JointBehaviorFilter& source) {
         const auto jointIndices = reader->getJointIndicesForLOD(lod);
         const auto mlJointsInputIndices = reader->getMLJointsInputIndices();
         const auto mlJointsOutputIndices = reader->getMLJointsOutputIndices();
-        assert(mlJointsInputIndices.size() == mlJointsOutputIndices.size());
 
         inputIndices[lod].reserve(mlJointsInputIndices.size());
         outputIndices[lod].reserve(mlJointsOutputIndices.size());
@@ -250,7 +272,8 @@ void MLJointsBuilder::fillStorage(const JointBehaviorFilter& source) {
         uniqueRotationBaseIndices[lod].reserve(mlJointsInputIndices.size());
         uniqueScaleBaseIndices[lod].reserve(mlJointsInputIndices.size());
 
-        for (std::size_t mi = {}; mi < mlJointsOutputIndices.size(); ++mi) {
+        const std::size_t mlJointsCount = std::min(mlJointsInputIndices.size(), mlJointsOutputIndices.size());
+        for (std::size_t mi = {}; mi < mlJointsCount; ++mi) {
             const auto outputControlIndex = mlJointsInputIndices[mi];
             const auto jointAttrIndex = mlJointsOutputIndices[mi];
             if (isJointInLOD(jointAttrIndex, inputJointAttrCount, jointIndices)) {
@@ -294,6 +317,7 @@ struct MLJointsEvaluatorFactory {
                                         RotationType mlRotationType,
                                         tdm::rot_seq rotationSequence,
                                         dna::RotationUnit rotationUnit,
+                                        bool isCoordSysTransformed,
                                         Matrix<std::uint16_t>&& inputIndices,
                                         Matrix<std::uint16_t>&& outputIndices,
                                         Matrix<std::uint16_t>&& inputRotationBaseIndices,
@@ -308,8 +332,8 @@ struct MLJointsEvaluatorFactory {
                                         tdm::rot_sign dstSigns,
                                         MemoryResource* memRes) {
 
-        const bool isCoordSysTransformed = !(changeOfBasis == tdm::fmat3::identity() && srcSeq == dstSeq && srcSigns == dstSigns);
-
+        // isCoordSysTransformed selects the transformer templates and is passed in, not recomputed from changeOfBasis/
+        // srcSeq/srcSigns: on restore those are still at ctor defaults here (load() streams them in later).
         if (targetRotationType == mlRotationType) {
             if (isCoordSysTransformed) {
                 if (targetRotationType == RotationType::EulerAngles) {
@@ -1358,27 +1382,66 @@ struct MLJointsEvaluatorFactory {
 
 JointsEvaluator::Pointer MLJointsBuilder::build() {
     const auto targetRotationType = config.rotationType;
-    const EvaluatorType type =
-        (meta->initializationMethod == InitializationMethod::Restore) ? meta->popFrontEvaluator() : EvaluatorType::Auto;
+    // Auto until this builder writes it on the create path; the deserialized kind on restore.
+    const EvaluatorType type = meta->evaluators.mlJoints;
 
     const bool isMLDataEmpty = [this]() {
         assert(inputIndices.size() == outputIndices.size());
         bool empty = true;
         for (std::size_t lod = {}; lod < inputIndices.size(); ++lod) {
-            empty = empty && (inputIndices[lod].empty() && outputIndices[lod].empty());
+            // fillStorage() routes rotation attributes into their own arrays, so a rotation-only rig leaves inputIndices/
+            // outputIndices empty at every LOD; probing those two alone would discard its ML data as a Null evaluator.
+            empty = empty && inputIndices[lod].empty() && outputIndices[lod].empty() && inputRotationBaseIndices[lod].empty() &&
+                    outputRotationBaseIndices[lod].empty();
         }
         return empty;
     }();
 
     if ((type == EvaluatorType::Null) || ((type == EvaluatorType::Auto) && isMLDataEmpty)) {
-        meta->pushBackEvaluator(EvaluatorType::Null);
+        meta->evaluators.mlJoints = EvaluatorType::Null;
         return UniqueInstance<JointsNullEvaluator, JointsEvaluator>::with(memRes).create();
+    }
+
+    // The evaluator templates are selected from mlRotationType, rotationUnit and isCoordSysTransformed; the DNA path
+    // derives them in fillStorage(), which restore never runs, so restore recovers them from this subsystem's record.
+    bool isCoordSysTransformed = !(changeOfBasis == tdm::fmat3::identity() && srcSeq == dstSeq && srcSigns == dstSigns);
+    if (isRestore) {
+        // Range-validated by RigMetadata::validate() before any factory runs.
+        mlRotationType = meta->mlJointsRotationType;
+        rotationUnit = meta->mlJointsRotationUnit;
+        isCoordSysTransformed = (meta->mlJointsCoordSysTransformed != 0u);
+    }
+
+    // Validate only on the DNA path (type == Auto): the restore shell's matrices are streamed and validated by
+    // MLJointsEvaluator::load(). A null return fails the whole create(), unlike the JointsNullEvaluator below.
+    // Spans must match the adapter the factory selects: NoopAdapter does quaternion math even for Euler/Euler, hence the
+    // quaternion span; a converting adapter spans each side's own type; unique-rotation is Euler only when transformed.
+    const bool sameRotationType = (mlRotationType == targetRotationType);
+    const auto spanOf = [](RotationType rotation) { return static_cast<std::size_t>(rotation); };
+    const std::size_t inputRotationSpan = sameRotationType ? spanOf(RotationType::Quaternions) : spanOf(mlRotationType);
+    const std::size_t outputRotationSpan = sameRotationType ? spanOf(RotationType::Quaternions) : spanOf(targetRotationType);
+    const std::size_t uniqueRotationSpan = (isCoordSysTransformed && (mlRotationType == RotationType::EulerAngles))
+                                               ? spanOf(RotationType::EulerAngles)
+                                               : spanOf(RotationType::Quaternions);
+    if ((type == EvaluatorType::Auto) && !MLJointsValidator::validate(inputIndices,
+                                                                      outputIndices,
+                                                                      inputRotationBaseIndices,
+                                                                      outputRotationBaseIndices,
+                                                                      uniqueTranslationBaseIndices,
+                                                                      uniqueRotationBaseIndices,
+                                                                      uniqueScaleBaseIndices,
+                                                                      inputRotationSpan,
+                                                                      outputRotationSpan,
+                                                                      uniqueRotationSpan,
+                                                                      *meta)) {
+        return nullptr;
     }
 
     auto evaluator = MLJointsEvaluatorFactory()(targetRotationType,
                                                 mlRotationType,
                                                 meta->rotationSequence,
                                                 rotationUnit,
+                                                isCoordSysTransformed,
                                                 std::move(inputIndices),
                                                 std::move(outputIndices),
                                                 std::move(inputRotationBaseIndices),
@@ -1394,11 +1457,16 @@ JointsEvaluator::Pointer MLJointsBuilder::build() {
                                                 memRes);
 
     if (evaluator == nullptr) {
-        meta->pushBackEvaluator(EvaluatorType::Null);
+        // Unsupported rotation configuration: a Null record carries no discriminator words (the reader keys off word count).
+        meta->evaluators.mlJoints = EvaluatorType::Null;
         return UniqueInstance<JointsNullEvaluator, JointsEvaluator>::with(memRes).create();
     }
 
-    meta->pushBackEvaluator(EvaluatorType::Concrete);
+    // Persist the template-selecting discriminators so restore rebuilds the identical evaluator.
+    meta->evaluators.mlJoints = EvaluatorType::Concrete;
+    meta->mlJointsRotationType = mlRotationType;
+    meta->mlJointsRotationUnit = rotationUnit;
+    meta->mlJointsCoordSysTransformed = (isCoordSysTransformed ? 1u : 0u);
     return evaluator;
 }
 

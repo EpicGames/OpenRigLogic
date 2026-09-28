@@ -9,6 +9,7 @@
 #include "rltests/controls/ControlFixtures.h"
 #include "rltests/ml/cpu/FixturesMLBChained.h"
 
+#include "riglogic/RigLogic.h"
 #include "riglogic/TypeDefs.h"
 #include "riglogic/ml/cpu/CPUMachineLearnedBehaviorFactory.h"
 #include "riglogic/riglogic/RigMetadata.h"
@@ -21,15 +22,12 @@
 
 namespace {
 
-// Exercises the chained topology: Gather -> MLP(odd layers) -> WeightedSum -> MLP(even layers) -> Scatter.
-// The odd-layer intermediate MLP triggers the ping-pong normalization fix in Operation.h.
-// Running multiple frames per LOD guards against stale-buffer regressions.
 class MLBChainedInferenceTest : public ::testing::TestWithParam<rl4::CalculationType> {
 protected:
     void SetUp() override {
         rl4::Configuration config = {};
         config.calculationType = GetParam();
-        auto meta = rl4::RigMetadata::create(config, &reader, &memRes, rl4::InitializationMethod::Create);
+        auto meta = rl4::RigMetadata::create(config, &reader, &memRes);
         evaluator = rl4::ml::cpu::Factory::create(config, meta.get(), &reader, &memRes);
     }
 
@@ -39,14 +37,12 @@ protected:
     rl4::MachineLearnedBehaviorEvaluator::Pointer evaluator;
 };
 
-// Same topology as above, but each neural net is assigned to a mesh region, so mask weights apply:
-// mask region 0 attenuates NN1 (final MLP, scatter outputs), region 1 attenuates NN0 (intermediate dep MLP).
 class MLBChainedMaskedInferenceTest : public ::testing::TestWithParam<rl4::CalculationType> {
 protected:
     void SetUp() override {
         rl4::Configuration config = {};
         config.calculationType = GetParam();
-        auto meta = rl4::RigMetadata::create(config, &reader, &memRes, rl4::InitializationMethod::Create);
+        auto meta = rl4::RigMetadata::create(config, &reader, &memRes);
         evaluator = rl4::ml::cpu::Factory::create(config, meta.get(), &reader, &memRes);
     }
 
@@ -56,15 +52,12 @@ protected:
     rl4::MachineLearnedBehaviorEvaluator::Pointer evaluator;
 };
 
-// Same topology, but the MLP op set contains a layer-less op at index 0 (real op shifted to index 1).
-// The factory must keep a placeholder for it so op indices stay aligned; results must match the canonical
-// topology exactly, since the placeholder contributes nothing.
 class MLBChainedMixedOpSetInferenceTest : public ::testing::TestWithParam<rl4::CalculationType> {
 protected:
     void SetUp() override {
         rl4::Configuration config = {};
         config.calculationType = GetParam();
-        auto meta = rl4::RigMetadata::create(config, &reader, &memRes, rl4::InitializationMethod::Create);
+        auto meta = rl4::RigMetadata::create(config, &reader, &memRes);
         evaluator = rl4::ml::cpu::Factory::create(config, meta.get(), &reader, &memRes);
     }
 
@@ -74,15 +67,12 @@ protected:
     rl4::MachineLearnedBehaviorEvaluator::Pointer evaluator;
 };
 
-// The WeightedSum reads more elements (12) from its dependency's buffer than the dependency outputs (8).
-// The factory-computed tail-zeroing must make the over-read region blend zeros - matching the old
-// unconditional tail fill - so the results stay canonical and stable across frames.
 class MLBChainedWSOverreadInferenceTest : public ::testing::TestWithParam<rl4::CalculationType> {
 protected:
     void SetUp() override {
         rl4::Configuration config = {};
         config.calculationType = GetParam();
-        auto meta = rl4::RigMetadata::create(config, &reader, &memRes, rl4::InitializationMethod::Create);
+        auto meta = rl4::RigMetadata::create(config, &reader, &memRes);
         evaluator = rl4::ml::cpu::Factory::create(config, meta.get(), &reader, &memRes);
     }
 
@@ -92,14 +82,12 @@ protected:
     rl4::MachineLearnedBehaviorEvaluator::Pointer evaluator;
 };
 
-// The final MLP outputs 8 values at LOD 0 but only 4 at LOD 1; with masks available, all three scatter
-// paths (unmasked, attenuated, zero-weight defaults) must write only the current LOD's output count.
 class MLBChainedLODLimitedMaskedInferenceTest : public ::testing::TestWithParam<rl4::CalculationType> {
 protected:
     void SetUp() override {
         rl4::Configuration config = {};
         config.calculationType = GetParam();
-        auto meta = rl4::RigMetadata::create(config, &reader, &memRes, rl4::InitializationMethod::Create);
+        auto meta = rl4::RigMetadata::create(config, &reader, &memRes);
         evaluator = rl4::ml::cpu::Factory::create(config, meta.get(), &reader, &memRes);
     }
 
@@ -109,14 +97,12 @@ protected:
     rl4::MachineLearnedBehaviorEvaluator::Pointer evaluator;
 };
 
-// The over-reading WeightedSum composed with a mask on the over-read intermediate dep: the over-read
-// tail must blend zeros in every mask state, including when the dep is masked off before it ever ran.
 class MLBChainedMaskedWSOverreadInferenceTest : public ::testing::TestWithParam<rl4::CalculationType> {
 protected:
     void SetUp() override {
         rl4::Configuration config = {};
         config.calculationType = GetParam();
-        auto meta = rl4::RigMetadata::create(config, &reader, &memRes, rl4::InitializationMethod::Create);
+        auto meta = rl4::RigMetadata::create(config, &reader, &memRes);
         evaluator = rl4::ml::cpu::Factory::create(config, meta.get(), &reader, &memRes);
     }
 
@@ -142,9 +128,8 @@ TEST_P(MLBChainedMaskedWSOverreadInferenceTest, OverreadTailStaysZeroAcrossMaskS
     auto maskBuffer = intermediateOutputs->getMaskBuffer();
     ASSERT_EQ(maskBuffer.size(), 1ul);
 
-    // The first evaluation runs with the dep masked off (never evaluated unmasked yet - the over-read tail
-    // holds the instance's zero-initialized memory), then unmasked (tail re-zeroed by the trailing memset),
-    // then masked off again (the zero-weight path preserves the previously zeroed tail).
+    // Masked off before ever running unmasked, then unmasked, then masked off again: each state reaches the
+    // over-read tail by a different path (zero-initialized buffers, trailing memset, zero-weight no-write).
     const float depMaskWeights[] = {0.0f, 1.0f, 0.0f};
 
     for (std::uint16_t lod = 0u; lod < lodCount; ++lod) {
@@ -152,8 +137,7 @@ TEST_P(MLBChainedMaskedWSOverreadInferenceTest, OverreadTailStaysZeroAcrossMaskS
             maskBuffer[0] = depWeight;  // region 0 -> NN0 (the over-read intermediate dep)
             std::fill(outputBuffer.begin(), outputBuffer.end(), 0.0f);
             this->evaluator->calculate(inputInstance.get(), intermediateOutputs.get(), lod);
-            // Masked off: NN0 publishes zero defaults and the over-read tail is zero, so everything is 0.
-            // Unmasked: canonical outputs (the over-read tail blends zeros, not stale data).
+            // Masked off: NN0 publishes zero defaults, so everything is 0; unmasked: canonical outputs.
             const auto& unmasked = output::valuesPerLOD[lod];
             rl4::Vector<float> expected{unmasked.size(), {}, &this->memRes};
             for (std::size_t i = {}; i < unmasked.size(); ++i) {
@@ -278,8 +262,7 @@ TEST_P(MLBChainedWSOverreadInferenceTest, OverreadTailBlendsZeros) {
 
     auto intermediateOutputs = this->evaluator->createInstance(&this->memRes);
     for (std::uint16_t lod = 0u; lod < lodCount; ++lod) {
-        // The stale over-read data only appears from the first evaluation onward (buffers start zeroed),
-        // so run multiple frames to prove the tail stays zeroed on every evaluation.
+        // Buffers start zeroed, so stale over-read data can only appear from the second frame on.
         for (int frame = 0; frame < 3; ++frame) {
             std::fill(outputBuffer.begin(), outputBuffer.end(), 0.0f);
             this->evaluator->calculate(inputInstance.get(), intermediateOutputs.get(), lod);
@@ -376,6 +359,23 @@ INSTANTIATE_TEST_SUITE_P(MLBChainedLODLimitedMaskedInferenceTestSuite,
                                            rl4::CalculationType::SSE,
                                            rl4::CalculationType::NEON,
                                            rl4::CalculationType::Scalar));
+
+// A DNA create() accepts must restore() from its own snapshot: the intermediate MLP's outputCountsPerLOD is not
+// serialized, so load()'s recompute must apply the factory's full-output-count rule even when the DNA trims rows.
+TEST(MLBChainedRoundTripTest, LODTrimmedIntermediateDumpStillRestores) {
+    rltests::ml::chained::LODTrimmedIntermediateReader reader;
+    pma::AlignedMemoryResource memRes;
+    rl4::Configuration config{};
+    auto rig = pma::makeScoped<rl4::RigLogic>(&reader, config, &memRes);
+    ASSERT_NE(rig.get(), nullptr);
+
+    auto snapshot = pma::makeScoped<trio::MemoryStream>();
+    rig->dump(snapshot.get());
+    snapshot->seek(0ul);
+    auto restored = rl4::RigLogic::restore(snapshot.get(), &memRes);
+    ASSERT_NE(restored, nullptr);
+    rl4::RigLogic::destroy(restored);
+}
 
 #ifdef _MSC_VER
     #pragma warning(pop)

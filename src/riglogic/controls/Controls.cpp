@@ -40,14 +40,16 @@ ConstArrayView<std::uint16_t> Controls::getRegisteredControls(std::uint16_t lod)
 
 void Controls::mapGUIToRaw(ControlsInputInstance* instance) const {
     auto guiControlBuffer = instance->getGUIControlBuffer();
-    assert(guiControlBuffer.size() == guiToRawMapping.getInputCount());
+    // The mapping only needs the buffer to COVER its input count (ConditionalTableValidator enforces
+    // inputCount <= the buffer width, and index values are bounded separately); equality is not required.
+    assert(guiControlBuffer.size() >= guiToRawMapping.getInputCount());
     auto inputBuffer = instance->getInputBuffer();
     guiToRawMapping.calculateForward(guiControlBuffer.data(), inputBuffer.data());
 }
 
 void Controls::mapRawToGUI(ControlsInputInstance* instance) const {
     auto guiControlBuffer = instance->getGUIControlBuffer();
-    assert(guiControlBuffer.size() == guiToRawMapping.getInputCount());
+    assert(guiControlBuffer.size() >= guiToRawMapping.getInputCount());
     auto inputBuffer = instance->getInputBuffer();
     guiToRawMapping.calculateReverse(guiControlBuffer.data(), inputBuffer.data());
 }

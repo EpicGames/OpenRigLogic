@@ -22,7 +22,18 @@ using trio::FileStream;
 using trio::MemoryMappedFileStream;
 using trio::MemoryStream;
 
-using namespace av;
-using namespace pma;
+using av::ArrayView;
+using av::ConstArrayView;
+using av::StringView;
+
+using pma::DefaultInstanceCreator;
+using pma::DefaultInstanceDestroyer;
+using pma::Delete;
+using pma::FactoryCreate;
+using pma::FactoryDestroy;
+using pma::makeScoped;
+using pma::MemoryResource;
+using pma::New;
+using pma::ScopedPtr;
 
 }  // namespace dna

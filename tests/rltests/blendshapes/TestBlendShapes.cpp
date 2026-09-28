@@ -26,7 +26,6 @@ class BlendShapesTest : public ::testing::TestWithParam<std::uint16_t> {};
 TEST_P(BlendShapesTest, Calculate) {
     using namespace rltests;
 
-    // Test input parameter - Which LOD level to test
     const auto lod = GetParam();
 
     pma::AlignedMemoryResource amr;

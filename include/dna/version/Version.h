@@ -3,6 +3,6 @@
 #pragma once
 
 #define DNA_MAJOR_VERSION 10
-#define DNA_MINOR_VERSION 1
-#define DNA_PATCH_VERSION 6
-#define DNA_VERSION_STRING "10.1.6"
+#define DNA_MINOR_VERSION 4
+#define DNA_PATCH_VERSION 1
+#define DNA_VERSION_STRING "10.4.1"

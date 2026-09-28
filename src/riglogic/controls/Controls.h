@@ -2,9 +2,12 @@
 
 #pragma once
 
+#include "riglogic/SerializationContext.h"
 #include "riglogic/TypeDefs.h"
 #include "riglogic/conditionaltable/ConditionalTable.h"
 #include "riglogic/controls/ControlsInputInstance.h"
+#include "riglogic/controls/ControlsValidator.h"
+#include "riglogic/riglogic/RigMetadata.h"
 
 #include <cstdint>
 
@@ -28,7 +31,17 @@ public:
     void mapRawToGUI(ControlsInputInstance* instance) const;
 
     template<class Archive>
-    void serialize(Archive& archive) {
+    void load(Archive& archive) {
+        archive(registeredControls, guiToRawMapping, initialValues);
+        const SerializationContext* context = static_cast<SerializationContext*>(archive.getUserData());
+        const RigMetadata& metadata = *context->metadata;
+        if (!ControlsValidator::validate(guiToRawMapping, initialValues, metadata)) {
+            archive.markMalformed();
+        }
+    }
+
+    template<class Archive>
+    void save(Archive& archive) {
         archive(registeredControls, guiToRawMapping, initialValues);
     }
 

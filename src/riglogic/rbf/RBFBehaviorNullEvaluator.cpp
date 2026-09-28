@@ -25,7 +25,7 @@ void RBFBehaviorNullEvaluator::calculate(ControlsInputInstance* /*unused*/,
                                          std::uint16_t /*unused*/) const {
 }
 
-void RBFBehaviorNullEvaluator::load(terse::BinaryInputArchive<BoundedIOStream>& /*unused*/) {
+void RBFBehaviorNullEvaluator::load(BoundedInputArchive& /*unused*/) {
 }
 
 void RBFBehaviorNullEvaluator::save(terse::BinaryOutputArchive<BoundedIOStream>& /*unused*/) {

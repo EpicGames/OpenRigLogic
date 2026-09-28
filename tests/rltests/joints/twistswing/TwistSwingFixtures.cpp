@@ -75,7 +75,6 @@ const pma::Matrix<std::uint16_t> twistInputIndices = {{0u, 1u, 2u, 3u}, {4u, 5u,
 
 namespace input {
 
-// Calculation input values
 const rl4::Vector<float> values = {0.308434369465179f,
                                    0.3353868017170958f,
                                    0.14504533469235772f,
@@ -94,7 +93,6 @@ const rl4::Vector<float> values = {0.308434369465179f,
 
 namespace output {
 
-// Expected output results for each LOD
 const rl4::Vector<rl4::Matrix<float>> valuesPerLODPerConfig = {
     { // Quaternion outputs
      {// LOD-0

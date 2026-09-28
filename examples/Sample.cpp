@@ -42,6 +42,11 @@ const float expectedAnimatedMaps[] = {
 
 #define ASSERT_NEAR(a, b, threshold) assert(std::fabs(a - b) <= threshold);
 
+template<typename T, std::size_t N>
+std::size_t arrayLength(const T (&)[N]) {
+    return N;
+}
+
 int main(int argc, char** argv) {
     auto stream =
         rl4::makeScoped<rl4::FileStream>("Sample.dna", rl4::FileStream::AccessMode::Read, rl4::FileStream::OpenMode::Binary);
@@ -64,17 +69,25 @@ int main(int argc, char** argv) {
 
     rigLogic->calculate(rigInstance.get());
 
+    // The tables mirror the shipped Sample.dna; if the asset changed, fail rather than compare past a table's end.
     const auto jointDeltas = rigInstance->getJointOutputs();
+    const auto blendShapeChannels = rigInstance->getBlendShapeOutputs();
+    const auto animatedMaps = rigInstance->getAnimatedMapOutputs();
+    if ((jointDeltas.size() != arrayLength(expectedJointDeltas)) ||
+        (blendShapeChannels.size() != arrayLength(expectedBlendShapeChannels)) ||
+        (animatedMaps.size() != arrayLength(expectedAnimatedMaps))) {
+        std::cout << "Output counts do not match the expected-value tables; regenerate them for this Sample.dna" << std::endl;
+        return -1;
+    }
+
     for (std::size_t i = {}; i < jointDeltas.size(); ++i) {
         ASSERT_NEAR(jointDeltas[i], expectedJointDeltas[i], 0.001f);
     }
 
-    const auto blendShapeChannels = rigInstance->getBlendShapeOutputs();
     for (std::size_t i = {}; i < blendShapeChannels.size(); ++i) {
         ASSERT_NEAR(blendShapeChannels[i], expectedBlendShapeChannels[i], 0.001f);
     }
 
-    const auto animatedMaps = rigInstance->getAnimatedMapOutputs();
     for (std::size_t i = {}; i < animatedMaps.size(); ++i) {
         ASSERT_NEAR(animatedMaps[i], expectedAnimatedMaps[i], 0.001f);
     }

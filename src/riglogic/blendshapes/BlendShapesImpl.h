@@ -21,7 +21,7 @@ public:
     BlendShapesOutputInstance::Pointer createInstance(MemoryResource* instanceMemRes) const override;
     ConstArrayView<std::uint16_t> getBlendShapeChannelIndicesForLOD(std::uint16_t lod) const override;
     void calculate(const ControlsInputInstance* inputs, BlendShapesOutputInstance* outputs, std::uint16_t lod) const override;
-    void load(terse::BinaryInputArchive<BoundedIOStream>& archive) override;
+    void load(BoundedInputArchive& archive) override;
     void save(terse::BinaryOutputArchive<BoundedIOStream>& archive) override;
 
 private:

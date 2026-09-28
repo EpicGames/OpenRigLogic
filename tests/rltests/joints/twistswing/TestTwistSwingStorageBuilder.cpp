@@ -7,7 +7,7 @@
 #include "riglogic/TypeDefs.h"
 #include "riglogic/joints/cpu/twistswing/TwistSwingJointsBuilder.h"
 #include "riglogic/riglogic/RigMetadata.h"
-#include "riglogic/system/simd/Detect.h"
+#include "riglogic/system/simd/SIMD.h"
 
 #include <tuple>
 
@@ -75,7 +75,7 @@ protected:
 
         rl4::Configuration config{};
         config.rotationType = RotationOutputTypeSelector<TRotationAdapter>::rotation();
-        auto meta = rl4::RigMetadata::create(config, &reader, &memRes, rl4::InitializationMethod::Create);
+        auto meta = rl4::RigMetadata::create(config, &reader, &memRes);
         rl4::TwistSwingJointsBuilder<T, TF256, TF128> builder(config, meta.get(), &memRes);
 
         rl4::JointBehaviorFilter filter{&reader, &memRes};
@@ -84,6 +84,9 @@ protected:
         builder.allocateStorage(filter);
         builder.fillStorage(filter);
         auto joints = builder.build();
+        // Where the asserted adapter cannot be constructed (rotation order compiled out) build() falls back to
+        // JointsNullEvaluator and the downcast below would read another type's memory; fail loudly instead.
+        ASSERT_EQ(meta->evaluators.twistSwingJoints, rl4::EvaluatorType::Concrete);
         rl4::TwistSwingJointsEvaluator<T, TF256, TF128, TRotationAdapter>::Accessor::assertRawDataEqual(
             *static_cast<TSJEvaluator*>(joints.get()));
     }
@@ -103,47 +106,47 @@ protected:
 using StorageValueTypeList = ::testing::Types<
     #ifdef RL_BUILD_WITH_HALF_FLOATS
     std::tuple<float, trimd::avx::F256, trimd::sse::F128, rl4::PassthroughAdapter>,
-    std::tuple<float, trimd::avx::F256, trimd::sse::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::zyx>>,
+    std::tuple<float, trimd::avx::F256, trimd::sse::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::xyz>>,
     std::tuple<float, trimd::sse::F256, trimd::sse::F128, rl4::PassthroughAdapter>,
-    std::tuple<float, trimd::sse::F256, trimd::sse::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::zyx>>
+    std::tuple<float, trimd::sse::F256, trimd::sse::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::xyz>>
     #else
     std::tuple<float, trimd::avx::F256, trimd::sse::F128, rl4::PassthroughAdapter>,
-    std::tuple<float, trimd::avx::F256, trimd::sse::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::zyx>>,
+    std::tuple<float, trimd::avx::F256, trimd::sse::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::xyz>>,
     std::tuple<float, trimd::sse::F256, trimd::sse::F128, rl4::PassthroughAdapter>,
-    std::tuple<float, trimd::sse::F256, trimd::sse::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::zyx>>,
+    std::tuple<float, trimd::sse::F256, trimd::sse::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::xyz>>,
     std::tuple<float, trimd::scalar::F256, trimd::scalar::F128, rl4::PassthroughAdapter>,
-    std::tuple<float, trimd::scalar::F256, trimd::scalar::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::zyx>>
+    std::tuple<float, trimd::scalar::F256, trimd::scalar::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::xyz>>
     #endif  // RL_BUILD_WITH_HALF_FLOATS
     >;
 #elif defined(RL_BUILD_WITH_AVX)
 using StorageValueTypeList = ::testing::Types<
     #ifdef RL_BUILD_WITH_HALF_FLOATS
     std::tuple<float, trimd::avx::F256, trimd::sse::F128, rl4::PassthroughAdapter>,
-    std::tuple<float, trimd::avx::F256, trimd::sse::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::zyx>>
+    std::tuple<float, trimd::avx::F256, trimd::sse::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::xyz>>
     #else
     std::tuple<float, trimd::avx::F256, trimd::sse::F128, rl4::PassthroughAdapter>,
-    std::tuple<float, trimd::avx::F256, trimd::sse::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::zyx>>,
+    std::tuple<float, trimd::avx::F256, trimd::sse::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::xyz>>,
     std::tuple<float, trimd::scalar::F256, trimd::scalar::F128, rl4::PassthroughAdapter>,
-    std::tuple<float, trimd::scalar::F256, trimd::scalar::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::zyx>>
+    std::tuple<float, trimd::scalar::F256, trimd::scalar::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::xyz>>
     #endif  // RL_BUILD_WITH_HALF_FLOATS
     >;
 #elif defined(RL_BUILD_WITH_SSE)
 using StorageValueTypeList = ::testing::Types<
     #ifdef RL_BUILD_WITH_HALF_FLOATS
     std::tuple<float, trimd::sse::F256, trimd::sse::F128, rl4::PassthroughAdapter>,
-    std::tuple<float, trimd::sse::F256, trimd::sse::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::zyx>>
+    std::tuple<float, trimd::sse::F256, trimd::sse::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::xyz>>
     #else
     std::tuple<float, trimd::sse::F256, trimd::sse::F128, rl4::PassthroughAdapter>,
-    std::tuple<float, trimd::sse::F256, trimd::sse::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::zyx>>,
+    std::tuple<float, trimd::sse::F256, trimd::sse::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::xyz>>,
     std::tuple<float, trimd::scalar::F256, trimd::scalar::F128, rl4::PassthroughAdapter>,
-    std::tuple<float, trimd::scalar::F256, trimd::scalar::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::zyx>>
+    std::tuple<float, trimd::scalar::F256, trimd::scalar::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::xyz>>
     #endif  // RL_BUILD_WITH_HALF_FLOATS
     >;
 #else
     #ifndef RL_BUILD_WITH_HALF_FLOATS
 using StorageValueTypeList = ::testing::Types<
     std::tuple<float, trimd::scalar::F256, trimd::scalar::F128, rl4::PassthroughAdapter>,
-    std::tuple<float, trimd::scalar::F256, trimd::scalar::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::zyx>>>;
+    std::tuple<float, trimd::scalar::F256, trimd::scalar::F128, rl4::QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::xyz>>>;
     #else
 using StorageValueTypeList = ::testing::Types<std::tuple<>>;
     #endif  // RL_BUILD_WITH_HALF_FLOATS

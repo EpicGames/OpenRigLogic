@@ -6,6 +6,7 @@
 
 #include "riglogic/riglogic/RigLogicImpl.h"
 
+#include "riglogic/SerializationContext.h"
 #include "riglogic/TypeDefs.h"
 #include "riglogic/animatedmaps/AnimatedMapsFactory.h"
 #include "riglogic/blendshapes/BlendShapesFactory.h"
@@ -20,12 +21,14 @@
 #include "riglogic/riglogic/Stats.h"
 #include "riglogic/system/simd/Utils.h"
 #include "riglogic/utils/Extd.h"
+#include "riglogic/version/Version.h"
 
 #ifdef _MSC_VER
     #pragma warning(push)
     #pragma warning(disable : 4365 4987)
 #endif
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <numeric>
 #include <utility>
@@ -35,6 +38,14 @@
 
 namespace rl4 {
 
+namespace {
+
+constexpr std::uint32_t snapshotMagic = 0x524C4453u;  // 'RLDS' (RigLogic Dump/Snapshot)
+constexpr std::uint16_t snapshotFormatVersionMajor = RL_MAJOR_VERSION;
+constexpr std::uint16_t snapshotFormatVersionMinor = RL_MINOR_VERSION;
+
+}  // namespace
+
 static RigInstanceImpl* castInstance(RigInstance* instance) {
     return static_cast<RigInstanceImpl*>(instance);
 }
@@ -43,8 +54,21 @@ RigLogic::~RigLogic() = default;
 
 RigLogic* RigLogic::create(const dna::Reader* reader, const Configuration& config, MemoryResource* memRes) {
     const ActiveFeatures activeFeatures = getActiveFeatures(config);
-    auto meta = RigMetadata::create(config, reader, memRes, InitializationMethod::Create);
+    auto meta = RigMetadata::create(config, reader, memRes);
+    if (!meta) {
+        return nullptr;
+    }
+    // Same check as restore(): a DNA create() accepts must produce a snapshot restore() also accepts.
+    if (!meta->validate(InitializationMethod::Create)) {
+        return nullptr;
+    }
+
     auto controls = ControlsFactory::create(config, meta.get(), reader, memRes);
+    // Checked first: the systems below consume it (registerControls).
+    if (!controls) {
+        return nullptr;
+    }
+
     auto mlBehavior = MachineLearnedBehaviorFactory::create(config, meta.get(), reader, memRes);
     auto rbfBehavior = RBFBehaviorFactory::create(config, meta.get(), reader, memRes);
     auto joints = JointsFactory::create(config, meta.get(), reader, controls.get(), memRes);
@@ -52,6 +76,12 @@ RigLogic* RigLogic::create(const dna::Reader* reader, const Configuration& confi
     auto animatedMaps = AnimatedMapsFactory::create(config, meta.get(), reader, controls.get(), memRes);
     // Must be created after controls are registered by the earlier systems
     auto psds = PSDNetFactory::create(config, meta.get(), reader, controls.get(), memRes);
+
+    // Every factory returns nullptr when its DNA-derived data fails validation; reject the whole rig rather than
+    // construct an evaluator that would dereference out-of-bounds indices at runtime.
+    if (!mlBehavior || !rbfBehavior || !joints || !blendShapes || !animatedMaps || !psds) {
+        return nullptr;
+    }
 
     PolyAllocator<RigLogicImpl> alloc{memRes};
     return alloc.newObject(config,
@@ -76,16 +106,35 @@ void RigLogic::destroy(RigLogic* instance) {
 RigLogic* RigLogic::restore(BoundedIOStream* source, MemoryResource* memRes) {
     PolyAllocator<RigLogicImpl> alloc{memRes};
 
-    terse::BinaryInputArchive<BoundedIOStream> archive{source};
+    BoundedInputArchive archive{source};
+
+    // Header mismatch: not a snapshot from this library version, or corrupt.
+    std::uint32_t magic = {};
+    std::uint16_t versionMajor = {};
+    std::uint16_t versionMinor = {};
+    archive >> magic >> versionMajor >> versionMinor;
+    if (!archive.isOk() || (magic != snapshotMagic) || (versionMajor != snapshotFormatVersionMajor) ||
+        (versionMinor != snapshotFormatVersionMinor)) {
+        return nullptr;
+    }
 
     Configuration config;
     archive >> config;
-    archive.setUserData(&config);
+    if (!archive.isOk() || !config.validate()) {
+        return nullptr;
+    }
 
     const ActiveFeatures activeFeatures = getActiveFeatures(config);
 
-    RigMetadata::Pointer meta = UniqueInstance<RigMetadata>::with(memRes).create(memRes, InitializationMethod::Restore);
+    RigMetadata::Pointer meta = UniqueInstance<RigMetadata>::with(memRes).create(memRes);
     archive >> *meta;
+    if (!archive.isOk() || !meta->validate(InitializationMethod::Restore)) {
+        return nullptr;
+    }
+
+    // After metadata is deserialized, so load() validators see populated values.
+    SerializationContext context{&config, meta.get()};
+    archive.setUserData(&context);
 
     auto controls = ControlsFactory::create(config, meta.get(), memRes);
     auto mlBehavior = MachineLearnedBehaviorFactory::create(config, meta.get(), memRes);
@@ -94,12 +143,19 @@ RigLogic* RigLogic::restore(BoundedIOStream* source, MemoryResource* memRes) {
     auto blendShapes = BlendShapesFactory::create(config, meta.get(), memRes);
     auto animatedMaps = AnimatedMapsFactory::create(config, meta.get(), memRes);
     auto psds = PSDNetFactory::create(config, meta.get(), memRes);
+    // Restore-path factories return null only on structural failure; bail before the streaming below dereferences them.
+    if (!controls || !mlBehavior || !rbfBehavior || !joints || !blendShapes || !animatedMaps || !psds) {
+        return nullptr;
+    }
 
     terse::VirtualSerializerProxy<AnimatedMaps> animatedMapsProxy{animatedMaps.get()};
     terse::VirtualSerializerProxy<BlendShapes> blendShapesProxy{blendShapes.get()};
     terse::VirtualSerializerProxy<PSDNet> psdNetProxy{psds.get()};
 
     archive >> *controls >> *mlBehavior >> *rbfBehavior >> psdNetProxy >> *joints >> blendShapesProxy >> animatedMapsProxy;
+    if (!archive.isOk()) {
+        return nullptr;
+    }
 
     return alloc.newObject(config,
                            activeFeatures,
@@ -143,11 +199,11 @@ void RigLogicImpl::dump(BoundedIOStream* destination) const {
     terse::VirtualSerializerProxy<AnimatedMaps> animatedMapsProxy{animatedMaps.get()};
     terse::VirtualSerializerProxy<BlendShapes> blendShapesProxy{blendShapes.get()};
     terse::VirtualSerializerProxy<PSDNet> psdNetProxy{psds.get()};
-    archive.setUserData(const_cast<Configuration*>(&config));
-    // *INDENT-OFF*
+    SerializationContext context{&config, meta.get()};
+    archive.setUserData(&context);
+    archive << snapshotMagic << snapshotFormatVersionMajor << snapshotFormatVersionMinor;
     archive << config << *meta << *controls << *machineLearnedBehavior << *rbfBehavior << psdNetProxy << *joints
             << blendShapesProxy << animatedMapsProxy;
-    // *INDENT-ON*
 }
 
 const Configuration& RigLogicImpl::getConfiguration() const {
@@ -350,6 +406,7 @@ void RigLogicImpl::collectCalculationStats(const RigInstance* instance, Stats* s
     const auto lod = instance->getLOD();
     stats->calculationType = activeFeatures.calculationType;
     stats->floatingPointType = activeFeatures.floatingPointType;
+    stats->floatingPointModel = activeFeatures.floatingPointModel;
     stats->rbfSolverCount = static_cast<std::uint16_t>(rbfBehavior->getSolverIndicesForLOD(lod).size());
     stats->mlOperationCount = {};
     for (std::uint16_t mlTypeIndex = {}; mlTypeIndex < meta->mlTypeCount; ++mlTypeIndex) {

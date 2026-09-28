@@ -45,7 +45,7 @@ public:
     void calculate(ControlsInputInstance* inputs,
                    MachineLearnedBehaviorOutputInstance* intermediateOutputs,
                    std::uint16_t lod) const override;
-    void load(terse::BinaryInputArchive<BoundedIOStream>& archive) override;
+    void load(BoundedInputArchive& archive) override;
     void save(terse::BinaryOutputArchive<BoundedIOStream>& archive) override;
 
 private:

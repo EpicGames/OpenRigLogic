@@ -13,8 +13,6 @@ namespace ml {
 
 namespace cpu {
 
-// Describes the memory layout of a weight matrix: original dimensions, SIMD-padded dimensions,
-// per-LOD output block views, and the input block view. Does not own any data.
 struct MatrixLayout {
     Extent original;
     Extent padded;

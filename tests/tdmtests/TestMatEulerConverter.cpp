@@ -96,9 +96,9 @@ float maxMatrixDiff(const tdm::mat3<float>& a, const tdm::mat3<float>& b) {
 
 // euler2mat -> mat2euler -> euler2mat, returning the matrix-recovery error.
 float roundTripError(tdm::rot_seq seq, tdm::rot_sign signs, const tdm::frad3& euler) {
-    const tdm::mat3<float> m = tdm::impl::euler2mat<float>(euler, seq, signs);
-    const tdm::frad3 extracted = tdm::impl::mat2euler<float>(m, seq, signs);
-    const tdm::mat3<float> reconstructed = tdm::impl::euler2mat<float>(extracted, seq, signs);
+    const tdm::mat3<float> m = tdm::euler2mat<float>(euler, seq, signs);
+    const tdm::frad3 extracted = tdm::mat2euler<float>(m, seq, signs);
+    const tdm::mat3<float> reconstructed = tdm::euler2mat<float>(extracted, seq, signs);
     return maxMatrixDiff(m, reconstructed);
 }
 

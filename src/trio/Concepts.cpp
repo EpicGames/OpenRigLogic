@@ -13,5 +13,6 @@ Controllable::~Controllable() = default;
 Bounded::~Bounded() = default;
 Buffered::~Buffered() = default;
 Resizable::~Resizable() = default;
+Mappable::~Mappable() = default;
 
 }  // namespace trio

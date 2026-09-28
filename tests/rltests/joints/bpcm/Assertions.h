@@ -24,6 +24,10 @@ namespace bpcm {
 
 struct Evaluator::Accessor {
 
+    static const JointStorage& storageOf(const Evaluator& result) {
+        return result.storage;
+    }
+
     template<typename T>
     static void assertRawDataEqual(const Evaluator& result, const Evaluator& expected) {
         ASSERT_EQ(result.storage.values.size<T>(), expected.storage.values.size<T>());
@@ -49,6 +53,7 @@ struct Evaluator::Accessor {
             ASSERT_EQ(jointGroup.valuesSize, expectedJointGroup.valuesSize);
             ASSERT_EQ(jointGroup.colCount, expectedJointGroup.colCount);
             ASSERT_EQ(jointGroup.rowCount, expectedJointGroup.rowCount);
+            ASSERT_EQ(jointGroup.blockHeight, expectedJointGroup.blockHeight);
         }
     }
 

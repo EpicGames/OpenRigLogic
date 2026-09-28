@@ -6,6 +6,7 @@
 #include "riglogic/rbf/RBFBehaviorEvaluator.h"
 #include "riglogic/rbf/cpu/CPURBFBehaviorEvaluator.h"
 #include "riglogic/rbf/cpu/CPURBFBehaviorOutputInstance.h"
+#include "riglogic/rbf/cpu/RBFBehaviorValidator.h"
 #include "riglogic/rbf/cpu/RBFSolver.h"
 #include "riglogic/riglogic/RigMetadata.h"
 #include "riglogic/types/Aliases.h"
@@ -25,7 +26,6 @@ template<typename T, typename TF256, typename TF128>
 class Factory {
 public:
     static RBFBehaviorEvaluator::Pointer create(RigMetadata* meta, const dna::Reader* reader, MemoryResource* memRes) {
-        RL_UNUSED(meta);
         Vector<RBFSolver::Pointer> solvers{memRes};
         Vector<std::uint16_t> inputCountPerSolver{memRes};
         Vector<std::uint16_t> targetCountPerSolver{memRes};
@@ -104,6 +104,11 @@ public:
             solverOutputIndices.erase(std::unique(solverOutputIndices.begin(), solverOutputIndices.end()),
                                       solverOutputIndices.end());
 
+            // Reject rather than narrow: the uint16 cast would wrap, and targetCount drives a targetCount x targetCount
+            // coefficient allocation.
+            if (poseIndices.size() > static_cast<std::size_t>(reader->getRBFPoseCount())) {
+                return nullptr;
+            }
             const auto targetCount = static_cast<std::uint16_t>(poseIndices.size());
             targetCountPerSolver.push_back(targetCount);
 
@@ -113,6 +118,14 @@ public:
             }
             recipe.targetValues = reader->getRBFSolverRawControlValues(solverIndex);
             recipe.targetScales = targetScales;
+
+            // The solver derives its target count as targetValues.size() / rawControlCount and the Interpolative ctor
+            // allocates targetCount^2 floats before the validator runs; at the uint16 ceiling bad_alloc escapes the API.
+            const std::size_t derivedTargetCount =
+                (recipe.rawControlCount == 0u) ? 0ul : (recipe.targetValues.size() / recipe.rawControlCount);
+            if (derivedTargetCount != static_cast<std::size_t>(targetCount)) {
+                return nullptr;
+            }
 
             auto solver = RBFSolver::create(recipe, memRes);
             solvers.emplace_back(std::move(solver));
@@ -129,6 +142,20 @@ public:
             poseInputControlIndices[poseIndex].assign(inputControlIndices.begin(), inputControlIndices.end());
             poseOutputControlIndices[poseIndex].assign(outputControlIndices.begin(), outputControlIndices.end());
             poseOutputControlWeights[poseIndex].assign(outputControlWeights.begin(), outputControlWeights.end());
+        }
+
+        if (!RBFBehaviorValidator::validate(lods,
+                                            solvers,
+                                            solverRawControlInputIndices,
+                                            solverRawControlOutputIndices,
+                                            solverPoseIndices,
+                                            poseInputControlIndices,
+                                            poseOutputControlIndices,
+                                            poseOutputControlWeights,
+                                            inputCountPerSolver,
+                                            targetCountPerSolver,
+                                            *meta)) {
+            return nullptr;
         }
 
         return factory.create(std::move(lods),

@@ -26,12 +26,12 @@ namespace sc {
  */
 using HookFunction = const char* (*)(StatusCode, std::size_t, const char*);
 
-class SCAPI Status {
+class Status {
 public:
-    static bool isOk();
-    static StatusCode get();
-    static HookFunction getHook();
-    static void setHook(HookFunction hook);
+    SCAPI static bool isOk();
+    SCAPI static StatusCode get();
+    SCAPI static HookFunction getHook();
+    SCAPI static void setHook(HookFunction hook);
 };
 
 }  // namespace sc

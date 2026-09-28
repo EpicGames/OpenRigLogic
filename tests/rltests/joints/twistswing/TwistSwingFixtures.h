@@ -55,14 +55,12 @@ extern const pma::Matrix<std::uint16_t> twistInputIndices;
 
 namespace input {
 
-// Calculation input values
 extern const Vector<float> values;
 
 }  // namespace input
 
 namespace output {
 
-// Calculation output values
 extern const Vector<Matrix<float>> valuesPerLODPerConfig;
 
 }  // namespace output
@@ -70,6 +68,26 @@ extern const Vector<Matrix<float>> valuesPerLODPerConfig;
 class TwistSwingReader : public dna::FakeReader {
 public:
     ~TwistSwingReader();
+
+    // Large enough that RigMetadata derives a jointAttributeCount / control-input count covering every output
+    // joint index and input control index in the fixtures above (TwistSwingValidator bounds against them).
+    std::uint16_t getJointCount() const override {
+        return 10u;
+    }
+
+    std::uint16_t getRawControlCount() const override {
+        return 12u;
+    }
+
+    // The storage-builder test downcasts the built evaluator to the <radians, xyz> adapter its type list names; the
+    // FakeReader default (degrees) would select another type; xyz is the only order compiled in on every consumer.
+    dna::RotationUnit getRotationUnit() const override {
+        return dna::RotationUnit::radians;
+    }
+
+    dna::RotationSequence getRotationSequence() const override {
+        return dna::RotationSequence::xyz;
+    }
 
     std::uint16_t getTwistCount() const override {
         return static_cast<std::uint16_t>(unoptimized::twistBlendWeights.size());

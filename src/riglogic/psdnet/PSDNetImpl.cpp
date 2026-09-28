@@ -2,8 +2,11 @@
 
 #include "riglogic/psdnet/PSDNetImpl.h"
 
+#include "riglogic/SerializationContext.h"
 #include "riglogic/TypeDefs.h"
 #include "riglogic/controls/ControlsInputInstance.h"
+#include "riglogic/psdnet/PSDNetValidator.h"
+#include "riglogic/riglogic/RigMetadata.h"
 #include "riglogic/utils/Extd.h"
 #include "riglogic/utils/Macros.h"
 
@@ -84,8 +87,13 @@ void PSDNetImpl::calculate(ControlsInputInstance* inputInstance, PSDNetOutputIns
     }
 }
 
-void PSDNetImpl::load(terse::BinaryInputArchive<BoundedIOStream>& archive) {
+void PSDNetImpl::load(BoundedInputArchive& archive) {
     archive(inputLODs, outputLODs, inputIndicesPerPSD, psds, psdMinIndex, psdMaxIndex);
+    const SerializationContext* context = static_cast<SerializationContext*>(archive.getUserData());
+    const RigMetadata& metadata = *context->metadata;
+    if (!PSDNetValidator::validate(inputLODs, outputLODs, inputIndicesPerPSD, psds, psdMinIndex, psdMaxIndex, metadata)) {
+        archive.markMalformed();
+    }
 }
 
 void PSDNetImpl::save(terse::BinaryOutputArchive<BoundedIOStream>& archive) {

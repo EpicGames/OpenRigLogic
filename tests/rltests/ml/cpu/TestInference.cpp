@@ -14,6 +14,7 @@
 #include "riglogic/riglogic/RigMetadata.h"
 #include "riglogic/system/simd/Utils.h"
 
+#include <string>
 #include <tuple>
 
 #ifdef _MSC_VER
@@ -23,12 +24,18 @@
 
 namespace {
 
-class MLBInferenceTest : public ::testing::TestWithParam<rl4::CalculationType> {
+struct MLBInferenceTestParams {
+    rl4::CalculationType calculationType;
+    rl4::FloatingPointModel floatingPointModel;
+};
+
+class MLBInferenceTest : public ::testing::TestWithParam<MLBInferenceTestParams> {
 protected:
     void SetUp() override {
         rl4::Configuration config = {};
-        config.calculationType = GetParam();
-        auto meta = rl4::RigMetadata::create(config, &reader, &memRes, rl4::InitializationMethod::Create);
+        config.calculationType = GetParam().calculationType;
+        config.floatingPointModel = GetParam().floatingPointModel;
+        auto meta = rl4::RigMetadata::create(config, &reader, &memRes);
         evaluator = rl4::ml::cpu::Factory::create(config, meta.get(), &reader, &memRes);
     }
 
@@ -67,12 +74,60 @@ TEST_P(MLBInferenceTest, InferencePerLOD) {
     }
 }
 
+namespace {
+
+/*
+ * The Fast floating point model rows silently degrade to Precise when the binary is built
+ * without RL_BUILD_WITH_FAST or the runtime environment cannot provide the relaxed kernels,
+ * so they are valid (if then redundant) in every configuration. Calculation types that are
+ * not built or not supported by the CPU fall back to the first available arm, as everywhere.
+ */
+const MLBInferenceTestParams mlbInferenceTestParams[] = {
+    {rl4::CalculationType::AVX512F, rl4::FloatingPointModel::Precise},
+    {rl4::CalculationType::AVX512F, rl4::FloatingPointModel::Fast},
+    {rl4::CalculationType::AVX, rl4::FloatingPointModel::Precise},
+    {rl4::CalculationType::AVX, rl4::FloatingPointModel::Fast},
+    {rl4::CalculationType::SSE, rl4::FloatingPointModel::Precise},
+    {rl4::CalculationType::SSE, rl4::FloatingPointModel::Fast},
+    {rl4::CalculationType::NEON, rl4::FloatingPointModel::Precise},
+    {rl4::CalculationType::NEON, rl4::FloatingPointModel::Fast},
+    {rl4::CalculationType::Scalar, rl4::FloatingPointModel::Precise},
+    {rl4::CalculationType::Scalar, rl4::FloatingPointModel::Fast},
+};
+
+std::string mlbInferenceTestName(const ::testing::TestParamInfo<MLBInferenceTestParams>& info) {
+    std::string name;
+    switch (info.param.calculationType) {
+    case rl4::CalculationType::Scalar:
+        name = "Scalar";
+        break;
+    case rl4::CalculationType::SSE:
+        name = "SSE";
+        break;
+    case rl4::CalculationType::AVX:
+        name = "AVX";
+        break;
+    case rl4::CalculationType::AVX512F:
+        name = "AVX512F";
+        break;
+    case rl4::CalculationType::NEON:
+        name = "NEON";
+        break;
+    case rl4::CalculationType::AnyVector:
+    default:
+        name = "AnyVector";
+        break;
+    }
+    name += (info.param.floatingPointModel == rl4::FloatingPointModel::Fast) ? "_Fast" : "_Precise";
+    return name;
+}
+
+}  // namespace
+
 INSTANTIATE_TEST_SUITE_P(MLBInferenceTestSuite,
                          MLBInferenceTest,
-                         ::testing::Values(rl4::CalculationType::AVX,
-                                           rl4::CalculationType::SSE,
-                                           rl4::CalculationType::NEON,
-                                           rl4::CalculationType::Scalar));
+                         ::testing::ValuesIn(mlbInferenceTestParams),
+                         mlbInferenceTestName);
 
 #ifdef _MSC_VER
     #pragma warning(pop)

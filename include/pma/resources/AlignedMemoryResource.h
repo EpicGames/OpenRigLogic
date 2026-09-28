@@ -13,10 +13,10 @@ namespace pma {
     @brief A MemoryResource that honors alignment requirements.
     @see MemoryResource
 */
-class PMAAPI AlignedMemoryResource : public MemoryResource {
+class PMAAPI_TYPE AlignedMemoryResource : public MemoryResource {
 public:
-    void* allocate(std::size_t size, std::size_t alignment) override;
-    void deallocate(void* ptr, std::size_t size, std::size_t alignment) override;
+    PMAAPI_MEMBER void* allocate(std::size_t size, std::size_t alignment) override;
+    PMAAPI_MEMBER void deallocate(void* ptr, std::size_t size, std::size_t alignment) override;
 };
 
 }  // namespace pma

@@ -17,9 +17,9 @@ namespace dna {
         Implementors should inherit from Reader itself and not this class.
     @see Reader
 */
-class DNAAPI DescriptorReader : public HeaderReader {
+class DNAAPI_TYPE DescriptorReader : public HeaderReader {
 protected:
-    virtual ~DescriptorReader();
+    DNAAPI_MEMBER virtual ~DescriptorReader();
 
 public:
     virtual StringView getName() const = 0;

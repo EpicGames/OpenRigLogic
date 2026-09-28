@@ -4,7 +4,15 @@
 
 #include "riglogic/utils/Extd.h"
 
+#ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable : 4365 4987)
+#endif
+#include <algorithm>
 #include <cstdint>
+#ifdef _MSC_VER
+    #pragma warning(pop)
+#endif
 
 namespace rl4 {
 
@@ -140,13 +148,21 @@ std::uint16_t JointBehaviorFilter::getJointGroupCount() const {
 
 void JointBehaviorFilter::copyInputIndices(std::uint16_t jointGroupIndex, ArrayView<std::uint16_t> dest) const {
     const auto inputIndices = reader->getJointGroupInputIndices(jointGroupIndex);
-    extd::copy(inputIndices, dest);
+    // The reader's count and the caller-sized dest can disagree; clamp - extd::copy's own bounds are debug-only.
+    const std::size_t count = std::min(inputIndices.size(), dest.size());
+    extd::copy(inputIndices.first(count), dest);
 }
 
 void JointBehaviorFilter::copyOutputIndices(std::uint16_t jointGroupIndex, ArrayView<std::uint16_t> dest) const {
     const auto outputIndices = reader->getJointGroupOutputIndices(jointGroupIndex);
+    // dest is sized from a separately computed row count and can disagree with the reader's array, so stop at
+    // dest.size(); nothing validates the filter's input - it reads the DNA reader directly.
     std::uint16_t* pDst = dest.data();
+    const std::uint16_t* const pEnd = dest.data() + dest.size();
     for (auto outputIndex : outputIndices) {
+        if (pDst == pEnd) {
+            break;
+        }
         if (isAttributeEnabled(outputIndex)) {
             *pDst++ = outputIndex;
         }
@@ -158,9 +174,15 @@ void JointBehaviorFilter::copyValues(std::uint16_t jointGroupIndex, ArrayView<fl
     const auto outputIndices = reader->getJointGroupOutputIndices(jointGroupIndex);
     const auto rowCount = outputIndices.size();
     const auto colCount = reader->getJointGroupInputIndices(jointGroupIndex).size();
+    const auto safeRowCount = (colCount == 0u) ? std::size_t{} : std::min(rowCount, values.size() / colCount);
+    // safeRowCount bounds only the source walk; dest can disagree, so stop once a full row no longer fits.
     float* pDst = dest.data();
-    for (std::size_t row = {}; row < rowCount; ++row) {
+    const float* const pEnd = dest.data() + dest.size();
+    for (std::size_t row = {}; row < safeRowCount; ++row) {
         if (isAttributeEnabled(outputIndices[row])) {
+            if (static_cast<std::size_t>(pEnd - pDst) < colCount) {
+                break;
+            }
             const auto rowOfValues = values.subview(row * colCount, colCount);
             extd::copy(rowOfValues, ArrayView<float>(pDst, colCount));
             pDst += rowOfValues.size();
@@ -170,15 +192,14 @@ void JointBehaviorFilter::copyValues(std::uint16_t jointGroupIndex, ArrayView<fl
 
 std::uint16_t JointBehaviorFilter::getRowCountForLOD(std::uint16_t jointGroupIndex, std::uint16_t lod) const {
     const auto lods = reader->getJointGroupLODs(jointGroupIndex);
-    assert(lods.size() == reader->getLODCount());
-
     std::uint16_t rowCount = {};
     if (lod >= lods.size()) {
         return rowCount;
     }
 
     const auto outputIndices = reader->getJointGroupOutputIndices(jointGroupIndex);
-    for (std::size_t row = {}; row < lods[lod]; ++row) {
+    const std::size_t rowLimit = std::min(static_cast<std::size_t>(lods[lod]), outputIndices.size());
+    for (std::size_t row = {}; row < rowLimit; ++row) {
         if (isAttributeEnabled(outputIndices[row])) {
             ++rowCount;
         }

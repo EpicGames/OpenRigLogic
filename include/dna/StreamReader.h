@@ -9,14 +9,15 @@
 
 namespace dna {
 
-class DNAAPI StreamReader : public Reader {
+class DNAAPI_TYPE StreamReader : public Reader {
 public:
-    static const sc::StatusCode SignatureMismatchError;
-    static const sc::StatusCode VersionMismatchError;
-    static const sc::StatusCode InvalidDataError;
+    DNAAPI_MEMBER static const sc::StatusCode SignatureMismatchError;
+    DNAAPI_MEMBER static const sc::StatusCode VersionMismatchError;
+    DNAAPI_MEMBER static const sc::StatusCode InvalidDataError;
+    DNAAPI_MEMBER static const sc::StatusCode InvalidConfigError;
 
 public:
-    ~StreamReader() override;
+    DNAAPI_MEMBER ~StreamReader() override;
     /**
        @brief read data from stream into internal structures.
     */

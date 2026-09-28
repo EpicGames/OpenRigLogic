@@ -40,14 +40,14 @@ using MakeISeq = typename Make<Size, Offset>::Type;
 
 }  // namespace impl
 
-class SCAPI StatusProvider {
+class StatusProvider {
 public:
-    explicit StatusProvider(std::initializer_list<StatusCode> statuses);
+    SCAPI explicit StatusProvider(std::initializer_list<StatusCode> statuses);
 
-    static void reset();
-    static StatusCode get();
-    static bool isOk();
-    static void set(StatusCode status);
+    SCAPI static void reset();
+    SCAPI static StatusCode get();
+    SCAPI static bool isOk();
+    SCAPI static void set(StatusCode status);
 
     template<std::size_t... Is, typename... Args>
     static void set(StatusCode status, impl::ISeq<Is...> /*unused*/, Args&&... args) {
@@ -56,6 +56,9 @@ public:
 #if !defined(__clang__) && defined(__GNUC__)
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wformat-security"
+    #if __GNUC__ >= 7
+        #pragma GCC diagnostic ignored "-Wformat-truncation"
+    #endif
 #endif
         // Invoke the hook with index = 0, denoting that this is the status message itself being hooked
         // The return value from the hook will override the original message
@@ -82,8 +85,8 @@ public:
     }
 
 private:
-    static void execSet(StatusCode status);
-    static const char* execHook(StatusCode status, std::size_t index, const char* data);
+    SCAPI static void execSet(StatusCode status);
+    SCAPI static const char* execHook(StatusCode status, std::size_t index, const char* data);
 
     template<typename T>
     static T&& execHook(StatusCode /*unused*/, std::size_t /*unused*/, T&& data) {

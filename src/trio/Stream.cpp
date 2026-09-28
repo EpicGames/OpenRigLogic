@@ -12,4 +12,8 @@ const sc::StatusCode BoundedIOStream::SeekError{104, "Error seeking file"};
 
 BoundedIOStream::~BoundedIOStream() = default;
 
+// Nothing is held back by default; streams that buffer override this
+void BoundedIOStream::flush() {
+}
+
 }  // namespace trio

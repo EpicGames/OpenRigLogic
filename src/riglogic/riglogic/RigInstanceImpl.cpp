@@ -102,11 +102,11 @@ void RigInstanceImpl::setRawControl(std::uint16_t index, float value) {
 }
 
 ArrayView<float> RigInstanceImpl::getRawControlValues() {
-    return controlsInstance->getInputBuffer().subview(0ul, rawControlCount);
+    return controlsInstance->getInputBuffer().first(rawControlCount);
 }
 
 ConstArrayView<float> RigInstanceImpl::getRawControlValues() const {
-    return controlsInstance->getInputBuffer().subview(0ul, rawControlCount);
+    return controlsInstance->getInputBuffer().first(rawControlCount);
 }
 
 std::uint16_t RigInstanceImpl::getPSDControlCount() const {

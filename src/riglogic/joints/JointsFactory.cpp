@@ -7,6 +7,7 @@
 #include "riglogic/joints/JointsBuilder.h"
 #include "riglogic/joints/JointsEvaluator.h"
 #include "riglogic/joints/JointsNullEvaluator.h"
+#include "riglogic/joints/JointsValidator.h"
 #include "riglogic/riglogic/Configuration.h"
 #include "riglogic/riglogic/RigMetadata.h"
 
@@ -30,7 +31,12 @@ namespace rl4 {
 template<class TSource, class TDestination>
 static void scatter(const TSource& source, TDestination& destination, std::size_t stride, std::size_t offset) {
     const auto size = static_cast<std::size_t>(std::distance(std::begin(source), std::end(source)));
-    for (std::size_t i = 0ul; i < size; ++i) {
+    const auto destSize = static_cast<std::size_t>(std::distance(std::begin(destination), std::end(destination)));
+    if (offset >= destSize) {
+        return;
+    }
+    const std::size_t writableCount = (stride == 0u) ? size : std::min(size, ((destSize - offset - 1u) / stride) + 1u);
+    for (std::size_t i = 0ul; i < writableCount; ++i) {
         destination[i * stride + offset] = source[i];
     }
 }
@@ -60,7 +66,9 @@ static Vector<float> copyNeutralValues(const Configuration& config,
         auto toRad = [rotationUnit](float x) {
             return (rotationUnit == dna::RotationUnit::radians) ? tdm::frad{x} : tdm::frad{tdm::fdeg{x}};
         };
-        for (std::size_t jointIndex = {}; jointIndex < rotationXs.size(); ++jointIndex) {
+        const std::size_t jointCount = static_cast<std::size_t>(reader->getJointCount());
+        const std::size_t neutralRotationCount = std::min({rotationXs.size(), rotationYs.size(), rotationZs.size(), jointCount});
+        for (std::size_t jointIndex = {}; jointIndex < neutralRotationCount; ++jointIndex) {
             const std::size_t absAttrIndexBase = jointIndex * numAttrsPerJoint;
             const tdm::frad3 euler{toRad(rotationXs[jointIndex]), toRad(rotationYs[jointIndex]), toRad(rotationZs[jointIndex])};
             const tdm::fquat q{euler, meta->rotationSequence, meta->rotationSigns};
@@ -98,6 +106,9 @@ static Matrix<std::uint16_t> copyVariableAttributeIndices(const Configuration& c
             Vector<bool> markers(reader->getJointCount(), false, memRes);
             for (const auto absAttrIndex : indices) {
                 const auto jointIndex = static_cast<std::uint16_t>(absAttrIndex / 9);
+                if (jointIndex >= markers.size()) {
+                    continue;
+                }
                 const auto relAttrIndex = static_cast<std::uint8_t>(absAttrIndex % 9);
                 const auto remappedBaseIndex = static_cast<std::uint16_t>(jointIndex * numAttrsPerJoint);
                 // Within the DNA, the structure is always fixed [tx, ty, tz, rx, ry, rz, sx, sy, sz]
@@ -105,8 +116,7 @@ static Matrix<std::uint16_t> copyVariableAttributeIndices(const Configuration& c
                     const auto remapped = static_cast<std::uint16_t>(remappedBaseIndex + translationOffset + (relAttrIndex % 3));
                     variableAttributeIndices[lod].push_back(remapped);
                 } else if (relAttrIndex < 6) {
-                    // Even if only a single rotation attribute is variable by DNA definition, when working with quaternions
-                    // all four attributes must be provided
+                    // A quaternion needs all four attributes even when the DNA marks a single rotation attribute variable
                     if (!markers[jointIndex]) {
                         const auto attrBase = static_cast<std::uint16_t>(remappedBaseIndex + rotationOffset);
                         std::uint16_t attrIndices[4] = {attrBase,
@@ -146,9 +156,20 @@ Joints::Pointer JointsFactory::create(const Configuration& config,
                                       const dna::Reader* reader,
                                       Controls* controls,
                                       MemoryResource* memRes) {
-    if (!config.loadJoints || (reader->getLODCount() == 0u) || (reader->getJointCount() == 0u)) {
+    // Must agree with the restore overload's early-out or restore() would reject a snapshot this library produced;
+    // jointAttributeCount is jointCount * attrsPerJoint, so it is zero exactly when getJointCount() is.
+    if (!config.loadJoints || (meta->lodCount == 0u) || (meta->jointAttributeCount == 0u)) {
+        // Skipped sub-builders write no evaluator records; left at Auto they would fail restore()'s metadata validation.
+        meta->evaluators.bpcmJoints = EvaluatorType::Null;
+        meta->evaluators.quaternionJoints = EvaluatorType::Null;
+        meta->evaluators.twistSwingJoints = EvaluatorType::Null;
+        meta->evaluators.mlJoints = EvaluatorType::Null;
         auto evaluator = UniqueInstance<JointsNullEvaluator, JointsEvaluator>::with(memRes).create();
         return UniqueInstance<Joints>::with(memRes).create(std::move(evaluator), meta, memRes);
+    }
+
+    if (!JointsValidator::validate(reader)) {
+        return nullptr;
     }
 
     JointBehaviorFilter filter{reader, memRes};
@@ -163,9 +184,18 @@ Joints::Pointer JointsFactory::create(const Configuration& config,
     builder->fillStorage(filter);
     builder->registerControls(controls);
     auto evaluator = builder->build();
+    // A null evaluator signals DNA validation failure; propagate it so RigLogic::create() fails the whole build.
+    if (!evaluator) {
+        return nullptr;
+    }
     auto neutralValues = copyNeutralValues(config, meta, reader, memRes);
     auto variableAttributeIndices = copyVariableAttributeIndices(config, reader, memRes);
     auto jointIndices = copyJointIndices(config, reader, memRes);
+    // The EulerAngles branch copies DNA attribute indices verbatim; validate so create() never hands out
+    // out-of-bounds indices.
+    if (!JointsValidator::validate(neutralValues, variableAttributeIndices, jointIndices, *meta, config.loadJoints)) {
+        return nullptr;
+    }
     return UniqueInstance<Joints>::with(memRes).create(std::move(evaluator),
                                                        std::move(neutralValues),
                                                        std::move(variableAttributeIndices),
@@ -175,6 +205,11 @@ Joints::Pointer JointsFactory::create(const Configuration& config,
 
 Joints::Pointer JointsFactory::create(const Configuration& config, RigMetadata* meta, MemoryResource* memRes) {
     if (!config.loadJoints || (meta->lodCount == 0u) || (meta->jointAttributeCount == 0u)) {
+        // Kinds must match the Null shell built here so the next dump() reproduces this snapshot.
+        meta->evaluators.bpcmJoints = EvaluatorType::Null;
+        meta->evaluators.quaternionJoints = EvaluatorType::Null;
+        meta->evaluators.twistSwingJoints = EvaluatorType::Null;
+        meta->evaluators.mlJoints = EvaluatorType::Null;
         auto evaluator = UniqueInstance<JointsNullEvaluator, JointsEvaluator>::with(memRes).create();
         return UniqueInstance<Joints>::with(memRes).create(std::move(evaluator), meta, memRes);
     }
@@ -182,6 +217,10 @@ Joints::Pointer JointsFactory::create(const Configuration& config, RigMetadata* 
     auto builder = JointsBuilder::create(config, meta, memRes);
     builder->computeStorageRequirements();
     auto evaluator = builder->build();
+    // A null evaluator is a structural failure; propagate so restore() rejects the snapshot before it is dereferenced.
+    if (!evaluator) {
+        return nullptr;
+    }
     return UniqueInstance<Joints>::with(memRes).create(std::move(evaluator), meta, memRes);
 }
 

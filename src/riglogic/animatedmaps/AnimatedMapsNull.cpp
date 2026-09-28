@@ -19,7 +19,7 @@ void AnimatedMapsNull::calculate(const ControlsInputInstance* /*unused*/,
                                  std::uint16_t /*unused*/) const {
 }
 
-void AnimatedMapsNull::load(terse::BinaryInputArchive<BoundedIOStream>& /*unused*/) {
+void AnimatedMapsNull::load(BoundedInputArchive& /*unused*/) {
 }
 
 void AnimatedMapsNull::save(terse::BinaryOutputArchive<BoundedIOStream>& /*unused*/) {

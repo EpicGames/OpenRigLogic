@@ -13,10 +13,10 @@ namespace pma {
     @brief A MemoryResource that delegates to malloc / free.
     @see MemoryResource
 */
-class PMAAPI DefaultMemoryResource : public MemoryResource {
+class PMAAPI_TYPE DefaultMemoryResource : public MemoryResource {
 public:
-    void* allocate(std::size_t size, std::size_t alignment) override;
-    void deallocate(void* ptr, std::size_t size, std::size_t alignment) override;
+    PMAAPI_MEMBER void* allocate(std::size_t size, std::size_t alignment) override;
+    PMAAPI_MEMBER void deallocate(void* ptr, std::size_t size, std::size_t alignment) override;
 };
 
 }  // namespace pma

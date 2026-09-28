@@ -15,8 +15,7 @@
 #endif
 #include <cstddef>
 #include <cstdint>
-#include <fstream>
-#include <ios>
+#include <cstdio>
 #ifdef _MSC_VER
     #pragma warning(pop)
 #endif
@@ -26,9 +25,16 @@ namespace trio {
 class FileStreamImpl : public FileStream {
 public:
     FileStreamImpl(const char* path_, AccessMode accessMode_, OpenMode openMode_, MemoryResource* memRes_);
+    ~FileStreamImpl() override;
+
+    FileStreamImpl(const FileStreamImpl&) = delete;
+    FileStreamImpl& operator=(const FileStreamImpl&) = delete;
+    FileStreamImpl(FileStreamImpl&&) = delete;
+    FileStreamImpl& operator=(FileStreamImpl&&) = delete;
 
     void open() override;
     void close() override;
+    void flush() override;
     std::uint64_t tell() override;
     void seek(std::uint64_t position) override;
     std::uint64_t size() override;
@@ -40,12 +46,16 @@ public:
     MemoryResource* getMemoryResource();
 
 private:
-    std::fstream file;
+    bool reposition(AccessMode direction);
+
+private:
+    std::FILE* file;
     NativeString filePath;
     AccessMode fileAccessMode;
-    OpenMode fileOpenMode;
     std::uint64_t fileSize;
     std::uint64_t filePos;
+    // Directions the C stream may take next without a positioning call in between
+    AccessMode positionedFor;
     MemoryResource* memRes;
     StreamStatus status;
 };

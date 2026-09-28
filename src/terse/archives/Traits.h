@@ -174,7 +174,11 @@ struct has_versioned_save_function : decltype(test_versioned_save_function<T, V>
 // Heuristic traits
 
 template<typename TContainer>
-using is_batchable = std::is_scalar<typename TContainer::value_type>;
+struct is_batchable {
+    static constexpr bool value =
+        (std::is_arithmetic<typename TContainer::value_type>::value || std::is_enum<typename TContainer::value_type>::value) &&
+        !std::is_same<typename TContainer::value_type, bool>::value;
+};
 
 template<typename TContainer>
 struct has_wide_elements {

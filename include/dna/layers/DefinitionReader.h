@@ -25,9 +25,9 @@ struct MeshBlendShapeChannelMapping {
         Implementors should inherit from Reader itself and not this class.
     @see Reader
 */
-class DNAAPI DefinitionReader : public DescriptorReader {
+class DNAAPI_TYPE DefinitionReader : public DescriptorReader {
 protected:
-    virtual ~DefinitionReader();
+    DNAAPI_MEMBER virtual ~DefinitionReader();
 
 public:
     /**

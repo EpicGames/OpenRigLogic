@@ -21,12 +21,12 @@ class RigInstance;
         itself may be considered stateless, and all of it's functions thread-safe.
     @see RigInstance
 */
-class RLAPI RigLogic {
+class RLAPI_TYPE RigLogic {
 public:
     using Configuration = rl4::Configuration;
 
 protected:
-    virtual ~RigLogic();
+    RLAPI_MEMBER virtual ~RigLogic();
 
 public:
     /**
@@ -44,14 +44,16 @@ public:
             User is responsible for releasing the returned pointer by calling destroy.
         @see destroy
     */
-    static RigLogic* create(const dna::Reader* reader, const Configuration& config = {}, MemoryResource* memRes = nullptr);
+    RLAPI_MEMBER static RigLogic* create(const dna::Reader* reader,
+                                         const Configuration& config = {},
+                                         MemoryResource* memRes = nullptr);
     /**
         @brief Method for freeing RigLogic.
         @param instance
             Instance of RigLogic to be freed.
         @see create
     */
-    static void destroy(RigLogic* instance);
+    RLAPI_MEMBER static void destroy(RigLogic* instance);
     /**
         @brief Factory method for restoring an instance of RigLogic from a memory dump.
         @note
@@ -64,12 +66,20 @@ public:
             A custom memory resource to be used for allocations.
         @note
             If a custom memory resource is not given, a default allocation mechanism will be used.
+        @note
+            The dumped state is an internal, version-specific format (not the stable DNA format), so a
+            snapshot can only be restored by the same library version that produced it. If the stream is
+            not a RigLogic snapshot, was produced by a different version, or is truncated/corrupt, restore
+            returns nullptr instead of a valid instance.
+        @return
+            A restored RigLogic instance, or nullptr if the source stream is not a compatible, well-formed
+            snapshot.
         @warning
             User is responsible for releasing the returned pointer by calling destroy.
         @see dump
         @see destroy
     */
-    static RigLogic* restore(BoundedIOStream* source, MemoryResource* memRes = nullptr);
+    RLAPI_MEMBER static RigLogic* restore(BoundedIOStream* source, MemoryResource* memRes = nullptr);
     /**
         @brief Create a snapshot of an initialized RigLogic instance.
         @param destination

@@ -2,8 +2,10 @@
 
 #include "dnatests/Defs.h"
 #include "dnatests/Fixturesv21.h"
+#include "dnatests/Fixturesv28.h"
 
 #include "dna/BinaryStreamReader.h"
+#include "dna/BinaryStreamWriter.h"
 #include "dna/StreamReader.h"
 #include "dna/types/Aliases.h"
 
@@ -295,4 +297,290 @@ TEST_F(MalformedInputTest, TruncatedHeaderSetsError) {
     reader->read();
 
     ASSERT_FALSE(dna::Status::isOk());
+}
+
+TEST_F(MalformedInputTest, InvalidCoordinateSystemSetsError) {
+    auto bytes = dna::RawV21::getBytes();
+    auto stream = pma::makeScoped<trio::MemoryStream>();
+    stream->write(bytes.data(), bytes.size());
+    stream->seek(0);
+    dna::Configuration config;
+    config.coordinateSystem = {dna::Direction::left, dna::Direction::up, dna::Direction::left};
+    config.coordinateSystemTransformPolicy = dna::CoordinateSystemTransformPolicy::Transform;
+    auto reader = dna::makeScoped<dna::BinaryStreamReader>(stream.get(), config);
+    reader->read();
+
+    ASSERT_FALSE(dna::Status::isOk());
+    ASSERT_EQ(dna::Status::get().code, dna::StreamReader::InvalidConfigError.code);
+}
+
+// A joint group carrying fewer LOD bounds than the descriptor declares LODs: one row count per LOD is the contract
+// (an empty array is the one tolerated exception - a group that is never evaluated), so this is rejected.
+TEST_F(MalformedInputTest, ShortJointGroupLODArraySetsInvalidDataError) {
+    const auto bytes = dna::RawV28::getBytes();
+    auto source = pma::makeScoped<trio::MemoryStream>();
+    source->write(bytes.data(), bytes.size());
+    source->seek(0);
+    auto sourceReader = dna::makeScoped<dna::BinaryStreamReader>(source.get());
+    sourceReader->read();
+    ASSERT_TRUE(dna::Status::isOk());
+    ASSERT_EQ(sourceReader->getLODCount(), 2u);
+    ASSERT_EQ(sourceReader->getJointGroupLODs(0u).size(), 2u);
+
+    auto crafted = pma::makeScoped<trio::MemoryStream>();
+    auto writer = dna::makeScoped<dna::BinaryStreamWriter>(crafted.get());
+    writer->setFrom(sourceReader.get());
+    const std::uint16_t shortLODs[] = {sourceReader->getJointGroupLODs(0u)[0]};
+    writer->setJointGroupLODs(0u, shortLODs, 1u);
+    writer->write();
+    ASSERT_TRUE(dna::Status::isOk());
+
+    crafted->seek(0);
+    auto reader = dna::makeScoped<dna::BinaryStreamReader>(crafted.get());
+    reader->read();
+
+    ASSERT_FALSE(dna::Status::isOk());
+    ASSERT_EQ(dna::Status::get().code, dna::StreamReader::InvalidDataError.code);
+}
+
+// A joint group whose per-group LOD array is empty, loaded with coordinate-system conversion enabled. The converter
+// rebuilds the group's LOD array at the same length and used to assign its first entry unconditionally - a heap write
+// past a zero-length array. The load must succeed and keep the array empty.
+TEST_F(MalformedInputTest, EmptyJointGroupLODArraySurvivesCoordinateSystemConversion) {
+    const auto bytes = dna::RawV28::getBytes();
+    auto source = pma::makeScoped<trio::MemoryStream>();
+    source->write(bytes.data(), bytes.size());
+    source->seek(0);
+    auto sourceReader = dna::makeScoped<dna::BinaryStreamReader>(source.get());
+    sourceReader->read();
+    ASSERT_TRUE(dna::Status::isOk());
+    ASSERT_EQ(sourceReader->getJointGroupLODs(0u).size(), 2u);
+    ASSERT_EQ(sourceReader->getCoordinateSystem().x, dna::Direction::right);
+
+    auto crafted = pma::makeScoped<trio::MemoryStream>();
+    auto writer = dna::makeScoped<dna::BinaryStreamWriter>(crafted.get());
+    writer->setFrom(sourceReader.get());
+    const std::uint16_t noLODs[] = {0u};
+    writer->setJointGroupLODs(0u, noLODs, 0u);
+    writer->write();
+    ASSERT_TRUE(dna::Status::isOk());
+
+    crafted->seek(0);
+    dna::Configuration config;
+    config.coordinateSystem = {dna::Direction::left, dna::Direction::up, dna::Direction::front};  // differs from the fixture
+    config.coordinateSystemTransformPolicy = dna::CoordinateSystemTransformPolicy::Transform;
+    auto reader = dna::makeScoped<dna::BinaryStreamReader>(crafted.get(), config);
+    reader->read();
+
+    ASSERT_TRUE(dna::Status::isOk());
+    ASSERT_EQ(reader->getJointGroupLODs(0u).size(), 0u);
+
+    // Control: the untouched fixture through the same conversion. The converter rebuilds every group's rows from its
+    // joints, so the crafted group must come out with exactly the control's rows - only its LOD array differs.
+    source->seek(0);
+    auto convertedSource = dna::makeScoped<dna::BinaryStreamReader>(source.get(), config);
+    convertedSource->read();
+    ASSERT_TRUE(dna::Status::isOk());
+    ASSERT_EQ(convertedSource->getCoordinateSystem().x, reader->getCoordinateSystem().x);
+    ASSERT_EQ(convertedSource->getJointGroupLODs(0u).size(), 2u);
+    const auto expectedRows = convertedSource->getJointGroupOutputIndices(0u);
+    const auto craftedRows = reader->getJointGroupOutputIndices(0u);
+    ASSERT_EQ(craftedRows.size(), expectedRows.size());
+    for (std::size_t row = 0u; row < expectedRows.size(); ++row) {
+        ASSERT_EQ(craftedRows[row], expectedRows[row]) << "row " << row;
+    }
+}
+
+// An ML type with one more operation set than LOD mappings. The two arrays are indexed in lockstep per operation
+// set; the constrained-LOD filter used to subscript the missing mapping (guarded by an assert only). The mismatch is
+// rejected at deserialization for constrained and unconstrained reads alike.
+TEST_F(MalformedInputTest, MLOperationSetWithoutLODMappingSetsInvalidDataError) {
+    const auto bytes = dna::RawV28::getBytes();
+    auto source = pma::makeScoped<trio::MemoryStream>();
+    source->write(bytes.data(), bytes.size());
+    source->seek(0);
+    auto sourceReader = dna::makeScoped<dna::BinaryStreamReader>(source.get());
+    sourceReader->read();
+    ASSERT_TRUE(dna::Status::isOk());
+    ASSERT_EQ(sourceReader->getMLTypeCount(), 1u);
+    const auto setCount = sourceReader->getMLOperationSetCount(0u);
+    ASSERT_GT(setCount, 0u);
+
+    auto crafted = pma::makeScoped<trio::MemoryStream>();
+    auto writer = dna::makeScoped<dna::BinaryStreamWriter>(crafted.get());
+    writer->setFrom(sourceReader.get());
+    // Grows the operations matrix to setCount + 1 sets while lodMLOperationMappings keeps setCount entries.
+    writer->setMLOperationType(0u, setCount, 0u, dna::MachineLearnedBehaviorOperationType::Gather);
+    writer->write();
+    ASSERT_TRUE(dna::Status::isOk());
+
+    // Unconstrained read.
+    crafted->seek(0);
+    auto reader = dna::makeScoped<dna::BinaryStreamReader>(crafted.get());
+    reader->read();
+    ASSERT_FALSE(dna::Status::isOk());
+    ASSERT_EQ(dna::Status::get().code, dna::StreamReader::InvalidDataError.code);
+
+    // Constrained read (drop LOD 0 of the fixture's two), the path that indexed the missing mapping.
+    crafted->seek(0);
+    dna::Configuration config;
+    config.maxLOD = 1u;
+    auto constrainedReader = dna::makeScoped<dna::BinaryStreamReader>(crafted.get(), config);
+    constrainedReader->read();
+    ASSERT_FALSE(dna::Status::isOk());
+    ASSERT_EQ(dna::Status::get().code, dna::StreamReader::InvalidDataError.code);
+}
+
+namespace {
+
+// Loads the v28 fixture, lets `mutate` rewrite it through the public writer, then reads the result back (optionally
+// with a reader configuration) and returns the reader for the caller's assertions.
+template<typename TMutate>
+pma::ScopedPtr<dna::BinaryStreamReader> rewriteV28(TMutate mutate,
+                                                   trio::MemoryStream* crafted,
+                                                   const dna::Configuration& config = dna::Configuration{}) {
+    const auto bytes = dna::RawV28::getBytes();
+    auto source = pma::makeScoped<trio::MemoryStream>();
+    source->write(bytes.data(), bytes.size());
+    source->seek(0);
+    auto sourceReader = dna::makeScoped<dna::BinaryStreamReader>(source.get());
+    sourceReader->read();
+    EXPECT_TRUE(dna::Status::isOk());
+
+    auto writer = dna::makeScoped<dna::BinaryStreamWriter>(crafted);
+    writer->setFrom(sourceReader.get());
+    mutate(sourceReader.get(), writer.get());
+    writer->write();
+    EXPECT_TRUE(dna::Status::isOk());
+
+    crafted->seek(0);
+    auto reader = dna::makeScoped<dna::BinaryStreamReader>(crafted, config);
+    reader->read();
+    return reader;
+}
+
+}  // namespace
+
+// Joint-group LOD row count one past the group's output rows (the original "lodSizes[0] = 5 with two output indices"
+// case). The cache used to clamp it; a prefix past the rows is malformed and is now rejected at read time.
+TEST_F(MalformedInputTest, JointGroupLODRowCountBeyondRowsSetsInvalidDataError) {
+    auto crafted = pma::makeScoped<trio::MemoryStream>();
+    auto reader = rewriteV28(
+        [](const dna::BinaryStreamReader* source, dna::BinaryStreamWriter* writer) {
+            const auto rowCount = static_cast<std::uint16_t>(source->getJointGroupOutputIndices(0u).size());
+            const std::uint16_t lods[] = {static_cast<std::uint16_t>(rowCount + 1u), 0u};
+            writer->setJointGroupLODs(0u, lods, 2u);
+        },
+        crafted.get());
+    ASSERT_FALSE(dna::Status::isOk());
+    ASSERT_EQ(dna::Status::get().code, dna::StreamReader::InvalidDataError.code);
+}
+
+// The matching valid shape: LOD 0 spanning exactly all rows still loads.
+TEST_F(MalformedInputTest, JointGroupLODRowCountAtRowsLoads) {
+    auto crafted = pma::makeScoped<trio::MemoryStream>();
+    auto reader = rewriteV28(
+        [](const dna::BinaryStreamReader* source, dna::BinaryStreamWriter* writer) {
+            const auto rowCount = static_cast<std::uint16_t>(source->getJointGroupOutputIndices(0u).size());
+            const std::uint16_t lods[] = {rowCount, 0u};
+            writer->setJointGroupLODs(0u, lods, 2u);
+        },
+        crafted.get());
+    ASSERT_TRUE(dna::Status::isOk());
+    ASSERT_EQ(reader->getJointGroupLODs(0u)[0], reader->getJointGroupOutputIndices(0u).size());
+}
+
+// A joint-group joint ID equal to the joint count (the original "jointCount = 1, jointIndices = {5}" case). It used to
+// be skipped when populating the RBF joint map; it is malformed and is now rejected, RBF poses or not.
+TEST_F(MalformedInputTest, JointGroupJointIndexBeyondJointCountSetsInvalidDataError) {
+    auto crafted = pma::makeScoped<trio::MemoryStream>();
+    auto reader = rewriteV28(
+        [](const dna::BinaryStreamReader* source, dna::BinaryStreamWriter* writer) {
+            const std::uint16_t jointIndices[] = {source->getJointCount()};
+            writer->setJointGroupJointIndices(0u, jointIndices, 1u);
+        },
+        crafted.get());
+    ASSERT_FALSE(dna::Status::isOk());
+    ASSERT_EQ(dna::Status::get().code, dna::StreamReader::InvalidDataError.code);
+}
+
+// Non-empty ML joint outputs with no recognized attribute width (no parameter keys). The width is the divisor and
+// modulus of the ML output remap; the case is rejected before either operation.
+TEST_F(MalformedInputTest, MLJointOutputsWithZeroAttributeWidthSetsInvalidDataError) {
+    auto crafted = pma::makeScoped<trio::MemoryStream>();
+    auto reader = rewriteV28(
+        [](const dna::BinaryStreamReader* /*unused*/, dna::BinaryStreamWriter* writer) {
+            const std::uint16_t none[] = {0u};
+            writer->setMLJointsParameterKeys(none, 0u);
+            writer->setMLJointsParameterValues(none, 0u);
+            const std::uint16_t outputs[] = {3u};
+            writer->setMLJointsInputIndices(outputs, 1u);
+            writer->setMLJointsOutputIndices(outputs, 1u);
+        },
+        crafted.get());
+    ASSERT_FALSE(dna::Status::isOk());
+    ASSERT_EQ(dna::Status::get().code, dna::StreamReader::InvalidDataError.code);
+}
+
+// A joint group whose coefficient array is shorter than rows x columns, loaded with coordinate-system conversion. The
+// converter used to read coefficients for every declared row; it now converts only the rows the array covers, and the
+// cache population that follows rejects the short matrix.
+TEST_F(MalformedInputTest, ShortJointGroupValuesAreConvertedSafelyAndRejected) {
+    auto crafted = pma::makeScoped<trio::MemoryStream>();
+    dna::Configuration config;
+    config.coordinateSystem = {dna::Direction::left, dna::Direction::up, dna::Direction::front};
+    config.coordinateSystemTransformPolicy = dna::CoordinateSystemTransformPolicy::Transform;
+    auto reader = rewriteV28(
+        [](const dna::BinaryStreamReader* source, dna::BinaryStreamWriter* writer) {
+            const auto values = source->getJointGroupValues(0u);
+            ASSERT_GT(values.size(), 2u);
+            writer->setJointGroupValues(0u, values.data(), static_cast<std::uint32_t>(values.size() / 2u));
+        },
+        crafted.get(),
+        config);
+    ASSERT_FALSE(dna::Status::isOk());
+    ASSERT_EQ(dna::Status::get().code, dna::StreamReader::InvalidDataError.code);
+}
+
+// ML joints parameter keys and values are parallel arrays; a mismatch used to be clamped to the shorter one.
+TEST_F(MalformedInputTest, MLJointsParameterArrayLengthMismatchSetsInvalidDataError) {
+    auto crafted = pma::makeScoped<trio::MemoryStream>();
+    auto reader = rewriteV28(
+        [](const dna::BinaryStreamReader* /*unused*/, dna::BinaryStreamWriter* writer) {
+            const std::uint16_t keys[] = {0u, 1u};
+            const std::uint16_t values[] = {0u};
+            writer->setMLJointsParameterKeys(keys, 2u);
+            writer->setMLJointsParameterValues(values, 1u);
+        },
+        crafted.get());
+    ASSERT_FALSE(dna::Status::isOk());
+    ASSERT_EQ(dna::Status::get().code, dna::StreamReader::InvalidDataError.code);
+}
+
+// Blend shape channel input and output indices are parallel arrays.
+TEST_F(MalformedInputTest, BlendShapeChannelIndexArrayLengthMismatchSetsInvalidDataError) {
+    auto crafted = pma::makeScoped<trio::MemoryStream>();
+    auto reader = rewriteV28(
+        [](const dna::BinaryStreamReader* source, dna::BinaryStreamWriter* writer) {
+            const auto inputs = source->getBlendShapeChannelInputIndices();
+            ASSERT_GT(inputs.size(), 1u);
+            writer->setBlendShapeChannelInputIndices(inputs.data(), static_cast<std::uint16_t>(inputs.size() - 1u));
+        },
+        crafted.get());
+    ASSERT_FALSE(dna::Status::isOk());
+    ASSERT_EQ(dna::Status::get().code, dna::StreamReader::InvalidDataError.code);
+}
+
+// Animated map input and output indices are parallel arrays.
+TEST_F(MalformedInputTest, AnimatedMapIndexArrayLengthMismatchSetsInvalidDataError) {
+    auto crafted = pma::makeScoped<trio::MemoryStream>();
+    auto reader = rewriteV28(
+        [](const dna::BinaryStreamReader* source, dna::BinaryStreamWriter* writer) {
+            const auto inputs = source->getAnimatedMapInputIndices();
+            ASSERT_GT(inputs.size(), 1u);
+            writer->setAnimatedMapInputIndices(inputs.data(), static_cast<std::uint16_t>(inputs.size() - 1u));
+        },
+        crafted.get());
+    ASSERT_FALSE(dna::Status::isOk());
+    ASSERT_EQ(dna::Status::get().code, dna::StreamReader::InvalidDataError.code);
 }

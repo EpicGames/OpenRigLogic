@@ -25,7 +25,7 @@ namespace ml {
 
 namespace cpu {
 
-template<typename T, typename TF256, typename TF128>
+template<typename T, typename TF512, typename TF256, typename TF128>
 struct MLPSetVerifier {
 
     void operator()(const OperationSet::Pointer& setPtr, std::uint16_t mlOperationIndex, std::uint16_t netIndex) {
@@ -82,8 +82,11 @@ struct Evaluator::Accessor {
                             rltests::ml::block4::optimized::mlOperationParameters[mlTypeIndex][mlOperationSetIndex]
                                                                                  [mlOperationIndex];
                         const auto neuralNetIndex = static_cast<std::uint16_t>(params[0]);
-                        RuntimeTemplateInstantiator rti{&config};
-                        rti.invoke<MLPSetVerifier, void>(opSet, mlOperationIndex, neuralNetIndex);
+                        RuntimeTemplateInstantiator::invoke<rl4::FloatingPointModel::Precise, MLPSetVerifier, void>(
+                            config,
+                            opSet,
+                            mlOperationIndex,
+                            neuralNetIndex);
                     } else {
                         ASSERT_NE(opSet->getType(), rl4::ml::cpu::OperationSetType::MLP);
                     }
@@ -110,7 +113,7 @@ TEST_P(MLBSStorageBuilderTest, LayoutOptimization) {
     rltests::ml::block4::CanonicalReader reader;
     rl4::Configuration config = {};
     config.calculationType = GetParam();
-    auto meta = rl4::RigMetadata::create(config, &reader, &memRes, rl4::InitializationMethod::Create);
+    auto meta = rl4::RigMetadata::create(config, &reader, &memRes);
     auto evaluator = rl4::ml::cpu::Factory::create(config, meta.get(), &reader, &memRes);
     auto evaluatorImpl = static_cast<rl4::ml::cpu::Evaluator*>(evaluator.get());
     rl4::ml::cpu::Evaluator::Accessor::assertRawDataEqual(*evaluatorImpl, config);

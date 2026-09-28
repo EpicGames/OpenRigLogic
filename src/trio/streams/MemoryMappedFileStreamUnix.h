@@ -2,7 +2,6 @@
 
 #pragma once
 
-// *INDENT-OFF*
 #ifdef TRIO_MMAP_AVAILABLE
 
     #include "trio/streams/MemoryMappedFileStream.h"
@@ -38,6 +37,9 @@ public:
     std::size_t write(Readable* source, std::size_t size) override;
     void flush() override;
     void resize(std::uint64_t size) override;
+    const char* mappedData() override;
+    std::uint64_t mappedOffset() override;
+    std::size_t mappedSize() override;
 
     MemoryResource* getMemoryResource();
 
@@ -54,16 +56,14 @@ private:
     AccessMode fileAccessMode;
     MemoryResource* memRes;
     int file;
-    void* data;
+    void* mapped;
     std::uint64_t position;
     std::uint64_t fileSize;
     std::uint64_t viewOffset;
     std::size_t viewSize;
-    bool delayedMapping;
     bool dirty;
 };
 
 }  // namespace trio
 
 #endif  // TRIO_MMAP_AVAILABLE
-// *INDENT-ON*

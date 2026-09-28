@@ -3,6 +3,7 @@
 #pragma once
 
 #include "riglogic/types/Aliases.h"
+#include "riglogic/types/BoundedInputArchive.h"
 #include "riglogic/utils/Macros.h"
 
 #include <pma/PolyAllocator.h>

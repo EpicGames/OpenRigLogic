@@ -22,8 +22,8 @@ namespace rltests {
 
 namespace ml {
 
-// Chained topology: Gather -> MLP(odd layers, intermediate dep) -> WeightedSum -> MLP(even layers, scatter)
-// Purpose: exercise cross-op-set dep gather path and the odd-layer ping-pong normalization fix.
+// Chained topology: Gather -> MLP(odd layers, intermediate dep) -> WeightedSum -> MLP(even layers, scatter).
+// The odd layer count exercises the ping-pong output normalization; WeightedSum outputCount 8 the SIMD aligned-block path.
 namespace chained {
 
 using namespace rl4;
@@ -53,14 +53,12 @@ extern const Matrix<float> valuesPerLOD;
 
 class CanonicalReader : public dna::FakeReader {
 protected:
-    // Canonical DNA layout has 5 op sets: Gather(0) -> MLP(1, intermediate dep) -> WeightedSum(2) ->
-    // MLP(3, final) -> Scatter(4). Gather and Scatter are not standalone runtime ops: the factory folds
-    // their params into the MLPs (Gather -> input indices, Scatter -> output control indices), so the
-    // final scatter is performed by the set-3 MLP - hence scatterMlpOpSet == 3 and no constant for set 4.
+    // Gather and Scatter are folded by the factory into the MLPs they feed (input indices / output control indices),
+    // so the final scatter is performed by the set-3 MLP: scatterMlpOpSet == 3 and set 4 has no constant.
     static constexpr std::uint16_t gatherOpSet = 0u;
     static constexpr std::uint16_t intermediateMlpOpSet = 1u;  // MLP feeding a downstream dep (no scatter)
     static constexpr std::uint16_t weightedSumOpSet = 2u;
-    static constexpr std::uint16_t scatterMlpOpSet = 3u;  // final MLP; the folded Scatter op (set 4) supplies its output controls
+    static constexpr std::uint16_t scatterMlpOpSet = 3u;
     static constexpr std::uint16_t intermediateNetIndex = 0u;  // NN0, driven by the intermediate MLP
     static constexpr std::uint16_t scatterNetIndex = 1u;       // NN1, driven by the scatter MLP
     static constexpr std::uint16_t canonicalMeshIndex = 0u;
@@ -70,6 +68,10 @@ public:
 
     std::uint16_t getRawControlCount() const override {
         return rawControlCount;
+    }
+
+    std::uint16_t getMLControlCount() const override {
+        return mlControlCount;
     }
 
     std::uint16_t getLODCount() const override {
@@ -165,12 +167,11 @@ public:
     }
 
 protected:
-    static constexpr std::uint16_t meshRegionCount = 2u;  // region 0 -> NN1, region 1 -> NN0
+    static constexpr std::uint16_t meshRegionCount = 2u;
 };
 
-// Injects a layer-less MLP op (neural net 2, zero layers) at index 0 of the first MLP op set (set 1),
-// shifting the real NN0 op to index 1. The factory must keep a placeholder for the layer-less op so that
-// LOD lists and cross-set dependency op indices (which reference original DNA indices) stay aligned.
+// A layer-less MLP op (NN2) at index 0 of the intermediate MLP set shifts the real NN0 op to index 1; the factory
+// must keep a placeholder for it so LOD lists and cross-set dependency op indices (DNA indices) stay aligned.
 class MixedOpSetReader : public CanonicalReader {
 public:
     ~MixedOpSetReader();
@@ -225,7 +226,6 @@ public:
             return {depOps, 1ul};
         }
         if (mlOperationSetIndex == weightedSumOpSet) {
-            // The weighted sum depends on the real MLP, which now sits at the shifted op index.
             static const std::uint16_t depOps[] = {realMlpOpIndex};
             return {depOps, 1ul};
         }
@@ -257,11 +257,8 @@ protected:
     static constexpr std::uint16_t realMlpOpIndex = 1u;  // real NN0 op, shifted down by the placeholder
 };
 
-// The WeightedSum's outputCount (12) exceeds its dependency NN0's true output width (8) - malformed data
-// that makes the WS read past NN0's outputs. NN1's first layer becomes 12-in x 8-out, where inputs [8..11]
-// feed outputs [0..3] with weight 1, so any non-zero garbage in the over-read region visibly corrupts the
-// final outputs. With the factory's tail-zeroing defense, the over-read region blends zeros and the final
-// outputs match the canonical expectations exactly.
+// WeightedSum outputCount 12 exceeds NN0's true width 8, so it reads past NN0's outputs; NN1's first layer routes
+// inputs [8..11] into outputs [0..3] at weight 1, so only a zeroed over-read tail yields the canonical outputs.
 class WSOverreadReader : public CanonicalReader {
 public:
     ~WSOverreadReader();
@@ -292,15 +289,12 @@ public:
     }
 
 protected:
-    static constexpr std::uint32_t overreadOutputCount = 12u;    // > NN0's true width of 8 -> WS reads past its outputs
+    static constexpr std::uint32_t overreadOutputCount = 12u;
     static constexpr std::uint32_t weightOneBits = 0x3F800000u;  // 1.0f
 };
 
-// Combines WSOverreadReader's malformed WeightedSum (outputCount 12 > NN0's true width 8) with a mesh
-// region mask on NN0, the over-read intermediate dep. Proves the mask and tail-zeroing features compose:
-// the WeightedSum's over-read tail reads zeros whether NN0 is masked off from the very first evaluation
-// (zero-initialized instance buffers), evaluated unmasked (trailing memset), or masked off afterwards
-// (the zero-weight path never writes past the output count, preserving the previously zeroed tail).
+// WSOverreadReader's over-reading WeightedSum plus a mesh-region mask on NN0, the over-read dep: the tail must read
+// zeros whether NN0 is masked off from the first evaluation, evaluated unmasked, or masked off afterwards.
 class MaskedWSOverreadReader : public WSOverreadReader {
 public:
     ~MaskedWSOverreadReader();
@@ -323,13 +317,34 @@ public:
     }
 
 protected:
-    static constexpr std::uint16_t meshRegionCount = 1u;  // single masked region over NN0
+    static constexpr std::uint16_t meshRegionCount = 1u;
 };
 
-// The final MLP (NN1) limits its last layer's output count per LOD: 8 rows at LOD 0, 4 rows at LOD 1.
-// Combined with the mesh-region masks of MaskedCanonicalReader, this pins down that both the masked
-// (weight == 0 defaults, weight != 1 attenuation) and unmasked scatter paths write exactly the current
-// LOD's output count and never touch control slots beyond it.
+// Intermediate MLP whose last layer is row-trimmed per LOD below its true output count. The factory keeps the FULL
+// output count for intermediates (and sizes defaultValues from it); the snapshot load() recompute must mirror that.
+class LODTrimmedIntermediateReader : public CanonicalReader {
+public:
+    ~LODTrimmedIntermediateReader();
+
+    // The full-rig round trip needs this metadata; FakeReader zero-inits it to an invalid value.
+    dna::RotationSign getRotationSign() const override {
+        return {tdm::rot_dir::positive, tdm::rot_dir::positive, tdm::rot_dir::positive};
+    }
+
+    ConstArrayView<std::uint32_t> getMLOperationParameters(std::uint16_t mlTypeIndex,
+                                                           std::uint16_t mlOperationSetIndex,
+                                                           std::uint16_t mlOperationIndex) const override {
+        if (mlOperationSetIndex == intermediateMlpOpSet) {
+            // [netIndex, layer0: rowsAtLOD0, rowsAtLOD1] - both trimmed below the layer's 8 output rows.
+            static const std::uint32_t mlpParams[] = {intermediateNetIndex, 4u, 4u};
+            return {mlpParams, 3ul};
+        }
+        return CanonicalReader::getMLOperationParameters(mlTypeIndex, mlOperationSetIndex, mlOperationIndex);
+    }
+};
+
+// The final MLP (NN1) limits its last layer's output count per LOD: 8 rows at LOD 0, 4 at LOD 1. With
+// MaskedCanonicalReader's region masks, every scatter path must write exactly the current LOD's output count.
 class LODLimitedMaskedReader : public MaskedCanonicalReader {
 public:
     ~LODLimitedMaskedReader();

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.14)
 ################################################
 # Project setup
 set(SPYUS spyus)
-set(SPYUS_VERSION 1.2.5)
+set(SPYUS_VERSION 1.2.6)
 
 # Prevent in-source-tree builds
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
@@ -37,6 +37,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMakeModulesExtra_DIRS})
 set(HEADERS
     include/spyus/ArrayView.i
     include/spyus/Caster.i
+    include/spyus/CharPtr.i
     include/spyus/ExceptionHandling.i
     include/spyus/TDM.i
     include/spyus/Vector3.i)

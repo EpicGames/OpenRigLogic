@@ -11,19 +11,31 @@
 
 namespace trio {
 
-class TRIOAPI BoundedIOStream : public Controllable, public Readable, public Writable, public Seekable, public Bounded {
+class TRIOAPI_TYPE BoundedIOStream : public Controllable,
+                                     public Readable,
+                                     public Writable,
+                                     public Seekable,
+                                     public Bounded,
+                                     public Buffered {
 public:
     using AccessMode = trio::AccessMode;
     using OpenMode = trio::OpenMode;
 
-    static const sc::StatusCode OpenError;
-    static const sc::StatusCode ReadError;
-    static const sc::StatusCode WriteError;
-    static const sc::StatusCode AlreadyOpenError;
-    static const sc::StatusCode SeekError;
+    TRIOAPI_MEMBER static const sc::StatusCode OpenError;
+    TRIOAPI_MEMBER static const sc::StatusCode ReadError;
+    TRIOAPI_MEMBER static const sc::StatusCode WriteError;
+    TRIOAPI_MEMBER static const sc::StatusCode AlreadyOpenError;
+    TRIOAPI_MEMBER static const sc::StatusCode SeekError;
 
 public:
-    virtual ~BoundedIOStream();
+    TRIOAPI_MEMBER virtual ~BoundedIOStream();
+    /**
+        @brief Flush the changes to filesystem.
+        @note
+            Streams that hold nothing back inherit this as a no-op, so every stream can be flushed uniformly and existing
+            subclasses need not implement it.
+    */
+    TRIOAPI_MEMBER void flush() override;
 };
 
 }  // namespace trio

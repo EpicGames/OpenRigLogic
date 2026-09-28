@@ -55,7 +55,7 @@ public:
     virtual RBFSolverType getSolverType() const = 0;
     virtual void solve(ArrayView<float> input, ArrayView<float> intermediateWeights, ArrayView<float> outputWeights) const = 0;
 
-    virtual void load(terse::BinaryInputArchive<BoundedIOStream>& archive);
+    virtual void load(BoundedInputArchive& archive);
     virtual void save(terse::BinaryOutputArchive<BoundedIOStream>& archive);
 
     ConstArrayView<AlignedVector<float>> getTargets() const;
@@ -69,9 +69,15 @@ public:
 
 protected:
     void normalizeAndCutOff(ArrayView<float> outputWeights) const;
+    // The rows the distance functor consumes: distanceTargets for TwistAngle, the stored targets for every other metric.
+    const AlignedMatrix<float>& getDistanceTargets() const;
+    void buildDistanceTargets();
 
 protected:
     Vector<AlignedVector<float>> targets;
+    // TwistAngle only (empty otherwise): targets in the form the distance functor consumes (toTwistAngleForm), built
+    // once in the constructor and serialized with the solver state, so neither solve() nor restore recomputes them.
+    Vector<AlignedVector<float>> distanceTargets;
     Vector<float> targetScale;
     DistanceWeightFun getDistanceWeight;
     InputConvertFun convertInput;

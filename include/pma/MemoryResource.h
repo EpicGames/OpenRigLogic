@@ -14,9 +14,9 @@ namespace pma {
         It's purpose is to allow passing arbitrary allocators through API boundaries, without requiring changes in the
         signatures and types involved.
 */
-class PMAAPI MemoryResource {
+class PMAAPI_TYPE MemoryResource {
 public:
-    virtual ~MemoryResource();
+    PMAAPI_MEMBER virtual ~MemoryResource();
     virtual void* allocate(std::size_t size, std::size_t alignment) = 0;
     virtual void deallocate(void* ptr, std::size_t size, std::size_t alignment) = 0;
 };

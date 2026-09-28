@@ -2,16 +2,68 @@
 
 #pragma once
 
+#include "riglogic/SerializationContext.h"
 #include "riglogic/TypeDefs.h"
 #include "riglogic/controls/ControlsInputInstance.h"
 #include "riglogic/joints/JointsEvaluator.h"
 #include "riglogic/joints/JointsOutputInstance.h"
+#include "riglogic/joints/cpu/ml/CoordinateSystemTransformer.h"
+#include "riglogic/joints/cpu/ml/MLJointsValidator.h"
+#include "riglogic/joints/cpu/ml/RotationAdapters.h"
+#include "riglogic/riglogic/RigMetadata.h"
 
 #include <cstdint>
 
 namespace rl4 {
 
 namespace ml {
+
+// Rotation component span each adapter/transformer reads/writes (a RotationType's enumerator value is its component count).
+template<class TRotationAdapter>
+struct MLRotationAdapterSpans {
+    // Default (NoopAdapter): quaternion in, quaternion out.
+    static constexpr std::size_t input() {
+        return static_cast<std::size_t>(RotationType::Quaternions);
+    }
+    static constexpr std::size_t output() {
+        return static_cast<std::size_t>(RotationType::Quaternions);
+    }
+};
+
+template<typename TAngle, tdm::rot_seq Order>
+struct MLRotationAdapterSpans<EulerAnglesToQuaternions<TAngle, Order>> {
+    static constexpr std::size_t input() {
+        return static_cast<std::size_t>(RotationType::EulerAngles);
+    }
+    static constexpr std::size_t output() {
+        return static_cast<std::size_t>(RotationType::Quaternions);
+    }
+};
+
+template<typename TAngle, tdm::rot_seq Order>
+struct MLRotationAdapterSpans<QuaternionsToEulerAngles<TAngle, Order>> {
+    static constexpr std::size_t input() {
+        return static_cast<std::size_t>(RotationType::Quaternions);
+    }
+    static constexpr std::size_t output() {
+        return static_cast<std::size_t>(RotationType::EulerAngles);
+    }
+};
+
+template<class TRotationTransformer>
+struct MLRotationTransformerSpan {
+    // Noop/Quaternion transformer spans a quaternion.
+    static constexpr std::size_t value() {
+        return static_cast<std::size_t>(RotationType::Quaternions);
+    }
+};
+
+template<typename TAngle>
+struct MLRotationTransformerSpan<EulerAnglesTransformer<TAngle>> {
+    static constexpr std::size_t value() {
+        return static_cast<std::size_t>(RotationType::EulerAngles);
+    }
+};
 
 template<class TTranslationTransformer, class TRotationTransformer, class TScaleTransformer, class TRotationAdapter>
 class MLJointsEvaluator : public JointsEvaluator {
@@ -115,7 +167,7 @@ public:
         calculate(inputs, outputs, lod);
     }
 
-    void load(terse::BinaryInputArchive<BoundedIOStream>& archive) override {
+    void load(BoundedInputArchive& archive) override {
         archive(inputIndices,
                 outputIndices,
                 inputRotationBaseIndices,
@@ -128,6 +180,22 @@ public:
                 srcSigns,
                 dstSeq,
                 dstSigns);
+
+        const SerializationContext* context = static_cast<SerializationContext*>(archive.getUserData());
+        const RigMetadata& metadata = *context->metadata;
+        if (!MLJointsValidator::validate(inputIndices,
+                                         outputIndices,
+                                         inputRotationBaseIndices,
+                                         outputRotationBaseIndices,
+                                         uniqueTranslationBaseIndices,
+                                         uniqueRotationBaseIndices,
+                                         uniqueScaleBaseIndices,
+                                         MLRotationAdapterSpans<TRotationAdapter>::input(),
+                                         MLRotationAdapterSpans<TRotationAdapter>::output(),
+                                         MLRotationTransformerSpan<TRotationTransformer>::value(),
+                                         metadata)) {
+            archive.markMalformed();
+        }
     }
 
     void save(terse::BinaryOutputArchive<BoundedIOStream>& archive) override {

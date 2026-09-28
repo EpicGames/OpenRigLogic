@@ -14,7 +14,7 @@
 
 namespace rl4 {
 
-PSDNetImplOutputInstance::PSDNetImplOutputInstance(std::uint16_t controlCount, MemoryResource* memRes) :
+PSDNetImplOutputInstance::PSDNetImplOutputInstance(std::size_t controlCount, MemoryResource* memRes) :
     clampBuffer{controlCount, {}, memRes} {
 }
 

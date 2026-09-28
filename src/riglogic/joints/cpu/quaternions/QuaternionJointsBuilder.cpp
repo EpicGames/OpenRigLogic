@@ -9,6 +9,7 @@
 #include "riglogic/joints/JointsNullEvaluator.h"
 #include "riglogic/joints/cpu/quaternions/QuaternionCalculationStrategy.h"
 #include "riglogic/joints/cpu/quaternions/QuaternionJointsEvaluator.h"
+#include "riglogic/joints/cpu/quaternions/QuaternionJointsStrategyFactory.h"
 #include "riglogic/joints/cpu/quaternions/RotationAdapters.h"
 #include "riglogic/joints/cpu/utils/JointGroupOptimizer.h"
 #include "riglogic/riglogic/Configuration.h"
@@ -18,6 +19,15 @@
 #include "riglogic/utils/Extd.h"
 
 #include <tdm/Quat.h>
+
+#ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable : 4365 4987)
+#endif
+#include <algorithm>
+#ifdef _MSC_VER
+    #pragma warning(pop)
+#endif
 
 namespace rl4 {
 
@@ -29,129 +39,13 @@ static constexpr std::uint32_t Stride = 4u;
 
 }  // namespace qjc
 
-template<typename T, typename TF256, typename TF128>
+template<typename T, typename TF512, typename TF256, typename TF128>
 struct MatrixOptimizer {
 
     void operator()(ConstArrayView<float> src, Extent srcDims, Extent dstDims, FloatArray& dst) {
         dst.resize<T>(dstDims.size());
         using BPCMOptimizer = bpcm::Optimizer<TF256, qjc::BlockHeight, qjc::PadTo, qjc::Stride>;
         BPCMOptimizer::optimize(dst.data<T>(), src.data(), srcDims);
-    }
-};
-
-template<typename T, typename TF256, typename TF128>
-struct JointGroupQuaternionStrategyFactory {
-    using BasePointer = UniqueInstance<JointGroupQuaternionCalculationStrategy>::PointerType;
-
-    BasePointer operator()(RotationType rotationType,
-                           tdm::rot_seq rotationSequence,
-                           tdm::rot_sign rotationSigns,
-                           dna::RotationUnit rotationUnit,
-                           MemoryResource* memRes) {
-
-        if (rotationType == RotationType::Quaternions) {
-            using CalculationStrategy = VectorizedJointGroupQuaternionCalculationStrategy<T, TF256, TF128, PassthroughAdapter>;
-            return UniqueInstance<CalculationStrategy, JointGroupQuaternionCalculationStrategy>::with(memRes).create(
-                PassthroughAdapter{rotationSigns});
-        }
-
-#ifdef RL_BUILD_WITH_XYZ_ROTATION_ORDER
-        if (rotationSequence == tdm::rot_seq::xyz) {
-            if (rotationUnit == dna::RotationUnit::degrees) {
-                using Q2E = QuaternionsToEulerAngles<tdm::fdeg, tdm::rot_seq::xyz>;
-                using CalculationStrategy = VectorizedJointGroupQuaternionCalculationStrategy<T, TF256, TF128, Q2E>;
-                return UniqueInstance<CalculationStrategy, JointGroupQuaternionCalculationStrategy>::with(memRes).create(
-                    Q2E{rotationSigns});
-            } else {
-                using Q2E = QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::xyz>;
-                using CalculationStrategy = VectorizedJointGroupQuaternionCalculationStrategy<T, TF256, TF128, Q2E>;
-                return UniqueInstance<CalculationStrategy, JointGroupQuaternionCalculationStrategy>::with(memRes).create(
-                    Q2E{rotationSigns});
-            }
-        }
-#endif  // RL_BUILD_WITH_XYZ_ROTATION_ORDER
-
-#ifdef RL_BUILD_WITH_XZY_ROTATION_ORDER
-        if (rotationSequence == tdm::rot_seq::xzy) {
-            if (rotationUnit == dna::RotationUnit::degrees) {
-                using Q2E = QuaternionsToEulerAngles<tdm::fdeg, tdm::rot_seq::xzy>;
-                using CalculationStrategy = VectorizedJointGroupQuaternionCalculationStrategy<T, TF256, TF128, Q2E>;
-                return UniqueInstance<CalculationStrategy, JointGroupQuaternionCalculationStrategy>::with(memRes).create(
-                    Q2E{rotationSigns});
-            } else {
-                using Q2E = QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::xzy>;
-                using CalculationStrategy = VectorizedJointGroupQuaternionCalculationStrategy<T, TF256, TF128, Q2E>;
-                return UniqueInstance<CalculationStrategy, JointGroupQuaternionCalculationStrategy>::with(memRes).create(
-                    Q2E{rotationSigns});
-            }
-        }
-#endif  // RL_BUILD_WITH_XZY_ROTATION_ORDER
-
-#ifdef RL_BUILD_WITH_YXZ_ROTATION_ORDER
-        if (rotationSequence == tdm::rot_seq::yxz) {
-            if (rotationUnit == dna::RotationUnit::degrees) {
-                using Q2E = QuaternionsToEulerAngles<tdm::fdeg, tdm::rot_seq::yxz>;
-                using CalculationStrategy = VectorizedJointGroupQuaternionCalculationStrategy<T, TF256, TF128, Q2E>;
-                return UniqueInstance<CalculationStrategy, JointGroupQuaternionCalculationStrategy>::with(memRes).create(
-                    Q2E{rotationSigns});
-            } else {
-                using Q2E = QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::yxz>;
-                using CalculationStrategy = VectorizedJointGroupQuaternionCalculationStrategy<T, TF256, TF128, Q2E>;
-                return UniqueInstance<CalculationStrategy, JointGroupQuaternionCalculationStrategy>::with(memRes).create(
-                    Q2E{rotationSigns});
-            }
-        }
-#endif  // RL_BUILD_WITH_YXZ_ROTATION_ORDER
-
-#ifdef RL_BUILD_WITH_YZX_ROTATION_ORDER
-        if (rotationSequence == tdm::rot_seq::yzx) {
-            if (rotationUnit == dna::RotationUnit::degrees) {
-                using Q2E = QuaternionsToEulerAngles<tdm::fdeg, tdm::rot_seq::yzx>;
-                using CalculationStrategy = VectorizedJointGroupQuaternionCalculationStrategy<T, TF256, TF128, Q2E>;
-                return UniqueInstance<CalculationStrategy, JointGroupQuaternionCalculationStrategy>::with(memRes).create(
-                    Q2E{rotationSigns});
-            } else {
-                using Q2E = QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::yzx>;
-                using CalculationStrategy = VectorizedJointGroupQuaternionCalculationStrategy<T, TF256, TF128, Q2E>;
-                return UniqueInstance<CalculationStrategy, JointGroupQuaternionCalculationStrategy>::with(memRes).create(
-                    Q2E{rotationSigns});
-            }
-        }
-#endif  // RL_BUILD_WITH_YZX_ROTATION_ORDER
-
-#ifdef RL_BUILD_WITH_ZXY_ROTATION_ORDER
-        if (rotationSequence == tdm::rot_seq::zxy) {
-            if (rotationUnit == dna::RotationUnit::degrees) {
-                using Q2E = QuaternionsToEulerAngles<tdm::fdeg, tdm::rot_seq::zxy>;
-                using CalculationStrategy = VectorizedJointGroupQuaternionCalculationStrategy<T, TF256, TF128, Q2E>;
-                return UniqueInstance<CalculationStrategy, JointGroupQuaternionCalculationStrategy>::with(memRes).create(
-                    Q2E{rotationSigns});
-            } else {
-                using Q2E = QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::zxy>;
-                using CalculationStrategy = VectorizedJointGroupQuaternionCalculationStrategy<T, TF256, TF128, Q2E>;
-                return UniqueInstance<CalculationStrategy, JointGroupQuaternionCalculationStrategy>::with(memRes).create(
-                    Q2E{rotationSigns});
-            }
-        }
-#endif  // RL_BUILD_WITH_ZXY_ROTATION_ORDER
-
-#ifdef RL_BUILD_WITH_ZYX_ROTATION_ORDER
-        if (rotationSequence == tdm::rot_seq::zyx) {
-            if (rotationUnit == dna::RotationUnit::degrees) {
-                using Q2E = QuaternionsToEulerAngles<tdm::fdeg, tdm::rot_seq::zyx>;
-                using CalculationStrategy = VectorizedJointGroupQuaternionCalculationStrategy<T, TF256, TF128, Q2E>;
-                return UniqueInstance<CalculationStrategy, JointGroupQuaternionCalculationStrategy>::with(memRes).create(
-                    Q2E{rotationSigns});
-            } else {
-                using Q2E = QuaternionsToEulerAngles<tdm::frad, tdm::rot_seq::zyx>;
-                using CalculationStrategy = VectorizedJointGroupQuaternionCalculationStrategy<T, TF256, TF128, Q2E>;
-                return UniqueInstance<CalculationStrategy, JointGroupQuaternionCalculationStrategy>::with(memRes).create(
-                    Q2E{rotationSigns});
-            }
-        }
-#endif  // RL_BUILD_WITH_ZYX_ROTATION_ORDER
-
-        return nullptr;
     }
 };
 
@@ -202,10 +96,9 @@ void QuaternionJointsBuilder::setOutputIndices(JointGroup& group, ConstArrayView
                    std::back_inserter(outputRotationBaseIndices),
                    [](std::uint16_t outputIndex) { return static_cast<std::uint16_t>((outputIndex / 9) * 9); });
     deduplicate(outputRotationBaseIndices);
-    // Expand output rotation base indices (qx) into (qx, qy, qz, qw) for all rotations
     group.outputIndices.reserve(outputRotationBaseIndices.size() * static_cast<std::uint8_t>(RotationType::Quaternions));
     for (const auto baseIndex : outputRotationBaseIndices) {
-        // Remap output indices from 9-attribute joints to 10-attribute joints rx -> qx
+        // 9-attribute joint rx -> 10-attribute joint qx
         const auto jointIndex = static_cast<std::uint16_t>(baseIndex / 9u);
         const auto remappedBaseIndex = static_cast<std::uint16_t>(jointIndex * 10u);
         group.outputIndices.push_back(static_cast<std::uint16_t>(remappedBaseIndex + 3));
@@ -219,7 +112,6 @@ void QuaternionJointsBuilder::setValues(JointGroup& group,
                                         ConstArrayView<float> eulers,
                                         ConstArrayView<std::uint16_t> inputIndices,
                                         ConstArrayView<std::uint16_t> outputIndices) {
-    // Convert euler angles to quaternions
     std::function<tdm::frad(float)> angConv;
     if (rotationUnit == dna::RotationUnit::degrees) {
         angConv = [](float angle) { return tdm::frad{tdm::fdeg{angle}}; };
@@ -227,47 +119,65 @@ void QuaternionJointsBuilder::setValues(JointGroup& group,
         angConv = [](float angle) { return tdm::frad{angle}; };
     }
 
-    const auto colCount = static_cast<std::uint16_t>(inputIndices.size());
-    const auto rowCount = static_cast<std::uint16_t>(outputIndices.size());
+    const std::size_t colCount = inputIndices.size();
+    const std::size_t rowCount = std::min(outputIndices.size(), (colCount == 0u) ? std::size_t{} : eulers.size() / colCount);
 
-    Vector<float> quaternions(group.outputIndices.size() * colCount, {}, memRes);
+    // One quaternion slot per unique joint; slotOfJoint maps joint index -> slot so sizing and emission agree.
+    const std::size_t quatCount = group.outputIndices.size() / 4u;
+    std::size_t maxJointIndex = {};
+    for (std::size_t slot = {}; slot < quatCount; ++slot) {
+        maxJointIndex = std::max(maxJointIndex, static_cast<std::size_t>(group.outputIndices[slot * 4u] / 10u));
+    }
+    Vector<std::size_t> slotOfJoint{(quatCount == 0u) ? std::size_t{} : maxJointIndex + 1u, quatCount, memRes};
+    for (std::size_t slot = {}; slot < quatCount; ++slot) {
+        slotOfJoint[group.outputIndices[slot * 4u] / 10u] = slot;
+    }
+
+    Vector<float> quaternions(quatCount * 4u * colCount, {}, memRes);
+    Vector<tdm::frad3> angles{quatCount, tdm::frad3{}, memRes};
     for (std::size_t col = {}; col < colCount; ++col) {
-        for (std::size_t row = {}, quatIndex = {}; row < rowCount; ++quatIndex) {
-            tdm::frad3 angles;
-            const std::uint16_t jointIndex = static_cast<std::uint16_t>(outputIndices[row] / 9u);
-            while ((row < rowCount) && (jointIndex == static_cast<std::uint16_t>(outputIndices[row] / 9u))) {
-                const auto relAttrIndex = static_cast<std::uint16_t>(outputIndices[row] % 9u);
-                // 0 = rx, 1 = ry, 2 = rz
-                const auto relRotAttrIndex = static_cast<std::uint16_t>(relAttrIndex % 3u);
-                angles[relRotAttrIndex] = angConv(eulers[row * colCount + col]);
-                ++row;
+        std::fill(angles.begin(), angles.end(), tdm::frad3{});
+        for (std::size_t row = {}; row < rowCount; ++row) {
+            const std::size_t jointIndex = outputIndices[row] / 9u;
+            const std::size_t slot = (jointIndex < slotOfJoint.size()) ? slotOfJoint[jointIndex] : quatCount;
+            if (slot == quatCount) {
+                continue;  // every row's joint has a slot by construction; defensive only
             }
-            tdm::fquat q{angles, meta->rotationSequence, meta->rotationSigns};
-            quaternions[((quatIndex * 4) + 0ul) * colCount + col] = q.x;
-            quaternions[((quatIndex * 4) + 1ul) * colCount + col] = q.y;
-            quaternions[((quatIndex * 4) + 2ul) * colCount + col] = q.z;
-            quaternions[((quatIndex * 4) + 3ul) * colCount + col] = q.w;
+            const auto relAttrIndex = static_cast<std::uint16_t>(outputIndices[row] % 9u);
+            // 0 = rx, 1 = ry, 2 = rz
+            const auto relRotAttrIndex = static_cast<std::uint16_t>(relAttrIndex % 3u);
+            angles[slot][relRotAttrIndex] = angConv(eulers[row * colCount + col]);
+        }
+        for (std::size_t slot = {}; slot < quatCount; ++slot) {
+            tdm::fquat q{angles[slot], meta->rotationSequence, meta->rotationSigns};
+            quaternions[((slot * 4u) + 0ul) * colCount + col] = q.x;
+            quaternions[((slot * 4u) + 1ul) * colCount + col] = q.y;
+            quaternions[((slot * 4u) + 2ul) * colCount + col] = q.z;
+            quaternions[((slot * 4u) + 3ul) * colCount + col] = q.w;
         }
     }
 
-    // 8 quaternions x 4 floats per quat = 32
     const auto newRowCount = static_cast<std::uint32_t>(group.outputIndices.size());
     const auto paddedRowCount = extd::roundUp(newRowCount, qjc::PadTo);
+    const auto storageColCount = static_cast<std::uint32_t>(colCount);
 
-    group.colCount = colCount;
+    group.colCount = storageColCount;
     group.rowCount = paddedRowCount;
-    RuntimeTemplateInstantiator instantiator{&config};
-    Extent srcDims{newRowCount, colCount};
-    Extent dstDims{paddedRowCount, colCount};
-    instantiator.invoke<MatrixOptimizer, void>(quaternions, srcDims, dstDims, group.values);
+    Extent srcDims{newRowCount, storageColCount};
+    Extent dstDims{paddedRowCount, storageColCount};
+    RuntimeTemplateInstantiator::invoke<FloatingPointModel::Precise, MatrixOptimizer, void>(config,
+                                                                                            quaternions,
+                                                                                            srcDims,
+                                                                                            dstDims,
+                                                                                            group.values);
 }
 
 void QuaternionJointsBuilder::setLODs(JointGroup& group, ConstArrayView<std::uint16_t> outputIndices) {
     const auto maxRemappedRotationIndex = [](std::uint16_t absRotAttrIndex) {
         const auto jointIndex = static_cast<std::uint16_t>(absRotAttrIndex / 9u);
         const auto newAttrBase = static_cast<std::uint16_t>(jointIndex * 10u);
-        // Only rotation indices are inputs, and since the goal is to find the maximum rotation index,
-        // the last quaternion attribute index is used, which is 6 based on [tx, ty, tz, qx, qy, qz, qw, sx, sy, sz]
+        // Only rotation indices are inputs; the maximum is the last quaternion attribute, qw = 6 in
+        // [tx, ty, tz, qx, qy, qz, qw, sx, sy, sz]
         return static_cast<std::uint16_t>(newAttrBase + 6);
     };
 
@@ -275,7 +185,10 @@ void QuaternionJointsBuilder::setLODs(JointGroup& group, ConstArrayView<std::uin
     const auto paddedRowCount = extd::roundUp(newRowCount, qjc::PadTo);
     const auto lodCount = static_cast<std::uint16_t>(group.lods.size());
     for (std::uint16_t lod = {}; lod < lodCount; ++lod) {
-        const std::uint32_t oldLODRowCount = group.lods[lod].outputLODs.size;
+        // DNA per-LOD row counts are not bounded by the LOD-0 row count and the storage validator runs only after
+        // this builder; unclamped, an increasing LOD row count indexes past the filtered output indices.
+        const std::uint32_t oldLODRowCount =
+            std::min(group.lods[lod].outputLODs.size, static_cast<std::uint32_t>(outputIndices.size()));
         std::uint32_t newLODRowCount = {};
         if (oldLODRowCount != 0) {
             const auto qwRotationIndexAtOldLODRowCount = maxRemappedRotationIndex(outputIndices[oldLODRowCount - 1ul]);
@@ -293,8 +206,7 @@ void QuaternionJointsBuilder::remapOutputIndices(JointGroup& group) {
         const auto jointIndex = static_cast<std::uint16_t>(outputIndex / 10u);
         const auto relAttrIndex = static_cast<std::uint16_t>(outputIndex % 10u);
         const auto newAttrBase = static_cast<std::uint16_t>(jointIndex * 9u);
-        // Only rotations are among output indices (no translation or scale)
-        // qx, qy, qz are kept, qw is ignored
+        // Only rotations are output indices; qx, qy, qz are kept, qw is dropped
         outputIndex = (relAttrIndex == 6) ? std::uint16_t{} : static_cast<std::uint16_t>(newAttrBase + relAttrIndex);
     }
 }
@@ -335,8 +247,7 @@ void QuaternionJointsBuilder::fillStorage(const JointBehaviorFilter& source) {
         setValues(group, eulers, inputIndices, outputIndices);
         setLODs(group, outputIndices);
 
-        // If the selected RigLogic output is in quaternions, then the output indices are already setup as needed.
-        // But if Euler angles were requested, the output indices need to be mapped back to 9-attribute joint output indices
+        // Euler output needs the indices mapped back to 9-attribute joints; quaternion output is already in place.
         if (config.rotationType == RotationType::EulerAngles) {
             remapOutputIndices(group);
         }
@@ -346,15 +257,16 @@ void QuaternionJointsBuilder::fillStorage(const JointBehaviorFilter& source) {
 void QuaternionJointsBuilder::registerControls(Controls* controls) {
     for (const auto& group : jointGroups) {
         for (std::uint16_t lod = {}; lod < static_cast<std::uint16_t>(group.lods.size()); ++lod) {
-            ConstArrayView<std::uint16_t> inputIndicesForLOD(group.inputIndices.data(), group.lods[lod].inputLODs.size);
+            const auto inputIndicesForLOD =
+                ConstArrayView<std::uint16_t>{group.inputIndices}.first(group.lods[lod].inputLODs.size);
             controls->registerControls(lod, inputIndicesForLOD);
         }
     }
 }
 
 JointsEvaluator::Pointer QuaternionJointsBuilder::build() {
-    const EvaluatorType type =
-        (meta->initializationMethod == InitializationMethod::Restore) ? meta->popFrontEvaluator() : EvaluatorType::Auto;
+    // Auto until this builder writes it on the create path; the deserialized kind on restore.
+    const EvaluatorType type = meta->evaluators.quaternionJoints;
 
     auto jointGroupsEmpty = [this]() {
         for (std::size_t i = {}; i < jointGroups.size(); ++i) {
@@ -366,24 +278,31 @@ JointsEvaluator::Pointer QuaternionJointsBuilder::build() {
     };
 
     if ((type == EvaluatorType::Null) || ((type == EvaluatorType::Auto) && jointGroupsEmpty())) {
-        meta->pushBackEvaluator(EvaluatorType::Null);
+        meta->evaluators.quaternionJoints = EvaluatorType::Null;
         return UniqueInstance<JointsNullEvaluator, JointsEvaluator>::with(memRes).create();
     }
 
-    RuntimeTemplateInstantiator instantiator{&config};
     using StrategyPointer = UniqueInstance<JointGroupQuaternionCalculationStrategy>::PointerType;
-    auto strategy = instantiator.invoke<JointGroupQuaternionStrategyFactory, StrategyPointer>(config.rotationType,
-                                                                                              meta->rotationSequence,
-                                                                                              meta->rotationSigns,
-                                                                                              rotationUnit,
-                                                                                              memRes);
+    StrategyPointer strategy;
+#ifdef RL_BUILD_WITH_FAST
+    if (config.floatingPointModel == FloatingPointModel::Fast) {
+        strategy = createFastQuaternionStrategy(config, meta->rotationSequence, meta->rotationSigns, rotationUnit, memRes);
+    }
+#endif  // RL_BUILD_WITH_FAST
+    if (strategy == nullptr) {
+        strategy = createPreciseQuaternionStrategy(config, meta->rotationSequence, meta->rotationSigns, rotationUnit, memRes);
+    }
 
     if (strategy == nullptr) {
-        meta->pushBackEvaluator(EvaluatorType::Null);
+        meta->evaluators.quaternionJoints = EvaluatorType::Null;
         return UniqueInstance<JointsNullEvaluator, JointsEvaluator>::with(memRes).create();
     }
 
-    meta->pushBackEvaluator(EvaluatorType::Concrete);
+    if (!RuntimeTemplateInstantiator::invoke<FloatingPointModel::Precise, StorageValidator, bool>(config, jointGroups, *meta)) {
+        return nullptr;
+    }
+
+    meta->evaluators.quaternionJoints = EvaluatorType::Concrete;
     auto factory = UniqueInstance<QuaternionJointsEvaluator, JointsEvaluator>::with(memRes);
     return factory.create(std::move(strategy), std::move(jointGroups), nullptr, memRes);
 }

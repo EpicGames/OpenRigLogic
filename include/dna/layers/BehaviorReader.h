@@ -16,9 +16,9 @@ namespace dna {
         Implementors should inherit from Reader itself and not this class.
     @see Reader
 */
-class DNAAPI BehaviorReader : public virtual DefinitionReader {
+class DNAAPI_TYPE BehaviorReader : public virtual DefinitionReader {
 protected:
-    virtual ~BehaviorReader();
+    DNAAPI_MEMBER virtual ~BehaviorReader();
 
 public:
     /**

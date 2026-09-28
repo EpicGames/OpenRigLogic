@@ -7,11 +7,11 @@
 
 namespace dna {
 
-struct DNAAPI VersionInfo {
-    static int getMajorVersion();
-    static int getMinorVersion();
-    static int getPatchVersion();
-    static StringView getVersionString();
+struct DNAAPI_TYPE VersionInfo {
+    DNAAPI_MEMBER static int getMajorVersion();
+    DNAAPI_MEMBER static int getMinorVersion();
+    DNAAPI_MEMBER static int getPatchVersion();
+    DNAAPI_MEMBER static StringView getVersionString();
 };
 
 }  // namespace dna

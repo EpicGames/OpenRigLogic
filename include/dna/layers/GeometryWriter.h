@@ -16,9 +16,9 @@ namespace dna {
         Implementors should inherit from Writer itself and not this class.
     @see Writer
 */
-class DNAAPI GeometryWriter : public virtual DefinitionWriter {
+class DNAAPI_TYPE GeometryWriter : public virtual DefinitionWriter {
 protected:
-    virtual ~GeometryWriter();
+    DNAAPI_MEMBER virtual ~GeometryWriter();
 
 public:
     /**

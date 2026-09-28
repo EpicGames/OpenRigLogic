@@ -11,7 +11,7 @@ namespace dna {
 class BinaryStreamReader;
 class JSONStreamReader;
 
-class DNAAPI BinaryStreamWriter : public StreamWriter {
+class DNAAPI_TYPE BinaryStreamWriter : public StreamWriter {
 public:
     /**
         @brief Factory method for creation of BinaryStreamWriter
@@ -25,16 +25,16 @@ public:
             User is responsible for releasing the returned pointer by calling destroy.
         @see destroy
     */
-    static BinaryStreamWriter* create(BoundedIOStream* stream, MemoryResource* memRes = nullptr);
+    DNAAPI_MEMBER static BinaryStreamWriter* create(BoundedIOStream* stream, MemoryResource* memRes = nullptr);
     /**
         @brief Method for freeing a BinaryStreamWriter instance.
         @param instance
             Instance of BinaryStreamWriter to be freed.
         @see create
     */
-    static void destroy(BinaryStreamWriter* instance);
+    DNAAPI_MEMBER static void destroy(BinaryStreamWriter* instance);
 
-    ~BinaryStreamWriter() override;
+    DNAAPI_MEMBER ~BinaryStreamWriter() override;
 
     using StreamWriter::setFrom;
     virtual void setFrom(const BinaryStreamReader* source,

@@ -3,7 +3,7 @@
 #include "riglogic/joints/cpu/ml/MLJointsBuilderFactory.h"
 
 #include "riglogic/joints/cpu/ml/MLJointsBuilder.h"
-#include "riglogic/system/simd/Detect.h"
+#include "riglogic/system/simd/SIMD.h"
 
 namespace rl4 {
 

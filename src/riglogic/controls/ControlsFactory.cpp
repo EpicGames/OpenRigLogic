@@ -5,12 +5,21 @@
 #include "riglogic/TypeDefs.h"
 #include "riglogic/conditionaltable/ConditionalTable.h"
 #include "riglogic/controls/Controls.h"
+#include "riglogic/controls/ControlsValidator.h"
 #include "riglogic/controls/instances/StandardControlsInputInstance.h"
 #include "riglogic/riglogic/Configuration.h"
 #include "riglogic/riglogic/RigMetadata.h"
 #include "riglogic/utils/Extd.h"
 
+#ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable : 4365 4987)
+#endif
+#include <algorithm>
 #include <cstdint>
+#ifdef _MSC_VER
+    #pragma warning(pop)
+#endif
 
 namespace rl4 {
 
@@ -29,8 +38,8 @@ static ConditionalTable createConditionalTable(const dna::Reader* reader, Memory
     extd::copy(reader->getGUIToRawCutValues(), cutValues);
     // DNAs may contain these parameters in reverse order
     // i.e. the `from` value is actually larger than the `to` value
-    assert(fromValues.size() == toValues.size());
-    for (std::size_t i = 0ul; i < fromValues.size(); ++i) {
+    const std::size_t conditionalCount = std::min(fromValues.size(), toValues.size());
+    for (std::size_t i = 0ul; i < conditionalCount; ++i) {
         if (fromValues[i] > toValues[i]) {
             std::swap(fromValues[i], toValues[i]);
         }
@@ -137,8 +146,6 @@ Controls::Pointer ControlsFactory::create(const Configuration& config,
                                           RigMetadata* meta,
                                           const dna::Reader* reader,
                                           MemoryResource* memRes) {
-    RL_UNUSED(meta);
-
     const auto guiControlCount = reader->getGUIControlCount();
     const auto rawControlCount = reader->getRawControlCount();
     const auto psdControlCount = reader->getPSDCount();
@@ -148,6 +155,11 @@ Controls::Pointer ControlsFactory::create(const Configuration& config,
 
     ConditionalTable conditionals = createConditionalTable(reader, memRes);
     Vector<ControlInitializer> initialValues = createInitialControlValues(reader, memRes);
+
+    if (!ControlsValidator::validate(conditionals, initialValues, *meta)) {
+        return nullptr;
+    }
+
     auto instanceFactory =
         createInstanceFactory(config, guiControlCount, rawControlCount, psdControlCount, mlControlCount, rbfControlCount);
 

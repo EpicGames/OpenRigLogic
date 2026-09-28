@@ -38,7 +38,11 @@ JointsOutputInstance::Pointer Joints::createInstance(MemoryResource* instanceMem
 }
 
 ConstArrayView<std::uint16_t> Joints::getJointIndicesForLOD(std::uint16_t lod) const {
+    // lod arrives unclamped from the public API; the assert is compiled out in release.
     assert(lod < jointIndices.size());
+    if (lod >= jointIndices.size()) {
+        return {};
+    }
     return jointIndices[lod];
 }
 
@@ -67,6 +71,9 @@ std::uint16_t Joints::getJointGroupCount() const {
 
 ConstArrayView<std::uint16_t> Joints::getVariableAttributeIndices(std::uint16_t lod) const {
     assert(lod < variableAttributeIndices.size());
+    if (lod >= variableAttributeIndices.size()) {
+        return {};
+    }
     return variableAttributeIndices[lod];
 }
 

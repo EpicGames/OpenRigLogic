@@ -39,7 +39,7 @@ public:
     ConstArrayView<std::uint16_t> getPSDInputIndicesForLOD(std::uint16_t lod) const override;
     ConstArrayView<std::uint16_t> getPSDOutputIndicesForLOD(std::uint16_t lod) const override;
     void calculate(ControlsInputInstance* inputInstance, PSDNetOutputInstance* outputInstance, std::uint16_t lod) const override;
-    void load(terse::BinaryInputArchive<BoundedIOStream>& archive) override;
+    void load(BoundedInputArchive& archive) override;
     void save(terse::BinaryOutputArchive<BoundedIOStream>& archive) override;
 
 private:

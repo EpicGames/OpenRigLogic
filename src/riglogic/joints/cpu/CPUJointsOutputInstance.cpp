@@ -29,7 +29,7 @@ CPUJointsOutputInstance::CPUJointsOutputInstance(std::uint16_t jointAttributeCou
             static_cast<std::size_t>(static_cast<std::uint8_t>(translationType) + static_cast<std::uint8_t>(rotationType) +
                                      static_cast<std::uint8_t>(scaleType));
         resetBuffer = [numAttrsPerJoint, translationType](ArrayView<float> buffer) {
-            // For quaternions, set the w component to 1.0, so the empty buffer will contain identity quaternions
+            // w = 1.0 so the reset buffer holds identity quaternions
             const auto qwOffset = static_cast<std::size_t>(static_cast<std::uint8_t>(translationType) + 3u);
             std::fill(buffer.begin(), buffer.end(), 0.0f);
             for (std::size_t i = qwOffset; i < buffer.size(); i += numAttrsPerJoint) {

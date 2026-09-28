@@ -7,6 +7,7 @@
 #include "dna/stream/BinaryStreamReaderImpl.h"
 
 #include "dna/TypeDefs.h"
+#include "dna/stream/Validator.h"
 #include "dna/types/CoordinateSystemConverter.h"
 #include "dna/types/Limits.h"
 
@@ -149,11 +150,40 @@ void BinaryStreamReaderImpl::read() {
         return;
     }
 
+    if (!Validator::validate(dna)) {
+        return;
+    }
+
     const bool isSameCoordSys = (dna.descriptor.coordinateSystem == config.coordinateSystem) &&
                                 (dna.descriptorExt.rotationSequence == config.rotationSequence) &&
                                 (dna.descriptorExt.rotationSign == config.rotationSign) &&
                                 (dna.descriptorExt.faceWindingOrder == config.faceWindingOrder);
     if ((config.coordinateSystemTransformPolicy == CoordinateSystemTransformPolicy::Transform) && !isSameCoordSys) {
+        if (!config.coordinateSystem.valid<float>()) {
+            const auto directionName = [](int value) {
+                switch (value) {
+                case static_cast<int>(dna::Direction::left):
+                    return "left";
+                case static_cast<int>(dna::Direction::right):
+                    return "right";
+                case static_cast<int>(dna::Direction::up):
+                    return "up";
+                case static_cast<int>(dna::Direction::down):
+                    return "down";
+                case static_cast<int>(dna::Direction::front):
+                    return "front";
+                case static_cast<int>(dna::Direction::back):
+                    return "back";
+                default:
+                    return "unknown";
+                }
+            };
+            status.set(InvalidConfigError,
+                       directionName(static_cast<int>(config.coordinateSystem.x)),
+                       directionName(static_cast<int>(config.coordinateSystem.y)),
+                       directionName(static_cast<int>(config.coordinateSystem.z)));
+            return;
+        }
         CoordinateSystemConverter csc{config.coordinateSystem,
                                       config.rotationSequence,
                                       config.rotationSign,
@@ -163,7 +193,10 @@ void BinaryStreamReaderImpl::read() {
     }
 
     // Cache must be populated after coordinate system conversion since some data that is about to be cached needs conversion
-    cache.populate(this);
+    if (!cache.populate(this)) {
+        status.set(InvalidDataError);
+        return;
+    }
 }
 
 }  // namespace dna

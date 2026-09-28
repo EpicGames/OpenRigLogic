@@ -7,11 +7,11 @@
 
 namespace rl4 {
 
-struct RLAPI VersionInfo {
-    static int getMajorVersion();
-    static int getMinorVersion();
-    static int getPatchVersion();
-    static StringView getVersionString();
+struct RLAPI_TYPE VersionInfo {
+    RLAPI_MEMBER static int getMajorVersion();
+    RLAPI_MEMBER static int getMinorVersion();
+    RLAPI_MEMBER static int getPatchVersion();
+    RLAPI_MEMBER static StringView getVersionString();
 };
 
 }  // namespace rl4

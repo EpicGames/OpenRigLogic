@@ -23,7 +23,7 @@ void JointsNullEvaluator::calculate(ControlsInputInstance* /*unused*/,
                                     std::uint16_t /*unused*/) const {
 }
 
-void JointsNullEvaluator::load(terse::BinaryInputArchive<BoundedIOStream>& /*unused*/) {
+void JointsNullEvaluator::load(BoundedInputArchive& /*unused*/) {
 }
 
 void JointsNullEvaluator::save(terse::BinaryOutputArchive<BoundedIOStream>& /*unused*/) {

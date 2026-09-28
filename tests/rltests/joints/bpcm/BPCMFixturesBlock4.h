@@ -32,6 +32,7 @@ namespace unoptimized {
 extern const tdm::rot_sign rotationSigns;
 extern const std::uint16_t lodCount;
 extern const std::uint16_t rawControlCount;
+extern const std::uint16_t jointCount;
 extern const Extent dimensions;
 extern const Matrix<float> values;
 extern const Matrix<std::uint16_t> inputIndices;
@@ -62,14 +63,12 @@ extern const Matrix<LODRegion> lodRegions;
 
 namespace input {
 
-// Calculation input values
 extern const Vector<float> values;
 
 }  // namespace input
 
 namespace output {
 
-// Calculation output values
 extern const Vector<Matrix<float>> valuesPerLOD;
 
 }  // namespace output
@@ -87,7 +86,7 @@ public:
     }
 
     std::uint16_t getJointCount() const override {
-        return static_cast<std::uint16_t>(unoptimized::neutralJointTranslationXs.size());
+        return unoptimized::jointCount;
     }
 
     ConstArrayView<float> getNeutralJointTranslationXs() const override {

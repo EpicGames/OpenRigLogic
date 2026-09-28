@@ -17,6 +17,7 @@
     #pragma warning(push)
     #pragma warning(disable : 4365 4987)
 #endif
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -57,7 +58,7 @@ FilteredBinaryInputArchive::FilteredBinaryInputArchive(BoundedIOStream* stream_,
 }
 
 bool FilteredBinaryInputArchive::isOk() {
-    return !malformed && sc::Status::isOk();
+    return !malformed && BaseArchive::isOk() && sc::Status::isOk();
 }
 
 std::size_t FilteredBinaryInputArchive::boundSize(std::size_t size) {
@@ -413,12 +414,22 @@ void FilteredBinaryInputArchive::process(RawMachineLearnedBehaviorExt& dest) {
         process(dest.mlbTypeData);
         process(dest.mlbJoints);
 
+        // operations and lodMLOperationMappings are independently sized DNA arrays that every consumer (the constrained
+        // LOD filtering below, the reader's per-set LOD queries) indexes in lockstep per operation set. Reject a mismatch
+        // at deserialization time, for constrained and unconstrained reads alike, rather than subscripting a missing
+        // mapping below.
+        for (const auto& mlbType : dest.mlbTypeData) {
+            if (mlbType.operations.size() != mlbType.lodMLOperationMappings.size()) {
+                malformed = true;
+                return;
+            }
+        }
+
         if (!lodConstraint.hasImpactOn(unconstrainedLODCount)) {
             return;
         }
 
         for (auto& mlbType : dest.mlbTypeData) {
-            assert(mlbType.operations.size() == mlbType.lodMLOperationMappings.size());
             for (std::size_t mlOperationSetIndex = {}; mlOperationSetIndex < mlbType.operations.size(); ++mlOperationSetIndex) {
                 auto& lodMapping = mlbType.lodMLOperationMappings[mlOperationSetIndex];
                 auto& mlOperations = mlbType.operations[mlOperationSetIndex];
@@ -472,12 +483,18 @@ void FilteredBinaryInputArchive::process(DNA& dest) {
 void FilteredBinaryInputArchive::removeUnreferencedBlendShapes(DNA& dest) {
     auto& bsc = dest.behavior.blendShapeChannels;
 
+    // Input and output indices are parallel arrays; differing lengths are malformed rather than a shorter list.
+    if (bsc.inputIndices.size() != bsc.outputIndices.size()) {
+        malformed = true;
+        return;
+    }
     const auto originalLODs = bsc.lods;
     Vector<std::uint16_t> unreferencedChannels{memRes};
-    for (std::size_t iPlusOne = bsc.inputIndices.size(); iPlusOne > 0ul; --iPlusOne) {
+    const auto pairCount = bsc.inputIndices.size();
+    for (std::size_t iPlusOne = pairCount; iPlusOne > 0ul; --iPlusOne) {
         const auto i = iPlusOne - 1ul;
         const auto controlIndex = bsc.inputIndices[i];
-        if ((controlIndex > loadedControls.size()) || (!loadedControls[controlIndex])) {
+        if ((controlIndex >= loadedControls.size()) || (!loadedControls[controlIndex])) {
             unreferencedChannels.push_back(bsc.outputIndices[i]);
             // Remove behavior data
             removeByIndex(bsc.inputIndices, i);

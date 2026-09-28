@@ -16,9 +16,9 @@ namespace dna {
         Implementors should inherit from Writer itself and not this class.
     @see Writer
 */
-class DNAAPI MachineLearnedBehaviorExtWriter : public virtual MachineLearnedBehaviorWriter {
+class DNAAPI_TYPE MachineLearnedBehaviorExtWriter : public virtual MachineLearnedBehaviorWriter {
 protected:
-    virtual ~MachineLearnedBehaviorExtWriter();
+    DNAAPI_MEMBER virtual ~MachineLearnedBehaviorExtWriter();
 
 public:
     /**

@@ -8,6 +8,7 @@
 #include "riglogic/joints/JointsNullEvaluator.h"
 #include "riglogic/joints/cpu/quaternions/RotationAdapters.h"
 #include "riglogic/joints/cpu/twistswing/TwistSwingJointsEvaluator.h"
+#include "riglogic/joints/cpu/twistswing/TwistSwingValidator.h"
 #include "riglogic/riglogic/Configuration.h"
 #include "riglogic/riglogic/RigMetadata.h"
 #include "riglogic/utils/Extd.h"
@@ -91,9 +92,6 @@ void TwistSwingJointsBuilder<TValue, TFVec256, TFVec128>::fillStorage(const Join
         const auto swingOutputIndices = reader->getSwingOutputJointIndices(si);
         const auto swingBlendWeights = reader->getSwingBlendWeights(si);
 
-        assert(swingInputIndices.size() == 4ul);
-        assert(swingBlendWeights.size() == swingOutputIndices.size());
-
         setup.swingTwistAxis = swingTwistAxis;
         setup.swingInputIndices.assign(swingInputIndices.begin(), swingInputIndices.end());
         setup.swingBlendWeights.assign(swingBlendWeights.begin(), swingBlendWeights.end());
@@ -124,9 +122,6 @@ void TwistSwingJointsBuilder<TValue, TFVec256, TFVec128>::fillStorage(const Join
         const auto twistOutputIndices = reader->getTwistOutputJointIndices(ti);
         const auto twistBlendWeights = reader->getTwistBlendWeights(ti);
         const auto twistTwistAxis = reader->getTwistSetupTwistAxis(ti);
-
-        assert(twistInputIndices.size() == 4ul);
-        assert(twistBlendWeights.size() == twistOutputIndices.size());
 
         auto fillSetup =
             [this, twistInputIndices, twistOutputIndices, twistBlendWeights, twistTwistAxis](TwistSwingSetup& setup) {
@@ -313,12 +308,17 @@ struct TwistSwingJointsEvaluatorFactory {
 
 template<typename TValue, typename TFVec256, typename TFVec128>
 JointsEvaluator::Pointer TwistSwingJointsBuilder<TValue, TFVec256, TFVec128>::build() {
-    const EvaluatorType type =
-        (meta->initializationMethod == InitializationMethod::Restore) ? meta->popFrontEvaluator() : EvaluatorType::Auto;
+    // Auto until this builder writes it on the create path; the deserialized kind on restore.
+    const EvaluatorType type = meta->evaluators.twistSwingJoints;
 
     if ((type == EvaluatorType::Null) || ((type == EvaluatorType::Auto) && setups.empty())) {
-        meta->pushBackEvaluator(EvaluatorType::Null);
+        meta->evaluators.twistSwingJoints = EvaluatorType::Null;
         return UniqueInstance<JointsNullEvaluator, JointsEvaluator>::with(memRes).create();
+    }
+
+    // A violation returns a genuine null, failing RigLogic::create(); JointsNullEvaluator means unsupported config.
+    if (!TwistSwingValidator::validate(setups, *meta)) {
+        return nullptr;
     }
 
     TwistSwingJointsEvaluatorFactory<TValue, TFVec256, TFVec128> factory;
@@ -326,11 +326,11 @@ JointsEvaluator::Pointer TwistSwingJointsBuilder<TValue, TFVec256, TFVec128>::bu
         factory(config.rotationType, meta->rotationSequence, meta->rotationSigns, rotationUnit, std::move(setups), memRes);
 
     if (evaluator == nullptr) {
-        meta->pushBackEvaluator(EvaluatorType::Null);
+        meta->evaluators.twistSwingJoints = EvaluatorType::Null;
         return UniqueInstance<JointsNullEvaluator, JointsEvaluator>::with(memRes).create();
     }
 
-    meta->pushBackEvaluator(EvaluatorType::Concrete);
+    meta->evaluators.twistSwingJoints = EvaluatorType::Concrete;
     return evaluator;
 }
 

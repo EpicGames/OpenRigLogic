@@ -82,7 +82,45 @@ TYPED_TEST(StreamTest, ReopenStreamContinueWork) {
     ASSERT_ELEMENTS_EQ(buffer, expected, 7ul);
 }
 
-// *INDENT-OFF*
+TYPED_TEST(StreamTest, ReadWriteInterleavedWithoutSeek) {
+    // Reads and writes alternate with no seek in between - the stream owes the positioning call a C update stream needs
+    static const char fixture[] = {'a', 'b', 'c', 'd', 'e', 'f'};
+    TestFixture::CreateTestFile(fixture, 6u);
+
+    auto stream =
+        StreamFactory<typename TestFixture::TStream>::create(TestFixture::GetTestFileName(), trio::AccessMode::ReadWrite);
+    ASSERT_STATUS_OK();
+
+    stream->open();
+    ASSERT_STATUS_OK();
+
+    char buffer[2ul] = {};
+    ASSERT_EQ(stream->read(buffer, 2ul), 2ul);
+    ASSERT_STATUS_OK();
+    ASSERT_ELEMENTS_EQ(buffer, fixture, 2ul);
+
+    // Overwrites "cd" in place
+    ASSERT_EQ(stream->write("XY", 2ul), 2ul);
+    ASSERT_STATUS_OK();
+    ASSERT_EQ(stream->tell(), 4ul);
+
+    ASSERT_EQ(stream->read(buffer, 2ul), 2ul);
+    ASSERT_STATUS_OK();
+    ASSERT_ELEMENTS_EQ(buffer, (fixture + 4), 2ul);
+    ASSERT_EQ(stream->tell(), 6ul);
+
+    // Appends
+    ASSERT_EQ(stream->write("Z", 1ul), 1ul);
+    ASSERT_STATUS_OK();
+    ASSERT_EQ(stream->size(), 7ul);
+
+    stream->close();
+    ASSERT_STATUS_OK();
+
+    static const char expected[] = {'a', 'b', 'X', 'Y', 'e', 'f', 'Z'};
+    TestFixture::CompareTestFile(expected, 7u);
+}
+
 #ifdef TRIO_BUILD_LFS_TESTS
 TYPED_TEST(StreamTest, LFSIntegrationTest) {
     pma::Vector<char> smallBuffer(711ul, 'x');
@@ -227,4 +265,3 @@ TYPED_TEST(StreamTest, LFSIntegrationTest) {
     ASSERT_STATUS_OK();
 }
 #endif  // TRIO_BUILD_LFS_TESTS
-// *INDENT-ON*

@@ -12,6 +12,7 @@ enum class AccessMode {
 
 enum class OpenMode {
     Binary = 4,
+    // Deprecated: files are always opened in binary mode, so this behaves as Binary. Kept for source compatibility.
     Text = 8
 };
 

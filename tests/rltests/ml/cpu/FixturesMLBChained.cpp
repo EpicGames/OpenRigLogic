@@ -23,12 +23,6 @@ const std::uint16_t rawControlCount = 8u;
 const std::uint16_t mlControlCount = 8u;
 const std::uint16_t lodCount = 2u;
 
-// Unoptimized pipeline (5 op-sets):
-//   Op-Set-0: Gather         – gathers raw controls [0..7]
-//   Op-Set-1: MLP (1 layer)  – intermediate dep, no scatter; 1 layer = odd → exercises normalization fix
-//   Op-Set-2: WeightedSum    – reads from Op-Set-1; outputCount=8 → exercises SIMD aligned-block path
-//   Op-Set-3: MLP (2 layers) – reads from Op-Set-2, scatters to controls [8..15]
-//   Op-Set-4: Scatter        – drives outputControlIndices on Op-Set-3
 const Vector<Matrix<dna::MachineLearnedBehaviorOperationType>> mlOperationTypes = {{
     // Type-0
     {dna::MachineLearnedBehaviorOperationType::Gather},       // Op-Set-0
@@ -38,8 +32,6 @@ const Vector<Matrix<dna::MachineLearnedBehaviorOperationType>> mlOperationTypes 
     {dna::MachineLearnedBehaviorOperationType::Scatter}       // Op-Set-4
 }};
 
-// Gather params: control indices. MLP params: [neuralNetIndex]. WeightedSum params: [outputCount, weight_bits...].
-// Scatter params: output control indices.
 const Matrix<Matrix<std::uint32_t>> mlOperationParameters = {{
     // Type-0
     {{0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u}},       // Op-Set-0 Gather: gathers controls [0..7]
@@ -67,7 +59,6 @@ const Matrix<Matrix<std::uint16_t>> mlDependencyOperationIndices = {{
     {{0u}}   // Op-Set-4: dep op 0
 }};
 
-// Both LODs run the single operation in each set.
 const Matrix<Matrix<std::uint16_t>> mlOperationIndicesPerLOD = {{
     // Type-0
     {{0u}, {0u}},  // Op-Set-0: LOD0={op0}, LOD1={op0}
@@ -77,10 +68,6 @@ const Matrix<Matrix<std::uint16_t>> mlOperationIndicesPerLOD = {{
     {{0u}, {0u}}   // Op-Set-4
 }};
 
-// NN0: 1 layer (odd), linear activation, 8 inputs -> 8 outputs.
-//   Weights: diagonal × 2  =>  output[i] = 2 × input[i].
-// NN1: 2 layers (even), linear activation, 8 inputs -> 8 outputs.
-//   Weights: identity in both layers  =>  output = input passthrough.
 const Matrix<dna::ActivationFunction> mlbNetActivationFunctions = {
     {dna::ActivationFunction::linear},                                  // NN0: 1 layer
     {dna::ActivationFunction::linear, dna::ActivationFunction::linear}  // NN1: 2 layers
@@ -115,18 +102,11 @@ const Vector<Matrix<float>> mlbNetBiases = {
 };
 
 namespace input {
-// Raw control values placed at indices 0..7 (rawControlCount=8).
 const Vector<float> values = {0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f};
 }  // namespace input
 
 namespace output {
-// Expected ML output for controls [8..15] at each LOD.
-// Computation:
-//   Gather:      [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
-//   NN0 (×2):    [0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6]
-//   WS (w=1.0):  [0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6]  (SIMD aligned-block path: outputCount=8)
-//   NN1 (id×2):  [0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6]
-//   Scatter:      controls[8..15] = [0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6]
+// Gather [0.1..0.8] -> NN0 doubles -> WeightedSum (w=1) passes through -> NN1 identity -> scattered to controls [8..15].
 const Matrix<float> valuesPerLOD = {
     {0.2f, 0.4f, 0.6f, 0.8f, 1.0f, 1.2f, 1.4f, 1.6f},  // LOD 0
     {0.2f, 0.4f, 0.6f, 0.8f, 1.0f, 1.2f, 1.4f, 1.6f}   // LOD 1
@@ -148,6 +128,8 @@ WSOverreadReader::~WSOverreadReader() = default;
 MaskedWSOverreadReader::~MaskedWSOverreadReader() = default;
 
 LODLimitedMaskedReader::~LODLimitedMaskedReader() = default;
+
+LODTrimmedIntermediateReader::~LODTrimmedIntermediateReader() = default;
 
 }  // namespace chained
 

@@ -39,7 +39,7 @@ void MachineLearnedBehaviorNullEvaluator::calculate(ControlsInputInstance* /*unu
                                                     std::uint16_t /*unused*/) const {
 }
 
-void MachineLearnedBehaviorNullEvaluator::load(terse::BinaryInputArchive<BoundedIOStream>& /*unused*/) {
+void MachineLearnedBehaviorNullEvaluator::load(BoundedInputArchive& /*unused*/) {
 }
 
 void MachineLearnedBehaviorNullEvaluator::save(terse::BinaryOutputArchive<BoundedIOStream>& /*unused*/) {

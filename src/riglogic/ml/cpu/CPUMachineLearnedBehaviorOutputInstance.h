@@ -28,10 +28,6 @@ public:
     OutputInstance(const Vector<Matrix<std::uint16_t>>& bufferSizes, std::uint32_t meshRegionCount, MemoryResource* memRes);
     ArrayView<float> getMaskBuffer() override;
     ConstArrayView<float> getMaskBuffer() const override;
-    ArrayView<float> getOutputBuffer(std::uint16_t mlTypeIndex,
-                                     std::uint16_t mlOperationSetIndex,
-                                     std::uint16_t mlOperationIndex);
-
     ConstArrayView<float*> getWorkBufferPtrs(std::uint16_t mlTypeIndex) const {
         return workBufferPtrs[mlTypeIndex];
     }
@@ -39,7 +35,8 @@ public:
         return workBufferHalfSizes[mlTypeIndex];
     }
 
-    ConstArrayView<std::uint16_t> getWorkBufferOffsetsPerOperationSet(std::uint16_t mlTypeIndex) const {
+    // Running op counts per set; uint32 since 65535 sets x 65535 ops exceeds uint16.
+    ConstArrayView<std::uint32_t> getWorkBufferOffsetsPerOperationSet(std::uint16_t mlTypeIndex) const {
         return workBufferOffsetsPerOperationSet[mlTypeIndex];
     }
 
@@ -50,7 +47,7 @@ private:
     AlignedVector<float> workBuffer;
     Matrix<float*> workBufferPtrs;
     Matrix<std::uint16_t> workBufferHalfSizes;
-    Matrix<std::uint16_t> workBufferOffsetsPerOperationSet;
+    Matrix<std::uint32_t> workBufferOffsetsPerOperationSet;
     Vector<float> maskBuffer;
 };
 

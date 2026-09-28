@@ -206,7 +206,7 @@ class typename(with_metaclass(typename ## ImplReflectionMixin, object)):
         self._instance = typename ## Impl. ## creator(*args, **kwargs)
 
     def __del__(self):
-        if self._instance:
+        if getattr(self, '_instance', None):
             typename ## Impl. ## destroyer(self._instance)
 
     def _in_slots(self, attr):

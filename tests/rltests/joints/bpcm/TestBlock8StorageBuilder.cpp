@@ -1,7 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "riglogic/system/simd/Detect.h"
-
 #include "rltests/Defs.h"
 #include "rltests/joints/bpcm/Assertions.h"
 #include "rltests/joints/bpcm/BPCMFixturesBlock8.h"
@@ -37,7 +35,7 @@ protected:
         rl4::Configuration config{};
         config.calculationType = TCalculationType::get();
         config.rotationType = BPCMRotationOutputTypeSelector<TRotationAdapter>::rotation();
-        auto meta = rl4::RigMetadata::create(config, &reader, &memRes, rl4::InitializationMethod::Create);
+        auto meta = rl4::RigMetadata::create(config, &reader, &memRes);
         auto builder = rl4::JointsBuilder::create(config, meta.get(), &memRes);
 
         rl4::JointBehaviorFilter filter{&reader, &memRes};
@@ -72,8 +70,7 @@ protected:
 
 }  // namespace
 
-// Block-8 storage optimizer will execute only if RigLogic is built with AVX support, and AVX is chosen as calculation
-// type. In all other cases- Block-4 storage optimizer will run.
+// Block-8 storage optimization runs only when built with AVX and AVX is the chosen calculation type; otherwise block-4.
 using Block8StorageValueTypeList = ::testing::Types<
 #if defined(RL_BUILD_WITH_AVX)
     std::tuple<StorageValueType, trimd::avx::F256, TCalculationType<rl4::CalculationType::AVX>, rl4::bpcm::NoopAdapter>,

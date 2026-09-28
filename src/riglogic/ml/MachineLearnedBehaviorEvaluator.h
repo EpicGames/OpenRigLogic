@@ -32,7 +32,7 @@ public:
                            std::uint16_t mlTypeIndex,
                            std::uint16_t mlOperationSetIndex,
                            std::uint16_t mlOperationIndex) const = 0;
-    virtual void load(terse::BinaryInputArchive<BoundedIOStream>& archive) = 0;
+    virtual void load(BoundedInputArchive& archive) = 0;
     virtual void save(terse::BinaryOutputArchive<BoundedIOStream>& archive) = 0;
 };
 

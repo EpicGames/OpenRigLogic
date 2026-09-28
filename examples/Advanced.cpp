@@ -1,6 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-// *INDENT-OFF*
 #include <riglogic/RigLogic.h>
 
 #include <cmath>
@@ -47,7 +46,6 @@ int main(int argc, char** argv) {
     }
 
     rl4::Configuration config{};
-    // Further refine which data to load from DNA and possibly additionally reduce the runtime compute
     config.loadJoints = true;
     config.loadBlendShapes = true;
     config.loadAnimatedMaps = true;
@@ -63,14 +61,18 @@ int main(int argc, char** argv) {
     std::uint32_t controlToManipulate = 4u;
     std::uint64_t frame = 0u;
 
-    // Bind pose joint attribute values in the following format:
-    // [j0.tx, j0.ty, j0.tz, j0.qx, j0.qy, j0.qz, j0.qw, j0.sx, j0.sy, j0.sz, j1.tx, j1.ty, j1.tz, j1.qx, j1.qy, j1.qz, j1.qw,
-    // j1.sx, j1.sy, j1.sz, ...] where: tx, ty tz are the translation attributes qx, qy, qz, qw are the rotation quaternion
-    // attributes sx, sy, sz are the scale attributes
+    // Bind pose joint attributes, 10 per joint: [tx, ty, tz, qx, qy, qz, qw, sx, sy, sz] for j0, then j1, ...
     rl4::ConstArrayView<float> bindPoseJoints = rigLogic->getNeutralJointValues();
 
+    // Cycle through the LODs the rig actually has (maxLOD above may have filtered ALL of them away).
+    const std::uint16_t lodCount = rigLogic->getLODCount();
+    if (lodCount == 0u) {
+        std::cout << "No LODs remain within the configured maxLOD range" << std::endl;
+        return -1;
+    }
+
     while (true) {
-        const std::uint16_t currentLOD = frame % 4ul;
+        const std::uint16_t currentLOD = static_cast<std::uint16_t>(frame % lodCount);
         rigInstance->setLOD(currentLOD);
 
         rl4::ArrayView<float> rawControlBuffer = rigInstance->getRawControlValues();
@@ -91,17 +93,13 @@ int main(int argc, char** argv) {
         rigLogic->calculateBlendShapes(rigInstance.get());
         rigLogic->calculateAnimatedMaps(rigInstance.get());
 
-        // These indices point to only those individual joint attributes of both getJointOutputs() and getNeutralJointValues()
-        // arrays which are changing when computing joint transforms for the current LOD
+        // Only these attributes of getJointOutputs() / getNeutralJointValues() change at the current LOD.
         rl4::ConstArrayView<std::uint16_t> jointVariableAttributeIndices = rigLogic->getJointVariableAttributeIndices(currentLOD);
 
-        // Joint deltas need to be combined with the bind pose (neutral values), and they follow the exact same format as the bind
-        // pose values
+        // Deltas combine with the bind pose and share its attribute layout.
         rl4::ConstArrayView<float> jointDeltas = rigInstance->getJointOutputs();
 
-        // Use only results that are needed for the current LOD (see getJointVariableAttributeIndices).
-        // The below example accesses the attributes of Joint-0 (all attributes, regardless if they're part of the variable
-        // attribute indices of the current LOD)
+        // Joint-0 is read in full here, regardless of which of its attributes are variable at the current LOD.
         const rl4::fvec3 j0translation = {bindPoseJoints[0] + jointDeltas[0],
                                           bindPoseJoints[1] + jointDeltas[1],
                                           bindPoseJoints[2] + jointDeltas[2]};
@@ -121,4 +119,3 @@ int main(int argc, char** argv) {
 
     return 0;
 }
-// *INDENT-ON*

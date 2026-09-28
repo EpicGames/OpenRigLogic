@@ -2,10 +2,14 @@
 
 #pragma once
 
+#include "pma/PolyAllocator.h"
+
 #ifdef _MSC_VER
     #pragma warning(push)
     #pragma warning(disable : 4365 4987)
 #endif
+#include <cassert>
+#include <type_traits>
 #include <utility>
 #ifdef _MSC_VER
     #pragma warning(pop)
@@ -75,7 +79,95 @@ struct FactoryCreate {
 template<class T, class B = T>
 struct FactoryDestroy {
     void operator()(B* ptr) {
+        static_assert(std::is_same<T, B>::value || std::is_base_of<B, T>::value, "Incompatible types.");
         T::destroy(static_cast<T*>(ptr));
+    }
+};
+
+template<class T>
+struct PolyAllocatorCreate {
+    MemoryResource* memRes;
+
+    PolyAllocatorCreate() :
+        memRes{nullptr} {
+    }
+
+    explicit PolyAllocatorCreate(MemoryResource* memRes_) :
+        memRes{memRes_} {
+    }
+
+    template<class... Args>
+    T* operator()(Args&&... args) const {
+        PolyAllocator<T> alloc{memRes};
+        return alloc.newObject(std::forward<Args>(args)...);
+    }
+};
+
+// Null memRes deliberately means the default resource (matching PolyAllocatorCreate) - a valid
+// state, so unlike PolyAllocatorDynamicDestroy there is nothing to assert on. Freeing to a
+// different resource than the one that allocated is undetectable here and remains the caller's
+// contract; to adopt a pointer together with its resource, use ScopedPtr's (pointer, destroyer)
+// constructor.
+template<class T, class B = T>
+struct PolyAllocatorDestroy {
+    MemoryResource* memRes;
+
+    PolyAllocatorDestroy() :
+        memRes{nullptr} {
+    }
+
+    explicit PolyAllocatorDestroy(MemoryResource* memRes_) :
+        memRes{memRes_} {
+    }
+
+    void operator()(B* ptr) {
+        static_assert(std::is_same<T, B>::value || std::is_base_of<B, T>::value, "Incompatible types.");
+        PolyAllocator<T> alloc{memRes};
+        alloc.deleteObject(static_cast<T*>(ptr));
+    }
+};
+
+// Runtime-dispatched (type-erased) sibling of PolyAllocatorDestroy. A default-constructed instance
+// (an empty or moved-from owner) has no destroy function and must never see a live pointer: bind
+// ownership through bound<T>(), never by adopting a raw pointer alone.
+template<class B>
+struct PolyAllocatorDynamicDestroy {
+    using DestroyFn = void (*)(B*, MemoryResource*);
+
+    DestroyFn destroy;
+    MemoryResource* memRes;
+
+    PolyAllocatorDynamicDestroy() :
+        destroy{nullptr},
+        memRes{nullptr} {
+    }
+
+    PolyAllocatorDynamicDestroy(DestroyFn destroy_, MemoryResource* memRes_) :
+        destroy{destroy_},
+        memRes{memRes_} {
+    }
+
+    template<class T>
+    static PolyAllocatorDynamicDestroy bound(MemoryResource* memRes) {
+        static_assert(std::is_same<T, B>::value || std::is_base_of<B, T>::value, "Incompatible types.");
+        return PolyAllocatorDynamicDestroy{&destroyAs<T>, memRes};
+    }
+
+    void operator()(B* ptr) {
+        // A live pointer with no bound destroy function means ownership was taken without bound().
+        // The erased type is unknown here, so destroying as B would be undefined behavior; the
+        // deliberate contract is loud in debug, a leak - the safest failure mode - in release.
+        assert((ptr == nullptr) || (destroy != nullptr));
+        if (ptr != nullptr && destroy != nullptr) {
+            destroy(ptr, memRes);
+        }
+    }
+
+private:
+    template<class T>
+    static void destroyAs(B* ptr, MemoryResource* memRes) {
+        PolyAllocator<T> alloc{memRes};
+        alloc.deleteObject(static_cast<T*>(ptr));
     }
 };
 
@@ -140,8 +232,8 @@ public:
         ptr{ptr_} {
     }
 
-    ScopedPtr(pointer ptr_, destroyer_type&& destroyer) :
-        destroyer_type{std::move(destroyer)},
+    ScopedPtr(pointer ptr_, destroyer_type&& destroyer_) :
+        destroyer_type{std::move(destroyer_)},
         ptr{ptr_} {
     }
 
@@ -165,8 +257,8 @@ public:
     ScopedPtr& operator=(const ScopedPtr&) = delete;
 
     ScopedPtr(ScopedPtr&& rhs) noexcept :
-        ptr{nullptr} {
-        rhs.swap(*this);
+        destroyer_type{static_cast<destroyer_type&&>(rhs)},
+        ptr{rhs.release()} {
     }
 
     ScopedPtr& operator=(ScopedPtr&& rhs) noexcept {
@@ -176,9 +268,8 @@ public:
 
     template<typename U, class UDestroyer>
     ScopedPtr(ScopedPtr<U, UDestroyer>&& rhs) noexcept :
-        ptr{nullptr} {
-        ScopedPtr<T, destroyer_type> tmp{rhs.release(), static_cast<UDestroyer&&>(rhs)};
-        tmp.swap(*this);
+        destroyer_type{static_cast<UDestroyer&&>(rhs)},
+        ptr{rhs.release()} {
     }
 
     template<typename U, class UDestroyer>
@@ -272,6 +363,14 @@ ScopedPtr<T, typename DefaultInstanceDestroyer<T>::type> makeScoped(Args&&... ar
     using TCreator = typename DefaultInstanceCreator<T>::type;
     using TDestroyer = typename DefaultInstanceDestroyer<T>::type;
     return makeScoped<T, TCreator, TDestroyer>(std::forward<Args>(args)...);
+}
+
+template<class TCreator,
+         class TDestroyer,
+         typename... Args,
+         typename T = typename std::remove_pointer<decltype(std::declval<TCreator&>()(std::declval<Args>()...))>::type>
+ScopedPtr<T, TDestroyer> makeScoped(TCreator creator, TDestroyer destroyer, Args&&... args) {
+    return ScopedPtr<T, TDestroyer>{creator(std::forward<Args>(args)...), std::move(destroyer)};
 }
 
 }  // namespace pma

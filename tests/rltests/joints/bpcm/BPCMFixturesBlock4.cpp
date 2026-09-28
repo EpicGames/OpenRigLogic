@@ -23,6 +23,8 @@ namespace unoptimized {
 const tdm::rot_sign rotationSigns = {tdm::rot_dir::positive, tdm::rot_dir::positive, tdm::rot_dir::positive};
 const std::uint16_t lodCount = 4u;
 const std::uint16_t rawControlCount = 13u;
+// Attribute span (jointCount * 9) must cover the highest authored output / rotation-output index.
+const std::uint16_t jointCount = 24u;
 const Extent dimensions = {75ul, 13ul};
 
 const Matrix<float> values = {
@@ -1572,7 +1574,7 @@ const Vector<Vector<AlignedVector<std::uint16_t>>> outputRotationLODs = {{ // Qu
 
 const Vector<Vector<bpcm::JointGroup>> jointGroups = {
     // {valueOffset, inputOffset, outputOffset, lodOffset, outputRotationIndicesOffset, outputRotationLODsOffset, valueSize,
-    // colCount, rowCount}
+    // colCount, rowCount, blockHeight}
     { // Quaternion outputs
      {// Joint group 0
       0,
@@ -1583,7 +1585,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       0,
       52,
       13,
-      4},
+      4,
+      8},
      {// Joint group 1
       52,
       13,
@@ -1593,7 +1596,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       4,
       52,
       13,
-      4},
+      4,
+      8},
      {// Joint group 2
       104,
       26,
@@ -1603,6 +1607,7 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       8,
       104,
       13,
+      8,
       8},
      {// Joint group 3
       208,
@@ -1613,6 +1618,7 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       12,
       104,
       13,
+      8,
       8},
      {// Joint group 4
       312,
@@ -1623,7 +1629,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       16,
       156,
       13,
-      12},
+      12,
+      8},
      {// Joint group 5
       468,
       65,
@@ -1633,7 +1640,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       20,
       156,
       13,
-      12},
+      12,
+      8},
      {// Joint group 6
       624,
       78,
@@ -1643,7 +1651,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       24,
       208,
       13,
-      16},
+      16,
+      8},
      {// Joint group 7
       832,
       91,
@@ -1653,7 +1662,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       28,
       208,
       13,
-      16},
+      16,
+      8},
      {// Joint group 8
       1040,
       104,
@@ -1663,7 +1673,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       32,
       208,
       13,
-      16},
+      16,
+      8},
      {// Joint group 9
       1248,
       117,
@@ -1673,7 +1684,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       36,
       20,
       5,
-      4},
+      4,
+      8},
      {// Joint group 10
       1268,
       122,
@@ -1683,7 +1695,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       40,
       20,
       5,
-      4},
+      4,
+      8},
      {// Joint group 11
       1288,
       127,
@@ -1693,7 +1706,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       44,
       20,
       5,
-      4},
+      4,
+      8},
      {// Joint group 12
       1308,
       132,
@@ -1703,7 +1717,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       48,
       160,
       8,
-      20}},
+      20,
+      8}},
     { // Euler-angle outputs
      {// Joint group 0
       0,
@@ -1714,7 +1729,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       0,
       52,
       13,
-      4},
+      4,
+      8},
      {// Joint group 1
       52,
       13,
@@ -1724,7 +1740,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       0,
       52,
       13,
-      4},
+      4,
+      8},
      {// Joint group 2
       104,
       26,
@@ -1734,6 +1751,7 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       0,
       104,
       13,
+      8,
       8},
      {// Joint group 3
       208,
@@ -1744,6 +1762,7 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       0,
       104,
       13,
+      8,
       8},
      {// Joint group 4
       312,
@@ -1754,7 +1773,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       0,
       156,
       13,
-      12},
+      12,
+      8},
      {// Joint group 5
       468,
       65,
@@ -1764,7 +1784,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       0,
       156,
       13,
-      12},
+      12,
+      8},
      {// Joint group 6
       624,
       78,
@@ -1774,7 +1795,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       0,
       208,
       13,
-      16},
+      16,
+      8},
      {// Joint group 7
       832,
       91,
@@ -1784,7 +1806,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       0,
       208,
       13,
-      16},
+      16,
+      8},
      {// Joint group 8
       1040,
       104,
@@ -1794,7 +1817,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       0,
       208,
       13,
-      16},
+      16,
+      8},
      {// Joint group 9
       1248,
       117,
@@ -1804,7 +1828,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       0,
       20,
       5,
-      4},
+      4,
+      8},
      {// Joint group 10
       1268,
       122,
@@ -1814,7 +1839,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       0,
       20,
       5,
-      4},
+      4,
+      8},
      {// Joint group 11
       1288,
       127,
@@ -1824,7 +1850,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       0,
       20,
       5,
-      4},
+      4,
+      8},
      {// Joint group 12
       1308,
       132,
@@ -1834,7 +1861,8 @@ const Vector<Vector<bpcm::JointGroup>> jointGroups = {
       0,
       160,
       8,
-      20}}};
+      20,
+      8}}};
 
 const Matrix<LODRegion> lodRegions = {
     // {unaligned, aligned to last block-8, aligned to second last block-8}
@@ -1934,100 +1962,23 @@ const Matrix<LODRegion> lodRegions = {
 
 namespace input {
 
-// Calculation input values
 const Vector<float> values = {1.0f, 2.0f, 3.0f, 4.0f, 0.0f, 6.0f, 7.0f, 8.0f, 9.0f, 0.0f, 11.0f, 12.0f, 13.0f};
 
 }  // namespace input
 
 namespace output {
 
-// Expected output results for each LOD
 const Vector<Matrix<float>> valuesPerLOD = {
-    { // Quaternion outputs
-     {// LOD-0
-      76.0f,   0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      152.0f,  228.0f,  304.0f,  -0.1736482f,  0.0f,           0.0f,         -0.9848078f,   0.0f,    0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      456.0f,  532.0f,  608.0f,  0.121975f,    0.4186294f,     0.7018941f,   0.5632195f,    912.0f,  0.0f,    0.0f,
-      988.0f,  1064.0f, 1140.0f, -0.4184162f,  0.1411047f,     0.7817417f,   0.4403377f,    1444.0f, 1520.0f, 0.0f,
-      1596.0f, 1672.0f, 1748.0f, -0.7535122f,  0.1074113f,     -0.6339166f,  0.1372298f,    2052.0f, 2128.0f, 2204.0f,
-      2280.0f, 2356.0f, 2432.0f, -0.4649149f,  -0.2635494f,    -0.773594f,   -0.3405117f,   2736.0f, 2812.0f, 2888.0f,
-      2964.0f, 3040.0f, 3116.0f, 0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      3192.0f, 3268.0f, 3344.0f, -0.5973737f,  -0.148942f,     0.7646035f,   0.1906371f,    3648.0f, 3724.0f, 3800.0f,
-      3876.0f, 3952.0f, 4028.0f, -0.3252805f,  0.290381f,      0.8937008f,   -0.10569f,     0.0f,    0.0f,    0.0f,
-      4256.0f, 4332.0f, 4408.0f, 0.5042307f,   0.0737294f,     -0.821218f,   -0.2567421f,   4712.0f, 4788.0f, 4864.0f,
-      4940.0f, 5016.0f, 5092.0f, 0.4187725f,   -0.2083559f,    -0.7320557f,  -0.4952896f,   5396.0f, 0.0f,    0.0f,
-      4256.0f, 4332.0f, 4408.0f, 0.5042307f,   0.0737294f,     -0.821218f,   -0.2567421f,   4712.0f, 4788.0f, 4864.0f,
-      4940.0f, 5016.0f, 5092.0f, 0.4187725f,   -0.2083559f,    -0.7320557f,  -0.4952896f,   5396.0f, 0.0f,    0.0f,
-      15.0f,   30.0f,   0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      40.0f,   80.0f,   0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.237489700f, 0.449574471f,   0.285265595f, 0.812468469f,  0.0f,    0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.382683456f, 0.0f,           0.0f,         0.923879504f,  0.0f,    0.0f,    0.0f,
-      62.0f,   62.0f,   62.0f,   0.552419543f, -0.174177229f,  0.552419543f, -0.599439502f, 125.0f,  125.0f,  125.0f,
-      157.0f,  157.0f,  122.0f,  0.265585661f, -0.0761554763f, 0.500303566f, -0.820585668f, 128.0f,  128.0f,  0.0f},
-     {// LOD-1
-      76.0f,   0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      152.0f,  228.0f,  304.0f,  0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      456.0f,  532.0f,  608.0f,  -0.290381f,   0.3252805f,     -0.10569f,    0.8937008f,    0.0f,    0.0f,    0.0f,
-      988.0f,  1064.0f, 1140.0f, -0.4184162f,  0.1411047f,     0.7817417f,   0.4403377f,    0.0f,    0.0f,    0.0f,
-      1596.0f, 1672.0f, 1748.0f, -0.7535122f,  0.1074113f,     -0.6339166f,  0.1372298f,    2052.0f, 0.0f,    0.0f,
-      2280.0f, 2356.0f, 2432.0f, -0.4649149f,  -0.2635494f,    -0.773594f,   -0.3405117f,   2736.0f, 2812.0f, 2888.0f,
-      0.0f,    0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      3192.0f, 3268.0f, 3344.0f, -0.5973737f,  -0.148942f,     0.7646035f,   0.1906371f,    3648.0f, 3724.0f, 3800.0f,
-      3876.0f, 3952.0f, 4028.0f, -0.9510565f,  0.0f,           0.0f,         -0.309017f,    0.0f,    0.0f,    0.0f,
-      4256.0f, 4332.0f, 4408.0f, 0.5042307f,   0.0737294f,     -0.821218f,   -0.2567421f,   4712.0f, 4788.0f, 4864.0f,
-      4940.0f, 5016.0f, 5092.0f, 0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      4256.0f, 4332.0f, 4408.0f, -0.495134f,   0.1205274f,     0.8575973f,   -0.0695866f,   0.0f,    0.0f,    0.0f,
-      4940.0f, 5016.0f, 5092.0f, 0.4187725f,   -0.2083559f,    -0.7320557f,  -0.4952896f,   5396.0f, 0.0f,    0.0f,
-      15.0f,   30.0f,   0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      40.0f,   80.0f,   0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.237489700f, 0.449574471f,   0.285265595f, 0.812468469f,  0.0f,    0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.382683456f, 0.0f,           0.0f,         0.923879504f,  0.0f,    0.0f,    0.0f,
-      62.0f,   62.0f,   62.0f,   0.552419543f, -0.174177229f,  0.552419543f, -0.599439502f, 125.0f,  125.0f,  125.0f,
-      157.0f,  157.0f,  122.0f,  0.265585661f, -0.0761554763f, 0.500303566f, -0.820585668f, 0.0f,    0.0f,    0.0f},
-     {// LOD-2
-      76.0f,   0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      152.0f,  228.0f,  0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      456.0f,  532.0f,  608.0f,  -0.309017f,   0.0f,           0.0f,         0.9510565f,    0.0f,    0.0f,    0.0f,
-      988.0f,  1064.0f, 1140.0f, -0.9271839f,  0.0f,           0.0f,         -0.3746066f,   0.0f,    0.0f,    0.0f,
-      1596.0f, 1672.0f, 1748.0f, -0.2079117f,  0.0f,           0.0f,         -0.9781476f,   0.0f,    0.0f,    0.0f,
-      2280.0f, 2356.0f, 2432.0f, -0.4649149f,  -0.2635494f,    -0.773594f,   -0.3405117f,   2736.0f, 0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      3192.0f, 3268.0f, 3344.0f, -0.5973737f,  -0.148942f,     0.7646035f,   0.1906371f,    3648.0f, 3724.0f, 3800.0f,
-      3876.0f, 3952.0f, 0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      4256.0f, 4332.0f, 4408.0f, 0.5042307f,   0.0737294f,     -0.821218f,   -0.2567421f,   4712.0f, 4788.0f, 0.0f,
-      0.0f,    0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      4256.0f, 0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      4940.0f, 5016.0f, 5092.0f, 0.4187725f,   -0.2083559f,    -0.7320557f,  -0.4952896f,   5396.0f, 0.0f,    0.0f,
-      15.0f,   30.0f,   0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      40.0f,   80.0f,   0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.126078621f, -0.0337826647f, 0.256604820f, 0.957662225f,  0.0f,    0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f,
-      62.0f,   62.0f,   62.0f,   0.552419543f, -0.174177229f,  0.552419543f, -0.599439502f, 125.0f,  125.0f,  125.0f,
-      0.0f,    0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,          0.0f,    0.0f,    0.0f},
-     {// LOD-3
-      76.0f,   0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,         0.0f,    0.0f,    0.0f,
-      152.0f,  0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,         0.0f,    0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,         0.0f,    0.0f,    0.0f,
-      456.0f,  0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,         0.0f,    0.0f,    0.0f,
-      988.0f,  1064.0f, 1140.0f, 0.0f,         0.0f,           0.0f,         1.0f,         0.0f,    0.0f,    0.0f,
-      1596.0f, 1672.0f, 0.0f,    0.0f,         0.0f,           0.0f,         1.0f,         0.0f,    0.0f,    0.0f,
-      2280.0f, 2356.0f, 2432.0f, 0.0f,         0.0f,           0.0f,         1.0f,         0.0f,    0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,         0.0f,    0.0f,    0.0f,
-      3192.0f, 3268.0f, 3344.0f, -0.5973737f,  -0.148942f,     0.7646035f,   0.1906371f,   3648.0f, 3724.0f, 3800.0f,
-      0.0f,    0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,         0.0f,    0.0f,    0.0f,
-      4256.0f, 4332.0f, 4408.0f, 0.9902681f,   0.0f,           0.0f,         0.1391731f,   0.0f,    0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,         0.0f,    0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,         0.0f,    0.0f,    0.0f,
-      4940.0f, 5016.0f, 5092.0f, 0.898794f,    0.0f,           0.0f,         0.4383711f,   0.0f,    0.0f,    0.0f,
-      15.0f,   30.0f,   0.0f,    0.0f,         0.0f,           0.0f,         1.0f,         0.0f,    0.0f,    0.0f,
-      40.0f,   80.0f,   0.0f,    0.0f,         0.0f,           0.0f,         1.0f,         0.0f,    0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.126078621f, -0.0337826647f, 0.256604820f, 0.957662225f, 0.0f,    0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,         0.0f,    0.0f,    0.0f,
-      62.0f,   62.0f,   62.0f,   0.0f,         0.0f,           0.0f,         1.0f,         0.0f,    0.0f,    0.0f,
-      0.0f,    0.0f,    0.0f,    0.0f,         0.0f,           0.0f,         1.0f,         0.0f,    0.0f,    0.0f}},
+    {// Quaternion outputs (generated for the xyz rotation sequence)
+{// LOD-0
+ 76.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 152.0f, 228.0f, 304.0f, -0.1736482f, 0.0f, 0.0f, -0.9848078f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 456.0f, 532.0f, 608.0f, -0.4297320f, -0.0738846f, 0.8139084f, 0.3839590f, 912.0f, 0.0f, 0.0f, 988.0f, 1064.0f, 1140.0f, 0.0049009f, 0.4415412f, -0.6603575f, -0.6074087f, 1444.0f, 1520.0f, 0.0f, 1596.0f, 1672.0f, 1748.0f, 0.7441840f, -0.1597120f, -0.6227997f, -0.1811153f, 2052.0f, 2128.0f, 2204.0f, 2280.0f, 2356.0f, 2432.0f, 0.5255518f, -0.0969510f, -0.8114841f, -0.2364095f, 2736.0f, 2812.0f, 2888.0f, 2964.0f, 3040.0f, 3116.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 3192.0f, 3268.0f, 3344.0f, -0.5973737f, 0.1489420f, -0.7646035f, -0.1906371f, 3648.0f, 3724.0f, 3800.0f, 3876.0f, 3952.0f, 4028.0f, -0.3252805f, 0.2903810f, -0.8937008f, -0.1056900f, 0.0f, 0.0f, 0.0f, 4256.0f, 4332.0f, 4408.0f, 0.4139299f, -0.2972316f, 0.7690828f, 0.3857811f, 4712.0f, 4788.0f, 4864.0f, 4940.0f, 5016.0f, 5092.0f, -0.1324714f, -0.4485911f, 0.6148852f, 0.6349280f, 5396.0f, 0.0f, 0.0f, 4256.0f, 4332.0f, 4408.0f, 0.4139299f, -0.2972316f, 0.7690828f, 0.3857811f, 4712.0f, 4788.0f, 4864.0f, 4940.0f, 5016.0f, 5092.0f, -0.1324714f, -0.4485911f, 0.6148852f, 0.6349280f, 5396.0f, 0.0f, 0.0f, 15.0f, 30.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 40.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -0.0191151f, 0.5080877f, 0.1591870f, 0.8462511f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.3826834f, 0.0f, 0.0f, 0.9238795f, 0.0f, 0.0f, 0.0f, 62.0f, 62.0f, 62.0f, -0.1741772f, 0.5524195f, -0.1741772f, 0.7963399f, 125.0f, 125.0f, 125.0f, 157.0f, 157.0f, 122.0f, -0.0761555f, 0.2655857f, -0.4307756f, 0.8591257f, 128.0f, 128.0f, 0.0f},
+{// LOD-1
+ 76.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 152.0f, 228.0f, 304.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 456.0f, 532.0f, 608.0f, -0.2903810f, 0.3252805f, 0.1056900f, 0.8937008f, 0.0f, 0.0f, 0.0f, 988.0f, 1064.0f, 1140.0f, 0.0049009f, 0.4415412f, -0.6603575f, -0.6074087f, 0.0f, 0.0f, 0.0f, 1596.0f, 1672.0f, 1748.0f, 0.7441840f, -0.1597120f, -0.6227997f, -0.1811153f, 2052.0f, 0.0f, 0.0f, 2280.0f, 2356.0f, 2432.0f, 0.5255518f, -0.0969510f, -0.8114841f, -0.2364095f, 2736.0f, 2812.0f, 2888.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 3192.0f, 3268.0f, 3344.0f, -0.5973737f, 0.1489420f, -0.7646035f, -0.1906371f, 3648.0f, 3724.0f, 3800.0f, 3876.0f, 3952.0f, 4028.0f, -0.9510565f, 0.0f, 0.0f, -0.3090170f, 0.0f, 0.0f, 0.0f, 4256.0f, 4332.0f, 4408.0f, 0.4139299f, -0.2972316f, 0.7690828f, 0.3857811f, 4712.0f, 4788.0f, 4864.0f, 4940.0f, 5016.0f, 5092.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 4256.0f, 4332.0f, 4408.0f, -0.4951340f, 0.1205274f, -0.8575973f, -0.0695866f, 0.0f, 0.0f, 0.0f, 4940.0f, 5016.0f, 5092.0f, -0.1324714f, -0.4485911f, 0.6148852f, 0.6349280f, 5396.0f, 0.0f, 0.0f, 15.0f, 30.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 40.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -0.0191151f, 0.5080877f, 0.1591870f, 0.8462511f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.3826834f, 0.0f, 0.0f, 0.9238795f, 0.0f, 0.0f, 0.0f, 62.0f, 62.0f, 62.0f, -0.1741772f, 0.5524195f, -0.1741772f, 0.7963399f, 125.0f, 125.0f, 125.0f, 157.0f, 157.0f, 122.0f, -0.0761555f, 0.2655857f, -0.4307756f, 0.8591257f, 0.0f, 0.0f, 0.0f},
+{// LOD-2
+ 76.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 152.0f, 228.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 456.0f, 532.0f, 608.0f, -0.3090170f, 0.0f, 0.0f, 0.9510565f, 0.0f, 0.0f, 0.0f, 988.0f, 1064.0f, 1140.0f, -0.9271839f, 0.0f, 0.0f, -0.3746066f, 0.0f, 0.0f, 0.0f, 1596.0f, 1672.0f, 1748.0f, -0.2079117f, 0.0f, 0.0f, -0.9781476f, 0.0f, 0.0f, 0.0f, 2280.0f, 2356.0f, 2432.0f, 0.5255518f, -0.0969510f, -0.8114841f, -0.2364095f, 2736.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 3192.0f, 3268.0f, 3344.0f, -0.5973737f, 0.1489420f, -0.7646035f, -0.1906371f, 3648.0f, 3724.0f, 3800.0f, 3876.0f, 3952.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 4256.0f, 4332.0f, 4408.0f, 0.4139299f, -0.2972316f, 0.7690828f, 0.3857811f, 4712.0f, 4788.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 4256.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 4940.0f, 5016.0f, 5092.0f, -0.1324714f, -0.4485911f, 0.6148852f, 0.6349280f, 5396.0f, 0.0f, 0.0f, 15.0f, 30.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 40.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1260786f, 0.0337827f, 0.2566048f, 0.9576622f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 62.0f, 62.0f, 62.0f, -0.1741772f, 0.5524195f, -0.1741772f, 0.7963399f, 125.0f, 125.0f, 125.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f},
+{// LOD-3
+ 76.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 152.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 456.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 988.0f, 1064.0f, 1140.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1596.0f, 1672.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 2280.0f, 2356.0f, 2432.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 3192.0f, 3268.0f, 3344.0f, -0.5973737f, 0.1489420f, -0.7646035f, -0.1906371f, 3648.0f, 3724.0f, 3800.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 4256.0f, 4332.0f, 4408.0f, 0.9902681f, 0.0f, 0.0f, 0.1391731f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 4940.0f, 5016.0f, 5092.0f, 0.8987940f, 0.0f, 0.0f, 0.4383711f, 0.0f, 0.0f, 0.0f, 15.0f, 30.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 40.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.1260786f, 0.0337827f, 0.2566048f, 0.9576622f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 62.0f, 62.0f, 62.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f}
+},
     {// Euler-angle outputs
      {
          // LOD-0
@@ -2203,7 +2154,7 @@ bpcm::Evaluator OptimizedStorage<TValue>::create(StrategyPtr strategy,
         return pma::UniqueInstance<CPUJointsOutputInstance, JointsOutputInstance>::with(instanceMemRes)
             .create(outputCount, rl4::TranslationType::Vector, rotationType, rl4::ScaleType::Vector, instanceMemRes);
     };
-    auto jointGroups = rl4::bpcm::StorageSnapshot<TValue, void, void>()(storage, memRes);
+    auto jointGroups = rl4::bpcm::StorageSnapshot<TValue, void, void, void>()(storage, memRes);
     return bpcm::Evaluator{std::move(storage), std::move(jointGroups), std::move(strategy), instanceFactory, memRes};
 }
 
@@ -2234,7 +2185,8 @@ bpcm::Evaluator OptimizedStorage<TValue>::create(StrategyPtr strategy,
                                                    0u,  // outputRotationLODsOffset
                                                    static_cast<std::uint32_t>(storage.values.size<TValue>()),
                                                    optimized::jointGroups[rotationSelectorIndex][jointGroupIndex].colCount,
-                                                   optimized::jointGroups[rotationSelectorIndex][jointGroupIndex].rowCount});
+                                                   optimized::jointGroups[rotationSelectorIndex][jointGroupIndex].rowCount,
+                                                   optimized::jointGroups[rotationSelectorIndex][jointGroupIndex].blockHeight});
 
     const auto lastJointGroupIndex = optimized::outputIndices[rotationSelectorIndex].size() - 1ul;
     const auto numAttrsPerJoint =
@@ -2246,7 +2198,7 @@ bpcm::Evaluator OptimizedStorage<TValue>::create(StrategyPtr strategy,
         return pma::UniqueInstance<CPUJointsOutputInstance, JointsOutputInstance>::with(instanceMemRes)
             .create(outputCount, rl4::TranslationType::Vector, rotationType, rl4::ScaleType::Vector, instanceMemRes);
     };
-    auto jointGroups = rl4::bpcm::StorageSnapshot<TValue, void, void>()(storage, memRes);
+    auto jointGroups = rl4::bpcm::StorageSnapshot<TValue, void, void, void>()(storage, memRes);
     return bpcm::Evaluator{std::move(storage), std::move(jointGroups), std::move(strategy), instanceFactory, memRes};
 }
 

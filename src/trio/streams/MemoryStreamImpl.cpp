@@ -84,7 +84,7 @@ void MemoryStream::destroy(MemoryStream* instance) {
 }
 
 MemoryStreamImpl::MemoryStreamImpl(std::size_t initialSize, MemoryResource* memRes_) :
-    data{initialSize, static_cast<char>(0), memRes_},
+    buffer{initialSize, static_cast<char>(0), memRes_},
     position{},
     memRes{memRes_} {
 }
@@ -132,9 +132,21 @@ std::size_t MemoryStreamImpl::read(Writable* destination, std::size_t size) {
         return 0ul;
     }
 
-    const std::size_t available = data.size() - position;
+    const std::size_t available = buffer.size() - position;
     const std::size_t bytesToRead = std::min(size, available);
-    const std::size_t bytesCopied = (bytesToRead > 0ul ? destination->write(&data[position], bytesToRead) : 0ul);
+    // A destination may take the bytes in pieces; only one that takes nothing has stopped consuming, which is an error as
+    // in the file streams
+    std::size_t bytesCopied = 0ul;
+    while (bytesCopied != bytesToRead) {
+        const std::size_t remaining = bytesToRead - bytesCopied;
+        // Not trusted beyond what it was handed - an overshoot would put the position past the end of the buffer
+        const std::size_t accepted = std::min(destination->write(&buffer[position + bytesCopied], remaining), remaining);
+        if (accepted == 0ul) {
+            status->set(ReadError);
+            break;
+        }
+        bytesCopied += accepted;
+    }
     position += bytesCopied;
     return bytesCopied;
 }
@@ -154,23 +166,54 @@ std::size_t MemoryStreamImpl::write(Readable* source, std::size_t size) {
         status->set(WriteError);
         return 0ul;
     }
-    const std::size_t available = data.size() - position;
+    const std::size_t previousSize = buffer.size();
+    const std::size_t available = previousSize - position;
     if (available < size) {
-        const std::size_t newSize = data.size() + (size - available);
+        const std::size_t newSize = previousSize + (size - available);
         // Check for overflow / wrap-around
-        if (newSize < data.size()) {
+        if (newSize < previousSize) {
             status->set(WriteError);
             return 0ul;
         }
-        data.resize(newSize);
+        // Deliberately the whole request: the source reads straight into the buffer, so the room has to exist beforehand.
+        // That makes any caller supplied size an allocation of that size, which is documented on the class.
+        buffer.resize(newSize);
     }
-    const std::size_t bytesCopied = source->read(&data[position], size);
+    // A source may deliver in pieces; only one that delivers nothing has stopped producing, which is an error as in the
+    // file streams
+    std::size_t bytesCopied = 0ul;
+    while (bytesCopied != size) {
+        const std::size_t remaining = size - bytesCopied;
+        // Not trusted beyond what it was handed - an overshoot would put the position past what the resize made room for
+        const std::size_t produced = std::min(source->read(&buffer[position + bytesCopied], remaining), remaining);
+        if (produced == 0ul) {
+            status->set(WriteError);
+            break;
+        }
+        bytesCopied += produced;
+    }
     position += bytesCopied;
+    // The source may have produced less than the buffer was grown for - give the untouched tail back rather than let size()
+    // and mappedData() report it as payload, but never shrink below what the buffer held on entry
+    buffer.resize(std::max(previousSize, position));
     return bytesCopied;
 }
 
 std::uint64_t MemoryStreamImpl::size() {
-    return data.size();
+    return buffer.size();
+}
+
+const char* MemoryStreamImpl::mappedData() {
+    return (buffer.empty() ? nullptr : buffer.data());
+}
+
+std::uint64_t MemoryStreamImpl::mappedOffset() {
+    // The whole buffer is addressable from its first byte, so this is fixed at zero and does not follow the position
+    return 0ul;
+}
+
+std::size_t MemoryStreamImpl::mappedSize() {
+    return buffer.size();
 }
 
 MemoryResource* MemoryStreamImpl::getMemoryResource() {

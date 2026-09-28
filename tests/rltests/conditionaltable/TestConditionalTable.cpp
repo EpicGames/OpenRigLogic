@@ -5,6 +5,7 @@
 
 #include "riglogic/TypeDefs.h"
 #include "riglogic/conditionaltable/ConditionalTable.h"
+#include "riglogic/conditionaltable/ConditionalTableValidator.h"
 
 namespace {
 
@@ -205,3 +206,27 @@ INSTANTIATE_TEST_SUITE_P(
         IOTestData{{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.5f},
                    {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
                    {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}}));
+
+TEST(ConditionalTableValidatorTest, RejectsWrappingIntervalSkip) {
+    pma::AlignedMemoryResource memRes;
+    rl4::Vector<std::uint16_t> inputIndices{{0u, 0u}, &memRes};
+    rl4::Vector<std::uint16_t> outputIndices{{0u, 0u}, &memRes};
+    rl4::Vector<float> fromValues{{0.0f, 0.0f}, &memRes};
+    rl4::Vector<float> toValues{{1.0f, 1.0f}, &memRes};
+    rl4::Vector<float> slopeValues{{1.0f, 1.0f}, &memRes};
+    rl4::Vector<float> cutValues{{0.0f, 0.0f}, &memRes};
+    rl4::ConditionalTable table{std::move(inputIndices),
+                                std::move(outputIndices),
+                                std::move(fromValues),
+                                std::move(toValues),
+                                std::move(slopeValues),
+                                std::move(cutValues),
+                                1u,
+                                1u,
+                                &memRes};
+    ASSERT_TRUE(rl4::ConditionalTableValidator::validate(table, 1ul, 1ul));
+    // calculateForward's skip is `row = uint16(row + intervalsRemaining[row])`: an oversized deserialized
+    // skip wraps the cursor backward and the evaluation loop never terminates.
+    table.intervalsRemaining[0] = 65535u;
+    ASSERT_FALSE(rl4::ConditionalTableValidator::validate(table, 1ul, 1ul));
+}

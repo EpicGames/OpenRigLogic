@@ -2,6 +2,10 @@
 
 #include "riglogic/joints/cpu/quaternions/QuaternionJointsEvaluator.h"
 
+#include "riglogic/SerializationContext.h"
+#include "riglogic/riglogic/RigMetadata.h"
+#include "riglogic/system/simd/Utils.h"
+
 namespace rl4 {
 
 QuaternionJointsEvaluator::QuaternionJointsEvaluator(CalculationStrategyPointer strategy_,
@@ -27,8 +31,10 @@ std::uint32_t QuaternionJointsEvaluator::getJointDeltaValueCountForLOD(std::uint
 }
 
 void QuaternionJointsEvaluator::calculate(ControlsInputInstance* inputs, JointsOutputInstance* outputs, std::uint16_t lod) const {
-    for (std::size_t i = {}; i < jointGroups.size(); ++i) {
-        calculate(inputs, outputs, lod, static_cast<std::uint16_t>(i));
+    for (const auto& jointGroup : jointGroups) {
+        if (jointGroup.rowCount != 0u) {
+            strategy->calculate(jointGroup, inputs->getInputBuffer(), outputs->getOutputBuffer(), lod);
+        }
     }
 }
 
@@ -36,14 +42,24 @@ void QuaternionJointsEvaluator::calculate(ControlsInputInstance* inputs,
                                           JointsOutputInstance* outputs,
                                           std::uint16_t lod,
                                           std::uint16_t jointGroupIndex) const {
+    // jointGroupIndex is unclamped public-API input.
+    if (jointGroupIndex >= jointGroups.size()) {
+        return;
+    }
     const auto& jointGroup = jointGroups[jointGroupIndex];
     if (jointGroup.rowCount != 0u) {
         strategy->calculate(jointGroup, inputs->getInputBuffer(), outputs->getOutputBuffer(), lod);
     }
 }
 
-void QuaternionJointsEvaluator::load(terse::BinaryInputArchive<BoundedIOStream>& archive) {
+void QuaternionJointsEvaluator::load(BoundedInputArchive& archive) {
     archive(jointGroups);
+    const SerializationContext* context = static_cast<SerializationContext*>(archive.getUserData());
+    if (!RuntimeTemplateInstantiator::invoke<FloatingPointModel::Precise, StorageValidator, bool>(*context->config,
+                                                                                                  jointGroups,
+                                                                                                  *context->metadata)) {
+        archive.markMalformed();
+    }
 }
 
 void QuaternionJointsEvaluator::save(terse::BinaryOutputArchive<BoundedIOStream>& archive) {
