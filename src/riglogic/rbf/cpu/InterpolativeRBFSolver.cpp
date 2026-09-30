@@ -124,27 +124,19 @@ inline void invert(Matrix<float>& m) {
     m = std::move(inv);
 }
 
-}  // namespace
-
-InterpolativeRBFSolver::InterpolativeRBFSolver(MemoryResource* memRes) :
-    RBFSolver(memRes),
-    coefficients{memRes} {
-}
-
-InterpolativeRBFSolver::InterpolativeRBFSolver(const RBFSolverRecipe& recipe, MemoryResource* memRes) :
-    RBFSolver(recipe, memRes),
-    coefficients{memRes} {
+inline void buildCoefficients(const AlignedMatrix<float>& targets,
+                              const RBFSolver::DistanceWeightFun& getDistanceWeight,
+                              float radius,
+                              Matrix<float>& coefficients) {
     const auto targetCount = targets.size();
-    coefficients = Matrix<float>{targetCount, Vector<float>{targetCount, 0.0f, memRes}, memRes};
     // This can also be optimized, we do not need the actual matrix what we are looking for the inverse matrix
     // We need to include the diagonal itself, since we can't guarantee that the weight
     // function returns 1.0 for nodes of the same coordinates.
-
     for (std::size_t i = {}; i < targetCount; ++i) {
         // matrix is symmetrical so we only need to calculate right side of the matrix and we ll copy it onto the left
         ArrayView<float> outputWeights{coefficients[i].data() + i, coefficients[i].size() - i};
         const auto& curTarget = targets[i];
-        ConstArrayView<AlignedVector<float>> targetView{targets.data() + i, targets.size() - i};
+        ConstArrayView<AlignedVector<float>> targetView{targets.data() + i, targetCount - i};
         if (targetView.size() > 0ul) {
             getDistanceWeight(targetView, curTarget, outputWeights, radius);
         }
@@ -157,6 +149,21 @@ InterpolativeRBFSolver::InterpolativeRBFSolver(const RBFSolverRecipe& recipe, Me
     // but since this is not in a hot path rather one time call i am not sure if it is
     // worth it
     invert(coefficients);
+}
+
+}  // namespace
+
+InterpolativeRBFSolver::InterpolativeRBFSolver(MemoryResource* memRes) :
+    RBFSolver(memRes),
+    coefficients{memRes} {
+}
+
+InterpolativeRBFSolver::InterpolativeRBFSolver(const RBFSolverRecipe& recipe, MemoryResource* memRes) :
+    RBFSolver(recipe, memRes),
+    coefficients{memRes} {
+    const auto targetCount = targets.size();
+    coefficients = Matrix<float>{targetCount, Vector<float>{targetCount, 0.0f, memRes}, memRes};
+    buildCoefficients(targets, getDistanceWeight, radius, coefficients);
 }
 
 RBFSolverType InterpolativeRBFSolver::getSolverType() const {
@@ -184,6 +191,11 @@ void InterpolativeRBFSolver::solve(ArrayView<float> input,
 void InterpolativeRBFSolver::load(terse::BinaryInputArchive<BoundedIOStream>& archive) {
     RBFSolver::load(archive);
     archive(coefficients);
+    // Snapshots dumped before TwistAngle used the unwrapped metric carry coefficients computed with the wrapped one,
+    // so the matrix is rebuilt from the restored targets.
+    if (distanceMethod == RBFDistanceMethod::TwistAngle) {
+        buildCoefficients(targets, getDistanceWeight, radius, coefficients);
+    }
 }
 
 void InterpolativeRBFSolver::save(terse::BinaryOutputArchive<BoundedIOStream>& archive) {
