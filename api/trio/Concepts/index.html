@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://epicgames.github.io/OpenRigLogic/api/trio/Concepts/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Concepts - OpenRigLogic</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Concepts";
+        var mkdocs_page_input_path = "api/trio/Concepts.md";
+        var mkdocs_page_url = "/OpenRigLogic/api/trio/Concepts/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> OpenRigLogic
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../release_notes/">Release Notes</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >arrayview</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/ArrayView/">ArrayView</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/StringView/">StringView</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >dna</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/BinaryStreamReader/">BinaryStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/BinaryStreamWriter/">BinaryStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/JSONStreamReader/">JSONStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/JSONStreamWriter/">JSONStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Reader/">Reader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/StreamReader/">StreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/StreamWriter/">StreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Writer/">Writer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/BehaviorReader/">BehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/BehaviorWriter/">BehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DefinitionReader/">DefinitionReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DefinitionWriter/">DefinitionWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Descriptor/">Descriptor</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DescriptorReader/">DescriptorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DescriptorWriter/">DescriptorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Geometry/">Geometry</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/GeometryReader/">GeometryReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/GeometryWriter/">GeometryWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/HeaderReader/">HeaderReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/HeaderWriter/">HeaderWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadata/">JointBehaviorMetadata</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadataReader/">JointBehaviorMetadataReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadataWriter/">JointBehaviorMetadataWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehavior/">MachineLearnedBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorExt</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExtReader/">MachineLearnedBehaviorExtReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExtWriter/">MachineLearnedBehaviorExtWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorReader/">MachineLearnedBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorWriter/">MachineLearnedBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehavior/">RBFBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehaviorReader/">RBFBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehaviorWriter/">RBFBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Twist/">Twist</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/TwistSwingBehaviorReader/">TwistSwingBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/TwistSwingBehaviorWriter/">TwistSwingBehaviorWriter</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/types/Vector3/">Vector3</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >pma</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/MemoryResource/">MemoryResource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/PolyAllocator/">PolyAllocator</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/ScopedPtr/">ScopedPtr</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/TypeDefs/">TypeDefs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >resources</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/AlignedMemoryResource/">AlignedMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/ArenaMemoryResource/">ArenaMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/DefaultMemoryResource/">DefaultMemoryResource</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/utils/ManagedInstance/">ManagedInstance</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >riglogic</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigInstance/">RigInstance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigLogic/">RigLogic</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Stats/">Stats</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/types/Aliases/">Aliases</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >status</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/Provider/">Provider</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/Status/">Status</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/StatusCode/">StatusCode</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >tdm</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Ang/">Ang</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Computations/">Computations</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/CoordSys/">CoordSys</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Mat/">Mat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Quat/">Quat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Transforms/">Transforms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Types/">Types</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Vec/">Vec</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >trio</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Concepts</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#class-trioapi-bounded">class TRIOAPI Bounded</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns">Returns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#class-trioapi-buffered">class TRIOAPI Buffered</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_1">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_1">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for">Watch out for</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#class-trioapi-closeable">class TRIOAPI Closeable</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_2">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_2">Example</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#class-trioapi-controllable-public-openable-public-closeable">class TRIOAPI Controllable : public Openable, public Closeable</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_3">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_3">Example</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#class-trioapi-openable">class TRIOAPI Openable</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_4">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_4">Example</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#class-trioapi-readable">class TRIOAPI Readable</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_5">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#method-groups">Method groups</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_5">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_1">Returns</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for_1">Watch out for</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#class-trioapi-resizable">class TRIOAPI Resizable</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_6">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_6">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_1">Parameters</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#class-trioapi-seekable">class TRIOAPI Seekable</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_7">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_7">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_2">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_2">Returns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#class-trioapi-writable">class TRIOAPI Writable</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_8">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#method-groups_1">Method groups</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_8">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_3">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_3">Returns</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for_2">Watch out for</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Stream/">Stream</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >streams</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../streams/FileStream/">FileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../streams/MemoryMappedFileStream/">MemoryMappedFileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../streams/MemoryStream/">MemoryStream</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../types/Parameters/">Parameters</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/StreamScope/">StreamScope</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">OpenRigLogic</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+          <li class="breadcrumb-item">trio</li>
+      <li class="breadcrumb-item active">Concepts</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="api-reference-trioconcepts">API Reference — <code>trio/Concepts</code></h1>
+<hr />
+<!-- ink:api name="Bounded" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="class-trioapi-bounded"><code>class TRIOAPI Bounded</code></h2>
+<p>Abstract interface for streams that have a known, finite size in bytes.</p>
+<h3 id="when-to-use-this">When to use this</h3>
+<p>Implement <code>Bounded</code> when a stream's total size can be queried up front, such as a file — useful for pre-allocating buffers or validating read ranges before issuing reads.</p>
+<h3 id="example">Example</h3>
+<pre><code class="language-cpp">std::uint64_t totalBytes = stream-&gt;size();
+</code></pre>
+<h3 id="returns">Returns</h3>
+<p><code>std::uint64_t</code> — size of the stream in bytes.</p>
+<!-- ink:api-end name="Bounded" -->
+
+<!-- ink:api name="Buffered" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="class-trioapi-buffered"><code>class TRIOAPI Buffered</code></h2>
+<p>Abstract interface for streams that buffer writes and need an explicit flush to guarantee data reaches the filesystem.</p>
+<h3 id="when-to-use-this_1">When to use this</h3>
+<p>Implement <code>Buffered</code> when writes to the stream may be held in memory before being committed, so callers can force a flush at points where durability matters (e.g., before closing or after a critical write).</p>
+<h3 id="example_1">Example</h3>
+<pre><code class="language-cpp">stream-&gt;write(data, size);
+stream-&gt;flush();
+// data is now guaranteed to be committed to disk
+</code></pre>
+<h3 id="watch-out-for">Watch out for</h3>
+<ul>
+<li><code>flush()</code> is distinct from <code>close()</code>. Closing a stream does not guarantee that buffered data is flushed unless the implementation explicitly does so. Call <code>flush()</code> before <code>close()</code> when durability is required.</li>
+</ul>
+<!-- ink:api-end name="Buffered" -->
+
+<!-- ink:api name="Closeable" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="class-trioapi-closeable"><code>class TRIOAPI Closeable</code></h2>
+<p>Abstract interface for streams that must release an underlying resource when done.</p>
+<h3 id="when-to-use-this_2">When to use this</h3>
+<p>Implement <code>Closeable</code> alongside <code>Openable</code> when a stream wraps a resource that needs explicit release, such as a file handle.</p>
+<h3 id="example_2">Example</h3>
+<pre><code class="language-cpp">stream-&gt;close();
+// underlying resource is released
+</code></pre>
+<!-- ink:api-end name="Closeable" -->
+
+<!-- ink:api name="Controllable" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="class-trioapi-controllable-public-openable-public-closeable"><code>class TRIOAPI Controllable : public Openable, public Closeable</code></h2>
+<p>Combines <code>Openable</code> and <code>Closeable</code> into a single interface for streams whose lifecycle needs both an explicit open and close step.</p>
+<h3 id="when-to-use-this_3">When to use this</h3>
+<p>Use <code>Controllable</code> as the base for any stream type where you want to require both open and close support at once, instead of implementing <code>Openable</code> and <code>Closeable</code> separately and hoping callers use both.</p>
+<h3 id="example_3">Example</h3>
+<pre><code class="language-cpp">trio::Controllable* stream = /* ... */;
+stream-&gt;open();
+// use the stream
+stream-&gt;close();
+</code></pre>
+<!-- ink:api-end name="Controllable" -->
+
+<!-- ink:api name="Openable" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="class-trioapi-openable"><code>class TRIOAPI Openable</code></h2>
+<p>Abstract interface for streams that must be explicitly opened before use.</p>
+<h3 id="when-to-use-this_4">When to use this</h3>
+<p>Implement <code>Openable</code> when a stream wraps a resource (e.g., a file handle) that needs an explicit open step before reads or writes are valid.</p>
+<h3 id="example_4">Example</h3>
+<pre><code class="language-cpp">stream-&gt;open();
+// stream is now ready for read/write calls
+</code></pre>
+<!-- ink:api-end name="Openable" -->
+
+<!-- ink:api name="Readable" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" cpp_abstract_class="true" -->
+
+<h2 id="class-trioapi-readable"><code>class TRIOAPI Readable</code></h2>
+<p>Abstract interface for anything bytes can be read from — into a buffer or into another stream.</p>
+<h3 id="when-to-use-this_5">When to use this</h3>
+<p>Implement <code>Readable</code> on any stream-like type that needs to produce byte input, so calling code that only reads data can depend on this interface rather than a concrete stream type. Use the buffer-read overload to pull bytes into memory, and the stream-read overload to pipe bytes directly into a <code>Writable</code> destination.</p>
+<h3 id="method-groups">Method groups</h3>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Methods</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>read</td>
+<td>read(char<em> destination, std::size_t size), read(Writable</em> destination, std::size_t size)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example_5">Example</h3>
+<pre><code class="language-cpp">char buffer[4096];
+std::size_t bytesRead = stream-&gt;read(buffer, sizeof(buffer));
+// process buffer[0..bytesRead)
+</code></pre>
+<h3 id="parameters">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>destination</code></td>
+<td><code>char*</code> / <code>Writable*</code></td>
+<td>required. Where read bytes are placed, either a raw buffer or another stream.</td>
+</tr>
+<tr>
+<td><code>size</code></td>
+<td><code>std::size_t</code></td>
+<td>required. Number of bytes to read.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_1">Returns</h3>
+<p><code>std::size_t</code> — the number of bytes actually read.</p>
+<h3 id="watch-out-for_1">Watch out for</h3>
+<ul>
+<li>The destructor is <code>protected</code>, so instances must be destroyed through the owning concrete type, not deleted directly through a <code>Readable*</code>.</li>
+</ul>
+<!-- ink:api-end name="Readable" -->
+
+<!-- ink:api name="Resizable" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="class-trioapi-resizable"><code>class TRIOAPI Resizable</code></h2>
+<p>Abstract interface for streams whose underlying storage can be resized to an exact byte length.</p>
+<h3 id="when-to-use-this_6">When to use this</h3>
+<p>Implement <code>Resizable</code> when a stream needs to grow or truncate its backing storage to a specific size — for example, pre-allocating a file to its final size, or truncating it after an overwrite.</p>
+<h3 id="example_6">Example</h3>
+<pre><code class="language-cpp">stream-&gt;resize(1024u);
+// underlying storage is now exactly 1024 bytes
+</code></pre>
+<h3 id="parameters_1">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>size</code></td>
+<td><code>std::uint64_t</code></td>
+<td>required. Requested size of the underlying storage, in bytes.</td>
+</tr>
+</tbody>
+</table>
+<!-- ink:api-end name="Resizable" -->
+
+<!-- ink:api name="Seekable" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="class-trioapi-seekable"><code>class TRIOAPI Seekable</code></h2>
+<p>Abstract interface for streams that support random access via a position cursor.</p>
+<h3 id="when-to-use-this_7">When to use this</h3>
+<p>Implement <code>Seekable</code> when a stream needs to support jumping to arbitrary offsets (e.g., a file), rather than only sequential reads/writes.</p>
+<h3 id="example_7">Example</h3>
+<pre><code class="language-cpp">std::uint64_t pos = stream-&gt;tell();
+stream-&gt;seek(0u);
+// stream cursor is now at the start
+</code></pre>
+<h3 id="parameters_2">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>position</code></td>
+<td><code>std::uint64_t</code></td>
+<td>required. Offset relative to the start of the stream (0 = start).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_2">Returns</h3>
+<p><code>std::uint64_t</code> — (from <code>tell()</code>) the current position relative to the stream's start.</p>
+<!-- ink:api-end name="Seekable" -->
+
+<!-- ink:api name="Writable" module="trio/Concepts" last_commit="api_scan" updated="2026-09-09" api_kind="callable" cpp_abstract_class="true" -->
+
+<h2 id="class-trioapi-writable"><code>class TRIOAPI Writable</code></h2>
+<p>Abstract interface for anything bytes can be written to — a byte buffer or another stream.</p>
+<h3 id="when-to-use-this_8">When to use this</h3>
+<p>Implement <code>Writable</code> on any stream-like type that needs to accept byte output (e.g., a file or memory stream), so calling code that only writes data can depend on this interface rather than a concrete stream type. Use the buffer-write overload for raw byte data, and the stream-write overload when writing bytes to come from another <code>Readable</code> stream.</p>
+<h3 id="method-groups_1">Method groups</h3>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Methods</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>write</td>
+<td>write(const char<em> source, std::size_t size), write(Readable</em> source, std::size_t size)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example_8">Example</h3>
+<pre><code class="language-cpp">void saveHeader(trio::Writable* stream, const char* header, std::size_t size) {
+    stream-&gt;write(header, size);
+}
+</code></pre>
+<h3 id="parameters_3">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>source</code></td>
+<td><code>const char*</code> / <code>Readable*</code></td>
+<td>required. Data to write, either a raw buffer or another stream to read from.</td>
+</tr>
+<tr>
+<td><code>size</code></td>
+<td><code>std::size_t</code></td>
+<td>required. Number of bytes to write.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_3">Returns</h3>
+<p><code>std::size_t</code> — the number of bytes actually written.</p>
+<h3 id="watch-out-for_2">Watch out for</h3>
+<ul>
+<li>The destructor is <code>protected</code>, so instances must be destroyed through the owning concrete type, not deleted directly through a <code>Writable*</code>.</li>
+</ul>
+<!-- ink:api-end name="Writable" -->
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../" class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../Stream/" class="btn btn-neutral float-right" title="Stream">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../Stream/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://epicgames.github.io/OpenRigLogic/api/pma/PolyAllocator/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>PolyAllocator - OpenRigLogic</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "PolyAllocator";
+        var mkdocs_page_input_path = "api/pma/PolyAllocator.md";
+        var mkdocs_page_url = "/OpenRigLogic/api/pma/PolyAllocator/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> OpenRigLogic
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../release_notes/">Release Notes</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >arrayview</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/ArrayView/">ArrayView</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/StringView/">StringView</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >dna</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/BinaryStreamReader/">BinaryStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/BinaryStreamWriter/">BinaryStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/JSONStreamReader/">JSONStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/JSONStreamWriter/">JSONStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Reader/">Reader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/StreamReader/">StreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/StreamWriter/">StreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Writer/">Writer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/BehaviorReader/">BehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/BehaviorWriter/">BehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DefinitionReader/">DefinitionReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DefinitionWriter/">DefinitionWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Descriptor/">Descriptor</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DescriptorReader/">DescriptorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DescriptorWriter/">DescriptorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Geometry/">Geometry</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/GeometryReader/">GeometryReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/GeometryWriter/">GeometryWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/HeaderReader/">HeaderReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/HeaderWriter/">HeaderWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadata/">JointBehaviorMetadata</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadataReader/">JointBehaviorMetadataReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadataWriter/">JointBehaviorMetadataWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehavior/">MachineLearnedBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorExt</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExtReader/">MachineLearnedBehaviorExtReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExtWriter/">MachineLearnedBehaviorExtWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorReader/">MachineLearnedBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorWriter/">MachineLearnedBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehavior/">RBFBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehaviorReader/">RBFBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehaviorWriter/">RBFBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Twist/">Twist</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/TwistSwingBehaviorReader/">TwistSwingBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/TwistSwingBehaviorWriter/">TwistSwingBehaviorWriter</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/types/Vector3/">Vector3</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >pma</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../MemoryResource/">MemoryResource</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">PolyAllocator</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#implmax_align_oft-u">impl::max_align_of&lt;T, U&gt;</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#implmin_align_t">impl::min_align_t</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_1">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_1">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templatetypename-t-stdsize_t-alignment-class-tdefaultmemoryresource-class-polyallocator-public-stdscoped_allocator_adaptor">template&lt;typename T, std::size_t Alignment, class TDefaultMemoryResource&gt; class PolyAllocator : public std::scoped_allocator_adaptor&lt;...&gt;</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#method-groups">Method groups</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for">Watch out for</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#constraints">Constraints</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#tdefaultmemoryresource-template-parameter">TDefaultMemoryResource (template parameter)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_2">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_2">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#udefaultmemoryresource-template-parameter">UDefaultMemoryResource (template parameter)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_3">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_3">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../ScopedPtr/">ScopedPtr</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../TypeDefs/">TypeDefs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >resources</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../resources/AlignedMemoryResource/">AlignedMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../resources/ArenaMemoryResource/">ArenaMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../resources/DefaultMemoryResource/">DefaultMemoryResource</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/ManagedInstance/">ManagedInstance</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >riglogic</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigInstance/">RigInstance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigLogic/">RigLogic</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Stats/">Stats</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/types/Aliases/">Aliases</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >status</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/Provider/">Provider</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/Status/">Status</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/StatusCode/">StatusCode</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >tdm</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Ang/">Ang</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Computations/">Computations</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/CoordSys/">CoordSys</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Mat/">Mat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Quat/">Quat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Transforms/">Transforms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Types/">Types</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Vec/">Vec</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >trio</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/Concepts/">Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/Stream/">Stream</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >streams</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/FileStream/">FileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/MemoryMappedFileStream/">MemoryMappedFileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/MemoryStream/">MemoryStream</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/types/Parameters/">Parameters</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/utils/StreamScope/">StreamScope</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">OpenRigLogic</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+          <li class="breadcrumb-item">pma</li>
+      <li class="breadcrumb-item active">PolyAllocator</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="api-reference-pmapolyallocator">API Reference — <code>pma/PolyAllocator</code></h1>
+<hr />
+<!-- ink:api name="max_align_of" module="pma/PolyAllocator" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="implmax_align_oft-u"><code>impl::max_align_of&lt;T, U&gt;</code></h2>
+<p>A compile-time trait that resolves to whichever of two types, <code>T</code> or <code>U</code>, has the greater alignment.</p>
+<h3 id="why-this-exists">Why this exists</h3>
+<p><code>PolyAllocator</code>'s default alignment must be at least as strict as both the element type's natural alignment and a baseline minimum (<code>min_align_t</code>); a raw <code>alignof</code> comparison on just one type could under-align the allocator's storage. This trait picks the correct type to take <code>alignof</code> of without requiring the caller to reason about the comparison themselves.</p>
+<h3 id="fields">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td><code>typename std::conditional&lt;(alignof(T) &gt; alignof(U)), T, U&gt;::type</code></td>
+<td>The type among <code>T</code>/<code>U</code> with the larger alignment.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships">Relationships</h3>
+<ul>
+<li><code>PolyAllocator</code> — <em>default <code>Alignment</code> parameter is <code>alignof(max_align_of&lt;T, min_align_t&gt;::type)</code>.</em></li>
+</ul>
+<!-- ink:api-end name="max_align_of" -->
+
+<!-- ink:api name="min_align_t" module="pma/PolyAllocator" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="implmin_align_t"><code>impl::min_align_t</code></h2>
+<p>An internal alias (<code>void*</code>) used as the minimal-alignment reference type when computing a <code>PolyAllocator</code>'s default alignment.</p>
+<h3 id="why-this-exists_1">Why this exists</h3>
+<p><code>PolyAllocator</code>'s default <code>Alignment</code> template parameter needs a baseline alignment to compare a type's own alignment against, and <code>void*</code> is a convenient stand-in for "pointer-sized minimum alignment" without depending on a specific concrete type. It exists purely to feed <code>max_align_of</code> inside the <code>impl</code> namespace.</p>
+<h3 id="relationships_1">Relationships</h3>
+<ul>
+<li><code>max_align_of</code> — <em>compares a type's alignment against <code>min_align_t</code> to compute the larger of the two.</em></li>
+<li><code>PolyAllocator</code> — <em>uses <code>max_align_of&lt;T, min_align_t&gt;</code> as its default alignment.</em></li>
+</ul>
+<!-- ink:api-end name="min_align_t" -->
+
+<!-- ink:api name="PolyAllocator" module="pma/PolyAllocator" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatetypename-t-stdsize_t-alignment-class-tdefaultmemoryresource-class-polyallocator-public-stdscoped_allocator_adaptor"><code>template&lt;typename T, std::size_t Alignment, class TDefaultMemoryResource&gt; class PolyAllocator : public std::scoped_allocator_adaptor&lt;...&gt;</code></h2>
+<p>A standard-library-compatible allocator that forwards allocation and construction to a runtime-supplied <code>MemoryResource</code>, letting containers use arbitrary memory strategies without being templated on the allocator's concrete type.</p>
+<h3 id="when-to-use-this">When to use this</h3>
+<p>Use this to plug a custom <code>MemoryResource</code> (arena, pool, tracking allocator) into <code>std::vector</code>, <code>std::map</code>, or any other allocator-aware standard container. Construct it with a <code>MemoryResource*</code>; passing <code>nullptr</code> falls back to a default (<code>TDefaultMemoryResource</code>) static instance.</p>
+<h3 id="method-groups">Method groups</h3>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Methods</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Construction</td>
+<td>PolyAllocator() (default and from <code>MemoryResource*</code> / <code>nullptr</code> / rebind-compatible allocator)</td>
+</tr>
+<tr>
+<td>Raw allocation</td>
+<td>allocateBytes, deallocateBytes</td>
+</tr>
+<tr>
+<td>Object allocation</td>
+<td>allocateObject, deallocateObject, newObject, deleteObject</td>
+</tr>
+<tr>
+<td>STL allocator interface</td>
+<td>allocate (and the deallocate/rebind machinery inherited from <code>scoped_allocator_adaptor</code>)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example">Example</h3>
+<pre><code class="language-cpp">pma::MemoryResource* memRes = getArenaMemoryResource();
+pma::PolyAllocator&lt;dna::Vector3&gt; alloc{memRes};
+std::vector&lt;dna::Vector3, pma::PolyAllocator&lt;dna::Vector3&gt;&gt; joints{alloc};
+joints.push_back({1.0f, 0.0f, 0.0f});
+</code></pre>
+<h3 id="parameters">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>memRes</code></td>
+<td><code>MemoryResource*</code></td>
+<td>optional — the backing memory resource; if <code>nullptr</code>, falls back to a static <code>TDefaultMemoryResource</code> instance.</td>
+</tr>
+<tr>
+<td><code>count</code></td>
+<td><code>std::size_t</code></td>
+<td>required (for <code>allocateObject</code>/<code>deallocateObject</code>) — number of objects to allocate/deallocate.</td>
+</tr>
+<tr>
+<td><code>alignment</code></td>
+<td><code>std::size_t</code></td>
+<td>optional — defaults to the allocator's <code>Alignment</code> template parameter.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="watch-out-for">Watch out for</h3>
+<ul>
+<li>Two <code>PolyAllocator</code> instances compare equal only if both <code>Alignment</code> matches and their underlying <code>MemoryResource</code> pointers match — allocators from different memory resources are never interchangeable.</li>
+<li>The default-constructed default memory resource is a function-local <code>static</code>, guarded against clang's exit-time-destructor warning — its lifetime spans the whole program.</li>
+<li>The default <code>MemoryResource</code> is a <strong>static local</strong> inside the default constructor, created once per <code>&lt;T, Alignment, TDefaultMemoryResource&gt;</code> instantiation. Its destructor runs at program exit. Clang's <code>-Wexit-time-destructors</code> warning is explicitly suppressed here; be aware of destruction ordering if your program relies on destructor sequencing.</li>
+<li>Passing <code>nullptr</code> explicitly is equivalent to the default constructor — it does <strong>not</strong> disable allocation; it selects the static default resource.</li>
+<li>The outer <code>pma::PolyAllocator</code> inherits from <code>std::scoped_allocator_adaptor</code>, meaning nested containers (e.g., <code>std::vector&lt;std::string&gt;</code>) automatically propagate the same resource to their inner allocators. If you want independent resources per nesting level, do not use the scoped adaptor directly.</li>
+</ul>
+<h3 id="constraints">Constraints</h3>
+<ul>
+<li>Thread safety of allocations depends entirely on the supplied <code>MemoryResource</code>. The allocator wrapper itself performs no synchronization.</li>
+</ul>
+<!-- ink:api-end name="PolyAllocator" -->
+
+<!-- ink:api name="TDefaultMemoryResource" module="pma/PolyAllocator" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="tdefaultmemoryresource-template-parameter"><code>TDefaultMemoryResource</code> (template parameter)</h2>
+<p>The fallback <code>MemoryResource</code> type a <code>PolyAllocator</code> uses when constructed without an explicit memory resource (or with <code>nullptr</code>).</p>
+<h3 id="why-this-exists_2">Why this exists</h3>
+<p>Requiring every <code>PolyAllocator</code> use site to pass a <code>MemoryResource*</code> would make simple cases (no custom allocator needed) verbose; this template parameter lets <code>PolyAllocator</code> default to <code>DefaultMemoryResource</code> while still allowing callers to override it for specialized allocation strategies.</p>
+<h3 id="relationships_2">Relationships</h3>
+<ul>
+<li><code>PolyAllocator</code> — <em>default-constructs a static instance of this type when no explicit <code>MemoryResource*</code> is supplied.</em></li>
+<li><code>MemoryResource</code> — <em><code>TDefaultMemoryResource</code> must be a concrete subclass of this abstract base.</em></li>
+</ul>
+<!-- ink:api-end name="TDefaultMemoryResource" -->
+
+<!-- ink:api name="UDefaultMemoryResource" module="pma/PolyAllocator" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="udefaultmemoryresource-template-parameter"><code>UDefaultMemoryResource</code> (template parameter)</h2>
+<p>The corresponding default-memory-resource template parameter for the "other" <code>PolyAllocator</code> type in cross-allocator comparisons (<code>operator==</code>/<code>operator!=</code>).</p>
+<h3 id="why-this-exists_3">Why this exists</h3>
+<p><code>PolyAllocator</code> equality/inequality comparisons need to compare two possibly-differently-templated <code>PolyAllocator</code> instances; <code>UDefaultMemoryResource</code> names the second instance's default-resource type parameter symmetrically to <code>TDefaultMemoryResource</code> on the first, even though it plays no role in the equality check itself (only alignment and the resolved <code>MemoryResource*</code> do).</p>
+<h3 id="relationships_3">Relationships</h3>
+<ul>
+<li><code>PolyAllocator::operator==</code> / <code>operator!=</code> — <em>free functions comparing a <code>PolyAllocator&lt;T, TAlignment, TDefaultMemoryResource&gt;</code> against a <code>PolyAllocator&lt;U, UAlignment, UDefaultMemoryResource&gt;</code>.</em></li>
+</ul>
+<!-- ink:api-end name="UDefaultMemoryResource" -->
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../MemoryResource/" class="btn btn-neutral float-left" title="MemoryResource"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../ScopedPtr/" class="btn btn-neutral float-right" title="ScopedPtr">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../MemoryResource/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../ScopedPtr/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
