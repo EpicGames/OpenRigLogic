@@ -88,6 +88,8 @@ inline void getSwing<TwistAxis::Z>(ArrayView<float> q) {
     q[0] = (w * x - z * y) / q[3];
 }
 
+// TwistAngle keeps only the twist component of each quaternion: the two non-twist vector slots are zeroed and
+// (twist, w) is renormalized, so exactly one vector slot is non-zero afterwards.
 template<TwistAxis TTwistAxis>
 inline void getTwist(ArrayView<float> q) {
     constexpr auto twistIndex = static_cast<std::uint16_t>(TTwistAxis);
@@ -95,10 +97,29 @@ inline void getTwist(ArrayView<float> q) {
     constexpr auto notTwistIndex1 = (twistIndex + 2u) % 3u;
     q[notTwistIndex0] = 0.0f;
     q[notTwistIndex1] = 0.0f;
-    // normalize
-    float magnitude = std::sqrt(q[twistIndex] * q[twistIndex] + q[3] * q[3]);
+    const float magnitude = std::sqrt(q[twistIndex] * q[twistIndex] + q[3] * q[3]);
+    if (magnitude == 0.0f) {
+        // A pure 180-degree swing about a perpendicular axis has no twist component.
+        q[twistIndex] = 0.0f;
+        q[3] = 1.0f;
+        return;
+    }
     q[twistIndex] /= magnitude;
     q[3] /= magnitude;
+}
+
+// Unwound twist angle (radians, [-pi, pi]) of a twist quaternion produced by getTwist.
+// Axis-agnostic: only one vector slot is non-zero, so their sum is the twist component.
+inline float getTwistAngle(ConstArrayView<float> q) {
+    constexpr float pi = static_cast<float>(tdm::pi());
+    float angle = 2.0f * std::atan2(q[0] + q[1] + q[2], q[3]);
+    // 2 * atan2 lies in (-2pi, 2pi]; a single correction unwinds it.
+    if (angle > pi) {
+        angle -= 2.0f * pi;
+    } else if (angle < -pi) {
+        angle += 2.0f * pi;
+    }
+    return angle;
 }
 
 template<RBFDistanceMethod TDistanceMethod>
@@ -137,6 +158,32 @@ struct DistanceMethodFunctor<RBFDistanceMethod::Quaternion> {
                 auto bQ = rawControlValues.subview(i * 4u, 4u);
                 // quaternions need to be normalized for this
                 distance += pow<2u>(getArcLength(aQ, bQ));
+            }
+            intermediateWeights[ti] = std::sqrt(distance);
+        }
+    }
+};
+
+template<>
+struct DistanceMethodFunctor<RBFDistanceMethod::TwistAngle> {
+    // |twistA - twistB| on unwound angles (range [0, 2pi]), as UE's RBFDistanceMetric::TwistAngle - NOT the arc length
+    // of the twist quaternions: arc length is sign-invariant and wraps at pi, so targets at +120 and -120 degrees would
+    // sit 120 apart instead of 240 and the net interpolates through the wrong neighbors. Inputs are twist quaternions
+    // from getTwist.
+    // The unwound range is discontinuous at +-180 degrees by design (+179 and -179 are 358 apart), exactly as UE's
+    // FQuat::GetTwistAngle: unrolling the circle so that +120 and -120 are distinguishable requires a seam, and a
+    // shortest-arc wrap here would reintroduce the collapse above.
+    static inline void getDistance(ConstArrayView<AlignedVector<float>> targets,
+                                   ConstArrayView<float> rawControlValues,
+                                   ArrayView<float> intermediateWeights) {
+        const std::size_t quaternionCount = rawControlValues.size() / 4u;
+        for (std::size_t ti = 0u; ti < targets.size(); ++ti) {
+            auto target = ConstArrayView<float>{targets[ti]};
+            float distance = 0.0f;
+            for (std::size_t i = 0u; i < quaternionCount; ++i) {
+                const float angleA = getTwistAngle(target.subview(i * 4u, 4u));
+                const float angleB = getTwistAngle(rawControlValues.subview(i * 4u, 4u));
+                distance += pow<2u>(angleA - angleB);
             }
             intermediateWeights[ti] = std::sqrt(distance);
         }
@@ -198,6 +245,9 @@ DistanceFun getDistanceFun(RBFDistanceMethod distanceMethod) {
     if (distanceMethod == RBFDistanceMethod::Euclidean) {
         return D<RBFDistanceMethod::Euclidean>::getDistance;
     }
+    if (distanceMethod == RBFDistanceMethod::TwistAngle) {
+        return D<RBFDistanceMethod::TwistAngle>::getDistance;
+    }
     return D<RBFDistanceMethod::Quaternion>::getDistance;
 }
 
@@ -223,6 +273,7 @@ DistanceWeightFun getDistanceWeightFun(RBFFunctionType weightMethod, RBFDistance
 
     constexpr auto Euclidean = RBFDistanceMethod::Euclidean;
     constexpr auto Quaternion = RBFDistanceMethod::Quaternion;
+    constexpr auto TwistAngle = RBFDistanceMethod::TwistAngle;
 
     if (distanceMethod == Euclidean) {
         switch (weightMethod) {
@@ -239,6 +290,22 @@ DistanceWeightFun getDistanceWeightFun(RBFFunctionType weightMethod, RBFDistance
         }
     }
 
+    if (distanceMethod == TwistAngle) {
+        switch (weightMethod) {
+        case Gaussian:
+            return DistanceWeightFunctor<D<TwistAngle>, W<Gaussian>>();
+        case Cubic:
+            return DistanceWeightFunctor<D<TwistAngle>, W<Cubic>>();
+        case Exponential:
+            return DistanceWeightFunctor<D<TwistAngle>, W<Exponential>>();
+        case Linear:
+            return DistanceWeightFunctor<D<TwistAngle>, W<Linear>>();
+        case Quintic:
+            return DistanceWeightFunctor<D<TwistAngle>, W<Quintic>>();
+        }
+    }
+
+    // Quaternion and SwingAngle share the arc-length metric (SwingAngle inputs are pre-converted to swing quaternions).
     switch (weightMethod) {
     case Gaussian:
         return DistanceWeightFunctor<D<Quaternion>, W<Gaussian>>();
