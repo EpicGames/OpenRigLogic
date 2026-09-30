@@ -4,9 +4,9 @@ _19 entries across 6 modules._
 
 ## By Task
 
-### Rig evaluation
+### Core evaluation
 
-Load, configure, and evaluate a rig to produce joint, blend shape, and animation output
+Load a rig and evaluate instances to drive rig output
 
 | API | Module | Summary |
 |-----|--------|---------|
@@ -15,9 +15,9 @@ Load, configure, and evaluate a rig to produce joint, blend shape, and animation
 | [RigLogic](riglogic/RigInstance.md) | RigInstance | Evaluates a `RigInstance` to produce joint, blend shape, and animated map output values. Pass a `RigInstance` to `RigLogic::calculate` to drive the rig for a given frame. |
 | [RigLogic](riglogic/RigLogic.md) | RigLogic | Loads and optimizes DNA rig data, then calculates rig output values for any number of `RigInstance` objects based on their input control values. |
 
-### Configuration and output types
+### Configuration
 
-Select CPU algorithm, floating point precision, and output representations for rotations, translations, and scales
+Set options for rig loading and evaluation behavior
 
 | API | Module | Summary |
 |-----|--------|---------|
@@ -29,25 +29,25 @@ Select CPU algorithm, floating point precision, and output representations for r
 | [ScaleType](riglogic/Configuration.md) | Configuration | Selects the representation RigLogic uses for scale output values. |
 | [TranslationType](riglogic/Configuration.md) | Configuration | Selects the representation RigLogic uses for translation output values. |
 
-### Memory management
+### Memory and type utilities
 
-Traits for memory management utilities to construct and destroy RigLogic and RigInstance objects
-
-| API | Module | Summary |
-|-----|--------|---------|
-| [DefaultInstanceCreator](riglogic/RigInstance.md) | RigInstance | A `pma` trait specialization that tells the memory management utilities how to construct a `RigInstance` by default. |
-| [DefaultInstanceCreator](riglogic/RigLogic.md) | RigLogic | A `pma` trait specialization that tells the memory management utilities how to construct a `RigLogic` by default. |
-| [DefaultInstanceDestroyer](riglogic/RigInstance.md) | RigInstance | A `pma` trait specialization that tells the memory management utilities how to destroy a `RigInstance` by default. |
-| [DefaultInstanceDestroyer](riglogic/RigLogic.md) | RigLogic | A `pma` trait specialization that tells the memory management utilities how to destroy a `RigLogic` by default. |
-
-### Data structures and introspection
-
-Lightweight views over arrays, rig statistics, and version information
+Type aliases for array views and memory management
 
 | API | Module | Summary |
 |-----|--------|---------|
 | [ArrayView](types/Aliases.md) | Aliases | An alias for `dna::ArrayView<T>`, a lightweight mutable view over a contiguous array of `T`. |
 | [ConstArrayView](types/Aliases.md) | Aliases | An alias for `dna::ConstArrayView<T>`, a lightweight read-only view over a contiguous array of `T`. |
+| [DefaultInstanceCreator](riglogic/RigInstance.md) | RigInstance | A `pma` trait specialization that tells the memory management utilities how to construct a `RigInstance` by default. |
+| [DefaultInstanceCreator](riglogic/RigLogic.md) | RigLogic | A `pma` trait specialization that tells the memory management utilities how to construct a `RigLogic` by default. |
+| [DefaultInstanceDestroyer](riglogic/RigInstance.md) | RigInstance | A `pma` trait specialization that tells the memory management utilities how to destroy a `RigInstance` by default. |
+| [DefaultInstanceDestroyer](riglogic/RigLogic.md) | RigLogic | A `pma` trait specialization that tells the memory management utilities how to destroy a `RigLogic` by default. |
+
+### Library information
+
+Query rig statistics and library version
+
+| API | Module | Summary |
+|-----|--------|---------|
 | [Stats](riglogic/Stats.md) | Stats | A snapshot of counts and configuration describing the size and shape of a loaded rig. |
 | [VersionInfo](version/VersionInfo.md) | VersionInfo | Reports the RigLogic library version at runtime, as major/minor/patch numbers and a formatted string. |
 

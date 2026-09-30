@@ -308,3 +308,41 @@ This release includes changes across three modules, with all functional work in 
 
 **Tags**: release, v13.2.9, riglogic, ml, cpu, cmake, include
 <!-- ink:end id=d0f5e815 -->
+
+<!-- ink:start id=f3d074e9 type=release_notes conflict_score=1.0 last_confirmed=2026-09-30 created=2026-09-30 -->
+## Release v13.5.0
+
+This release spans twelve modules, with the bulk of the work in riglogic (118 files: serialization validation infrastructure), dna (44 files: malformed-input rejection), and trio (21 files: stream API additions and a stdio-based FileStream). It adds four features and four bug fixes centred on hardening dump/restore and DNA loading against malformed data, plus a library-wide rework of the DLL export macros; no breaking changes. RigLogic version moves from 13.2.9 to 13.5.0.
+
+### Highlights
+
+- **riglogic**: Restored rigs are now validated — per-module validators (joints, storage, controls, blend shapes, conditional tables, animated maps, ML behavior) check dumped data offsets and sizes against rig metadata before use
+- **dna**: The binary reader rejects malformed DNA with `InvalidDataError` instead of clamping it into a rig that silently differs from the file
+- **trimd**: One binary can now host both AVX-only and AVX2+FMA SIMD kernels, selected by runtime CPU feature detection
+- **(root)**: New `RL_BUILD_WITH_AVX2` / `RL_BUILD_WITH_AVX512F` build options; RigLogic version bumped to 13.5.0
+
+### Features
+
+- **riglogic**: Added `SerializationContext` (passed via the archive's user-data pointer during `dump()`/`restore()`) and per-module validators so each `load()` validates its offsets and sizes against the rig dimensions before use
+- **riglogic**: Added `BoundedInputArchive`, a bounds-checked input archive now used by all evaluator `load()` paths in place of the raw `terse::BinaryInputArchive`
+- **trimd**: Parameterized the SIMD wrappers on a compile-time `FPModel` tag (`Precise`/`Fast`) so the same kernel template produces distinct coexisting symbols — an AVX-only arm and an AVX2+FMA arm — with the runtime dispatcher picking by detected CPU features; `F256` remains as the backwards-compatible `Precise` alias
+- **trio**: Added the `Mappable` stream concept and a default no-op `BoundedIOStream::flush()` (buffering streams override it); exposed `flush` through the Python bindings
+
+### Bug Fixes
+
+- **dna**: `DenormalizedData::populate` and the new stream `Validator` reject malformed sources — mismatched parallel parameter arrays, joint-group LOD row counts past the group's rows, joint indices past the joint count, and ML joint outputs with no recognized attribute width — reporting `InvalidDataError` instead of clamping
+- **terse**: Bool deserialization validates the wire value (a byte greater than 1 marks the archive malformed, reported via `isOk()`), and `is_batchable` now admits enums while excluding `bool`
+- **python**: Fixed the SWIG runtime type-table name — the previous quoted, dot-containing capsule name broke `PyCapsule_Import` type lookups (null-deref on bad arguments); now a plain version-suffixed identifier
+- **python**: `setMetaData(key, None)` is accepted again, matching the `DescriptorWriter` contract where a null value deletes the key
+
+### Infrastructure
+
+- **include**: Reworked the DLL export/visibility macros across all public headers (`RLAPI_TYPE`/`RLAPI_MEMBER`, `DNAAPI_TYPE`/`DNAAPI_MEMBER`, and template instantiation declaration/definition halves) to attach the correct attribute per export mechanism — visibility vs `dllexport`/`dllimport` — per compiler and ABI
+- **(root)**: Bumped `RL_VERSION` from 13.2.9 to 13.5.0; added `RL_AUTODETECT_AVX2`/`RL_BUILD_WITH_AVX2` and AVX-512F options; registered the new validator sources and test suites in the build
+
+### Other Changes
+
+- **trio**: Reimplemented `FileStream` over C stdio with explicit read/write positioning (replacing `std::fstream`), shared-open semantics on Windows (`_wfsopen`/`_SH_DENYNO`), and `fstat`-based size queries where available
+
+**Tags**: release, v13.5.0, riglogic, dna, trio, trimd, terse, python
+<!-- ink:end id=f3d074e9 -->

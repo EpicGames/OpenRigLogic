@@ -6,7 +6,7 @@ _5 entries across 2 modules._
 
 ### Array and string views
 
-Create and use non-owning views over contiguous sequences of objects and C strings
+Non-owning views over contiguous sequences with pointer-and-count pairs
 
 | API | Module | Summary |
 |-----|--------|---------|
@@ -14,9 +14,9 @@ Create and use non-owning views over contiguous sequences of objects and C strin
 | [ConstArrayView](ArrayView.md) | ArrayView | A read-only view over a contiguous sequence of objects — an alias for `ArrayView<const T>`. |
 | [StringView](StringView.md) | StringView | A non-owning, NULL-safe view over a C string, built on top of `ConstArrayView<char>`. |
 
-### View type traits
+### Array view type traits
 
-Compile-time type checking and trait utilities for safe view conversions and const-correctness
+Type system support for array views, including const-correctness and conversion compatibility checks
 
 | API | Module | Summary |
 |-----|--------|---------|

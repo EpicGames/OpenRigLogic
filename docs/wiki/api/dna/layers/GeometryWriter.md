@@ -2,25 +2,26 @@
 
 ---
 
-<!-- ink:api name="GeometryWriter" module="dna/layers/GeometryWriter" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="GeometryWriter" module="dna/layers/GeometryWriter" last_commit="api_scan" updated="2026-09-30" api_kind="callable" -->
+## `class DNAAPI GeometryWriter : public virtual DefinitionWriter`
 
-## `class GeometryWriter : public virtual DefinitionWriter`
-
-Write geometry data (meshes, vertex positions, normals, texture coordinates, and layouts) into a rig DNA structure.
+Write mesh geometry (vertex positions, texture coordinates, normals and layouts) into a rig. Write-only counterpart of the geometry reader.
 
 ### When to use this
 
 Use this interface when you need to populate or replace the mesh geometry layer of a DNA asset during a write pass. Pair with `GeometryReader` to read geometry back after writing, or combine multiple `set*` calls to progressively build up mesh data before committing.
 
+Use it when you populate or edit the mesh data of a rig. Do not inherit from it directly. Implementors should inherit from `Writer` instead.
+
 ### Method groups
 
 | Group | Methods |
 |-------|---------|
-| Mesh management | `clearMeshes`, `deleteMesh` |
-| Vertex positions | `setVertexPositions` |
-| Texture coordinates | `setVertexTextureCoordinates` |
-| Vertex normals | `setVertexNormals` |
-| Vertex layouts | `setVertexLayouts` |
+| Meshes | clearMeshes, deleteMesh |
+| Vertex positions | setVertexPositions |
+| Vertex texture coordinates | setVertexTextureCoordinates |
+| Vertex normals | setVertexNormals |
+| Vertex layouts | setVertexLayouts |
 
 ### Example
 
@@ -57,11 +58,10 @@ writer->deleteMesh(2);
 
 ### Constraints
 
-- `meshIndex` passed to `deleteMesh` must be less than the value returned by `getMeshCount`.
-- For all `set*` methods, mesh storage is implicitly resized to accommodate the inferred mesh count from `meshIndex` — no explicit pre-allocation required.
+- For `deleteMesh`, `meshIndex` must be less than the value returned by `getMeshCount`.
 
 ### Watch out for
 
-- Do not inherit directly from `GeometryWriter`. Implementors must inherit from `Writer` itself; this interface is a write-layer mixin only.
-
+- The setters implicitly resize mesh storage, if needed, to fit the number of meshes inferred from `meshIndex`.
+- The destructor is protected, so you cannot delete an instance through this interface.
 <!-- ink:api-end name="GeometryWriter" -->

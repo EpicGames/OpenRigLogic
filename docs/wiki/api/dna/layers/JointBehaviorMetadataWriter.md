@@ -2,11 +2,14 @@
 
 ---
 
-<!-- ink:api name="JointBehaviorMetadataWriter" module="dna/layers/JointBehaviorMetadataWriter" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="JointBehaviorMetadataWriter" module="dna/layers/JointBehaviorMetadataWriter" last_commit="api_scan" updated="2026-09-30" api_kind="callable" -->
 
-## `class JointBehaviorMetadataWriter : public virtual DefinitionWriter`
+## `class DNAAPI JointBehaviorMetadataWriter : public virtual DefinitionWriter`
 
-Configure per-joint internal representation metadata that controls how each joint's translation, rotation, and scale components are evaluated during rig execution.
+Set how each joint's translation, rotation and scale are represented internally when the rig is evaluated at runtime.
+
+### Description
+The representation metadata set through this interface is consumed by the evaluator implementation at rig-evaluation time. The choice of representation (e.g., quaternion vs. Euler for rotation) can affect numerical stability and performance of the downstream joint solver. This class exposes write-only setters; it extends `DefinitionWriter` and is part of the layered writer hierarchy under `Writer`.
 
 ### When to use this
 
@@ -15,34 +18,34 @@ Use this interface when you need to control the internal numeric representation 
 ### Example
 
 ```cpp
-// writer is a concrete class that inherits from Writer (not from JointBehaviorMetadataWriter directly)
+// writer is a dna::JointBehaviorMetadataWriter (for example a dna::Writer)
 writer->clearJointRepresentations();
-
-// Set each component's representation for joint at index 0
-writer->setJointTranslationRepresentation(0, TranslationRepresentation::Vector3);
-writer->setJointRotationRepresentation(0, RotationRepresentation::Quaternion);
-writer->setJointScaleRepresentation(0, ScaleRepresentation::Vector3);
+std::uint16_t jointIndex = 0;  // must be less than getJointCount()
+writer->setJointTranslationRepresentation(jointIndex, translationRepresentation);
+writer->setJointRotationRepresentation(jointIndex, rotationRepresentation);
+writer->setJointScaleRepresentation(jointIndex, scaleRepresentation);
+// the joint now evaluates using the chosen representations
 ```
 
 ### Parameters
 
 | Name | Type | Description |
 |------|------|-------------|
-| `jointIndex` | `std::uint16_t` | required — zero-based index of the target joint; must be less than `getJointCount()` |
-| `representation` | `TranslationRepresentation` / `RotationRepresentation` / `ScaleRepresentation` | required — the desired internal representation for the joint's TRS component |
+| `jointIndex` | `std::uint16_t` | required. A joint's position in the zero-indexed array of joints. Must be less than the value returned by `getJointCount`. |
+| `representation` | `TranslationRepresentation`, `RotationRepresentation` or `ScaleRepresentation` | required. The desired representation of the joint's translation, rotation or scale component, respectively. |
 
 ### Constraints
 
+- `jointIndex` must be less than the value returned by `getJointCount`.
 - `jointIndex` must be less than the value returned by `getJointCount()`. Passing an out-of-range index is undefined behavior per the `@warning` on each setter.
 - Do not inherit directly from `JointBehaviorMetadataWriter`. Concrete implementations must inherit from `Writer`.
 
 ### Watch out for
 
+- Implementors should inherit from `Writer` itself and not this class.
+- This metadata affects how joints are calculated, as the given representation is used internally by the implementation that evaluates them.
+- `clearJointRepresentations` deletes all representations.
 - Implementors must inherit from `Writer`, not from this class directly. Inheriting from `JointBehaviorMetadataWriter` alone will result in an incomplete implementation that bypasses required Writer lifecycle machinery.
 - Call `clearJointRepresentations()` before re-populating all joint representations to avoid stale entries from a prior configuration.
-
-### Description
-
-The representation metadata set through this interface is consumed by the evaluator implementation at rig-evaluation time. The choice of representation (e.g., quaternion vs. Euler for rotation) can affect numerical stability and performance of the downstream joint solver. This class exposes write-only setters; it extends `DefinitionWriter` and is part of the layered writer hierarchy under `Writer`.
 
 <!-- ink:api-end name="JointBehaviorMetadataWriter" -->

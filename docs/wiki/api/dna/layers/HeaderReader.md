@@ -2,11 +2,10 @@
 
 ---
 
-<!-- ink:api name="HeaderReader" module="dna/layers/HeaderReader" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="HeaderReader" module="dna/layers/HeaderReader" last_commit="api_scan" updated="2026-09-30" api_kind="callable" -->
+## `class DNAAPI HeaderReader`
 
-## `class HeaderReader`
-
-Read the file format generation and version numbers from a DNA rig's header block.
+Read the file format generation and version of a rig's DNA data.
 
 ### When to use this
 
@@ -24,10 +23,10 @@ std::uint16_t ver = hdr->getFileFormatVersion();
 
 ### Returns
 
-`std::uint16_t` — unsigned 16-bit integer representing the file format generation or version number stored in the DNA header.
+`std::uint16_t` — the file format generation from `getFileFormatGeneration`, or the file format version from `getFileFormatVersion`.
 
 ### Watch out for
 
+- The destructor is protected, so you cannot delete an instance through this interface.
 - Do not inherit from `HeaderReader` directly. The Doxygen `@warning` states that implementors must inherit from `Reader` itself; `HeaderReader` is an abstract accessor layer only.
-
 <!-- ink:api-end name="HeaderReader" -->

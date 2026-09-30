@@ -2,14 +2,13 @@
 
 ---
 
-<!-- ink:api name="ActivationFunction" module="dna/layers/MachineLearnedBehavior" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+<!-- ink:api name="ActivationFunction" module="dna/layers/MachineLearnedBehavior" last_commit="api_scan" updated="2026-09-30" api_kind="data_shape" -->
 
 ## `ActivationFunction`
 
-Specify the nonlinear activation function applied at each neuron layer in a machine-learned rig behavior network.
+Enumerates the activation functions available for machine learned behavior.
 
 ### Why this exists
-
 Activation functions are a configuration concern embedded in DNA files — they must survive serialization, versioning, and cross-platform loading. Using a scoped enum rather than a raw integer or string makes every assignment compiler-checked and ensures that adding a new function in a future DNA version is a source-visible change. The five enumerators cover all activation functions supported by the RigLogic ML backend.
 
 ### Fields

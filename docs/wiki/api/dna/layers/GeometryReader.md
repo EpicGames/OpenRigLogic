@@ -2,22 +2,22 @@
 
 ---
 
-<!-- ink:api name="GeometryReader" module="dna/layers/GeometryReader" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
+<!-- ink:api name="GeometryReader" module="dna/layers/GeometryReader" last_commit="api_scan" updated="2026-09-30" api_kind="callable" -->
+## `class DNAAPI GeometryReader : public virtual DefinitionReader`
 
-## `class GeometryReader : public virtual DefinitionReader`
-
-Access all geometry data — vertex positions, texture coordinates, and related mesh data — for a rig's meshes. This is the read-only side of the geometry layer; pair it with `GeometryWriter` when you need to modify mesh data.
+Read vertex data (positions and texture coordinates) of the meshes in a rig, without modifying it.
 
 ### When to use this
 
-Use this when you need to inspect or export mesh geometry from a DNA asset — vertex positions, UV sets, or per-mesh data — without modifying it. If you need to write or patch geometry data, use `GeometryWriter` instead. Do not inherit from `GeometryReader` directly; the class requires implementors to inherit from `Reader` itself.
+Use it to read mesh geometry from a loaded DNA. Use `getVertexPosition` for convenient per-vertex access. Use the `getVertexPositionXs`, `Ys` and `Zs` accessors for performance-critical bulk access. If you need to write or patch geometry data, use `GeometryWriter` instead.
+
 
 ### Method groups
 
 | Group | Methods |
 |-------|---------|
-| Vertex positions | `getVertexPositionCount`, `getVertexPosition`, `getVertexPositionXs`, `getVertexPositionYs`, `getVertexPositionZs` |
-| Texture coordinates | `getVertexTextureCoordinateCount` |
+| VertexPosition | getVertexPositionCount, getVertexPosition, getVertexPositionXs, getVertexPositionYs, getVertexPositionZs |
+| VertexTextureCoordinate | getVertexTextureCoordinateCount |
 
 ### Example
 
@@ -43,11 +43,23 @@ dna::ConstArrayView<float> xs = reader->getVertexPositionXs(0);
 
 | Name | Type | Description |
 |------|------|-------------|
-| `meshIndex` | `std::uint16_t` | required — zero-based mesh index. Must be less than `getMeshCount()`. |
-| `vertexIndex` | `std::uint32_t` | required — zero-based vertex index within the mesh. Must be less than `getVertexPositionCount(meshIndex)`. Vertices are ordered by vertex ID. |
+| `meshIndex` | `std::uint16_t` | required. Position in the zero-indexed array of meshes. Must be less than `getMeshCount`. |
+| `vertexIndex` | `std::uint32_t` | required. Position in the zero-indexed array of vertex positions. Must be less than `getVertexPositionCount`. |
+
+### Returns
+
+`Position`, `ConstArrayView<float>` or `std::uint32_t`, depending on the method. These are a vertex position, a view over all X, Y or Z values of a mesh, and an element count.
+
+### Constraints
+
+- `meshIndex` must be less than the value returned by `getMeshCount`.
+- `vertexIndex` must be less than the value returned by `getVertexPositionCount`.
+- Vertices are sorted by vertex ID.
 
 ### Watch out for
 
+- Implementors should inherit from `Reader` itself, not this class.
+- The destructor is protected, so you cannot delete an instance through a `GeometryReader` pointer.
 - `meshIndex` and `vertexIndex` are not bounds-checked. Passing an out-of-range value is undefined behavior — always validate against `getMeshCount()` and `getVertexPositionCount()` first.
 - `getVertexPositionXs`, `getVertexPositionYs`, and `getVertexPositionZs` return a `ConstArrayView<float>` — a non-owning view. The view is only valid while the underlying DNA data object is alive.
 - Do not inherit from `GeometryReader` directly. The class-level `@warning` requires implementors to inherit from `Reader` itself, not from this interface.

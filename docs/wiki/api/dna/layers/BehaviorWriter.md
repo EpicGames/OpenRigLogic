@@ -2,21 +2,14 @@
 
 ---
 
-<!-- ink:api name="BehaviorWriter" module="dna/layers/BehaviorWriter" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
-
+<!-- ink:api name="BehaviorWriter" module="dna/layers/BehaviorWriter" last_commit="api_scan" updated="2026-09-30" api_kind="callable" -->
 ## `class DNAAPI BehaviorWriter : public virtual DefinitionWriter`
 
-Write rig evaluation behavior data into a DNA asset — GUI-to-raw control mapping, PSD expressions, joint group matrices, blend shape channels, and animated maps. Do not subclass this directly; inherit from `Writer` instead.
+Write the DNA attributes that define how the rig evaluates: GUI-to-raw control mapping and PSD expressions.
 
 ### When to use this
 
 Use when constructing or modifying the behavioral layer of a DNA asset — populating evaluation data that drives how raw controls respond to GUI inputs, how joints are driven by PSD expressions, or how blend shapes and animated maps are activated per LOD. If you only need to read behavior data, use `BehaviorReader` instead.
-
-### Watch out for
-
-- Implementors must inherit from `Writer`, not from `BehaviorWriter` directly. Subclassing `BehaviorWriter` directly bypasses lifecycle management provided by `Writer`.
-- `jointGroupIndex` passed to any `setJointGroup*` method must be less than the value returned by `getJointGroupCount`. Joint group storage is implicitly resized when an index exceeds current capacity, but out-of-range indices still violate the documented precondition.
-- The LOD values set via `setBlendShapeChannelLODs` are not interchangeable with the LOD indices set in `DefinitionWriter::setBlendShapeNameIndices` and `DefinitionWriter::setLODBlendShapeMapping`. Passing the wrong set silently produces incorrect blend shape evaluation at runtime.
 
 ### Method groups
 
@@ -46,4 +39,19 @@ writer->setPSDColumnIndices(psdCols.data(), static_cast<uint16_t>(psdCols.size()
 writer->setPSDValues(psdWeights.data(), static_cast<uint16_t>(psdWeights.size()));
 ```
 
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `inputIndices`, `outputIndices`, `rowIndices`, `columnIndices` | `const std::uint16_t*` | required. Source address the indices are copied from. |
+| `fromValues`, `toValues`, `slopeValues`, `cutValues` | `const float*` | required. Source address the values are copied from. |
+| `count` | `std::uint16_t` | required. Number of elements to copy. For `setPSDCount`, the number of distinct PSD expressions. |
+
+### Watch out for
+
+- The destructor is protected, so you cannot delete through a `BehaviorWriter` pointer.
+- Setters copy from the source address, so the caller keeps ownership of its buffers.
+- Implementors must inherit from `Writer`, not from `BehaviorWriter` directly. Subclassing `BehaviorWriter` directly bypasses lifecycle management provided by `Writer`.
+- `jointGroupIndex` passed to any `setJointGroup*` method must be less than the value returned by `getJointGroupCount`. Joint group storage is implicitly resized when an index exceeds current capacity, but out-of-range indices still violate the documented precondition.
+- The LOD values set via `setBlendShapeChannelLODs` are not interchangeable with the LOD indices set in `DefinitionWriter::setBlendShapeNameIndices` and `DefinitionWriter::setLODBlendShapeMapping`. Passing the wrong set silently produces incorrect blend shape evaluation at runtime.
 <!-- ink:api-end name="BehaviorWriter" -->

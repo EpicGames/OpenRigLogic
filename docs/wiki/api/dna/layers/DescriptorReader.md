@@ -2,25 +2,24 @@
 
 ---
 
-<!-- ink:api name="DescriptorReader" module="dna/layers/DescriptorReader" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
-
+<!-- ink:api name="DescriptorReader" module="dna/layers/DescriptorReader" last_commit="api_scan" updated="2026-09-30" api_kind="callable" -->
 ## `class DNAAPI DescriptorReader : public HeaderReader`
 
-Query character identity, rig configuration, coordinate conventions, LOD range, and database provenance from a loaded DNA asset.
+Read metadata about the character and the rig: name, archetype, gender, age, key-value metadata, coordinate conventions, LOD count and database info.
 
 ### When to use this
 
-Use `DescriptorReader` when you need to inspect a character's metadata — name, archetype, LOD range, coordinate system, or database origin — before performing a full behavior or geometry read. This interface is for consumers of DNA data; if you are implementing a reader type, inherit from `Reader` instead of this class.
+Use it when you need to know how a DNA's data is to be interpreted (units, coordinate system, rotation conventions) or where the character comes from. Implementors should inherit from `Reader` itself, not from this class.
 
 ### Method groups
 
 | Group | Methods |
 |-------|---------|
-| Identity | `getName`, `getArchetype`, `getGender`, `getAge` |
-| Metadata | `getMetaDataCount`, `getMetaDataKey`, `getMetaDataValue` |
-| Coordinate conventions | `getTranslationUnit`, `getRotationUnit`, `getCoordinateSystem`, `getRotationSequence`, `getRotationSign`, `getFaceWindingOrder` |
-| LOD | `getLODCount`, `getDBMaxLOD` |
-| Database | `getDBComplexity`, `getDBName` |
+| Character | getName, getArchetype, getGender, getAge |
+| MetaData | getMetaDataCount, getMetaDataKey, getMetaDataValue |
+| Conventions | getTranslationUnit, getRotationUnit, getCoordinateSystem, getRotationSequence, getRotationSign, getFaceWindingOrder |
+| LOD | getLODCount, getDBMaxLOD |
+| DB | getDBComplexity, getDBName |
 
 ### Example
 
@@ -43,10 +42,23 @@ std::uint16_t maxLOD   = desc->getDBMaxLOD();   // relative to LOD-0 in the data
 dna::StringView dbName = desc->getDBName();
 ```
 
+### Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `index` | `std::uint32_t` | required. Position in the key-value array. Must be less than `getMetaDataCount`. |
+| `key` | `const char*` | required. Null-terminated key. |
+
+### Returns
+
+`StringView` for strings, enums for conventions, and `std::uint16_t` counts. For `getMetaDataValue`, an unknown key yields a view containing nullptr with size 0.
+
 ### Watch out for
 
+- `getMetaDataValue` requires a null-terminated key.
+- `getDBMaxLOD` is relative to LOD-0 from the database.
+- Characters from the same database must have the same Definition, but may differ in complexity or LOD.
 - Inherit from `Reader` (not `DescriptorReader`) when implementing a custom reader. Direct inheritance from this interface is not supported.
 - `getMetaDataKey(index)` requires `index < getMetaDataCount()`. Passing an out-of-range index is undefined behavior.
 - `getMetaDataValue(key)` requires a null-terminated `key`. If the key has no associated value, the returned `StringView` contains `nullptr` with size 0 — check the size before dereferencing.
-
 <!-- ink:api-end name="DescriptorReader" -->

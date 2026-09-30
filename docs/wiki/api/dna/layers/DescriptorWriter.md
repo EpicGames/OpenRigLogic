@@ -2,25 +2,24 @@
 
 ---
 
-<!-- ink:api name="DescriptorWriter" module="dna/layers/DescriptorWriter" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="callable" -->
-
+<!-- ink:api name="DescriptorWriter" module="dna/layers/DescriptorWriter" last_commit="api_scan" updated="2026-09-30" api_kind="callable" -->
 ## `class DNAAPI DescriptorWriter : public HeaderWriter`
 
-Write character and rig metadata — identity, coordinate conventions, LOD range, and database provenance — into a DNA asset.
+Write metadata about the character and the rig: name, archetype, gender, age, key-value metadata, coordinate conventions, LOD count and database info.
 
 ### When to use this
 
-Use this interface when populating or updating the descriptor layer of a DNA file: setting the character's name, archetype, gender, age, coordinate frame, available LOD levels, and database origin. All setter methods are pure-virtual; obtain a concrete instance through a `Writer` subclass — not by subclassing `DescriptorWriter` directly.
+Use it when you author a DNA and need to set its descriptor. Implementors should inherit from `Writer` itself, not from this class.
 
 ### Method groups
 
 | Group | Methods |
-|---|---|
-| Identity | `setName`, `setArchetype`, `setGender`, `setAge` |
-| Metadata | `clearMetaData`, `setMetaData` |
-| Units & coordinate system | `setTranslationUnit`, `setRotationUnit`, `setCoordinateSystem`, `setRotationSequence`, `setRotationSign`, `setFaceWindingOrder` |
-| Level of detail | `setLODCount`, `setDBMaxLOD` |
-| Database | `setDBComplexity`, `setDBName` |
+|-------|---------|
+| Character | setName, setArchetype, setGender, setAge |
+| MetaData | clearMetaData, setMetaData |
+| Conventions | setTranslationUnit, setRotationUnit, setCoordinateSystem, setRotationSequence, setRotationSign, setFaceWindingOrder |
+| LOD | setLODCount, setDBMaxLOD |
+| DB | setDBComplexity, setDBName |
 
 ### Example
 
@@ -74,8 +73,10 @@ dw->setDBName("MetaHumans");
 
 ### Watch out for
 
+- Consecutive `setMetaData` calls with the same key overwrite existing data.
+- Passing nullptr as the value removes the key.
+- Strings are copied, which costs an additional allocation.
 - Do not subclass `DescriptorWriter` directly — the class docstring states that implementors must inherit from `Writer` itself. Subclassing `DescriptorWriter` bypasses the full writer contract.
 - Passing `nullptr` as the `value` argument to `setMetaData` deletes the associated key rather than storing a null value. This is a deletion shortcut, not a no-op.
 - Every `const char*` name or value is copied internally, so the caller's buffer may be freed after the call — but each copy involves an allocation; avoid calling string setters in tight per-frame loops.
-
 <!-- ink:api-end name="DescriptorWriter" -->

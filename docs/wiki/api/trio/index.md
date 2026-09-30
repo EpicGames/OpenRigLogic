@@ -4,25 +4,9 @@ _24 entries across 7 modules._
 
 ## By Task
 
-### Core stream interfaces
-
-Abstract interfaces defining the capabilities of streams: opening, closing, reading, writing, and seeking
-
-| API | Module | Summary |
-|-----|--------|---------|
-| [Bounded](Concepts.md) | Concepts | Abstract interface for streams that have a known, finite size in bytes. |
-| [Buffered](Concepts.md) | Concepts | Abstract interface for streams that buffer writes and need an explicit flush to guarantee data reaches the filesystem. |
-| [Closeable](Concepts.md) | Concepts | Abstract interface for streams that must release an underlying resource when done. |
-| [Controllable](Concepts.md) | Concepts | Combines `Openable` and `Closeable` into a single interface for streams whose lifecycle needs both an explicit open and close step. |
-| [Openable](Concepts.md) | Concepts | Abstract interface for streams that must be explicitly opened before use. |
-| [Readable](Concepts.md) | Concepts | Abstract interface for anything bytes can be read from — into a buffer or into another stream. |
-| [Resizable](Concepts.md) | Concepts | Abstract interface for streams whose underlying storage can be resized to an exact byte length. |
-| [Seekable](Concepts.md) | Concepts | Abstract interface for streams that support random access via a position cursor. |
-| [Writable](Concepts.md) | Concepts | Abstract interface for anything bytes can be written to — a byte buffer or another stream. |
-
 ### Stream implementations
 
-Concrete stream types for working with files, memory-mapped files, and in-memory buffers
+Concrete stream types for files, memory, and memory-mapped files with full I/O capabilities
 
 | API | Module | Summary |
 |-----|--------|---------|
@@ -31,9 +15,32 @@ Concrete stream types for working with files, memory-mapped files, and in-memory
 | [MemoryMappedFileStream](streams/MemoryMappedFileStream.md) | MemoryMappedFileStream | Memory mapped file stream. Use this when you need direct memory access to file contents instead of buffered read/write calls. |
 | [MemoryStream](streams/MemoryStream.md) | MemoryStream | In-memory stream. Use this when you need a `BoundedIOStream`-compatible buffer that isn't backed by a file, for example to stage serialized data before writing it out. |
 
+### Stream capability interfaces
+
+Abstract interfaces defining individual read, write, seek, and size operations on streams
+
+| API | Module | Summary |
+|-----|--------|---------|
+| [Bounded](Concepts.md) | Concepts | Abstract interface for streams that have a known, finite size in bytes. |
+| [Readable](Concepts.md) | Concepts | Abstract interface for anything bytes can be read from — into a buffer or into another stream. |
+| [Resizable](Concepts.md) | Concepts | Abstract interface for streams whose underlying storage can be resized to an exact byte length. |
+| [Seekable](Concepts.md) | Concepts | Abstract interface for streams that support random access via a position cursor. |
+| [Writable](Concepts.md) | Concepts | Abstract interface for anything bytes can be written to — a byte buffer or another stream. |
+
+### Stream lifecycle and control
+
+Interfaces and utilities for opening, closing, and managing stream resource lifecycles
+
+| API | Module | Summary |
+|-----|--------|---------|
+| [Closeable](Concepts.md) | Concepts | Abstract interface for streams that must release an underlying resource when done. |
+| [Controllable](Concepts.md) | Concepts | Combines `Openable` and `Closeable` into a single interface for streams whose lifecycle needs both an explicit open and close step. |
+| [Openable](Concepts.md) | Concepts | Abstract interface for streams that must be explicitly opened before use. |
+| [StreamScope](utils/StreamScope.md) | StreamScope | RAII wrapper that opens a `Controllable` stream on construction and closes it on destruction. |
+
 ### Stream configuration
 
-Enumerations and parameters controlling how streams are opened and accessed
+Parameters and enumerations controlling how streams are opened and the data format they use
 
 | API | Module | Summary |
 |-----|--------|---------|
@@ -42,19 +49,19 @@ Enumerations and parameters controlling how streams are opened and accessed
 | [OpenMode](Stream.md) | Stream | Alias, scoped under `BoundedIOStream`, for `trio::OpenMode` — controls whether a stream is opened in binary or textual mode. |
 | [OpenMode](types/Parameters.md) | Parameters | Enumerates the byte-level mode a stream is opened in: binary or text. |
 
-### Stream lifecycle management
+### Buffering and factory integration
 
-RAII helpers and factory specializations for stream creation and destruction
+Buffered stream behavior and factory-based creation and destruction for stream instances
 
 | API | Module | Summary |
 |-----|--------|---------|
+| [Buffered](Concepts.md) | Concepts | Abstract interface for streams that buffer writes and need an explicit flush to guarantee data reaches the filesystem. |
 | [DefaultInstanceCreator](streams/FileStream.md) | FileStream | Specialization telling `pma`'s generic factory machinery how to create a `trio::FileStream` instance by default. |
 | [DefaultInstanceCreator](streams/MemoryMappedFileStream.md) | MemoryMappedFileStream | Template specialization that binds `trio::MemoryMappedFileStream` to its factory-based creation function. |
 | [DefaultInstanceCreator](streams/MemoryStream.md) | MemoryStream | Template specialization that binds `trio::MemoryStream` to its factory-based creation function. |
 | [DefaultInstanceDestroyer](streams/FileStream.md) | FileStream | Template specialization that binds `trio::FileStream` to its factory-based destruction function. |
 | [DefaultInstanceDestroyer](streams/MemoryMappedFileStream.md) | MemoryMappedFileStream | Template specialization that binds `trio::MemoryMappedFileStream` to its factory-based destruction function. |
 | [DefaultInstanceDestroyer](streams/MemoryStream.md) | MemoryStream | Template specialization that binds `trio::MemoryStream` to its factory-based destruction function. |
-| [StreamScope](utils/StreamScope.md) | StreamScope | RAII wrapper that opens a `Controllable` stream on construction and closes it on destruction. |
 
 ## All Modules
 

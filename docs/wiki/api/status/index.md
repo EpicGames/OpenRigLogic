@@ -4,9 +4,9 @@ _8 entries across 3 modules._
 
 ## By Task
 
-### Status tracking and reporting
+### Status tracking
 
-Read status outcomes, install message interception hooks, and format status messages with variadic arguments
+Check operation outcomes, attach hooks to intercept and override status messages
 
 | API | Module | Summary |
 |-----|--------|---------|
@@ -15,9 +15,9 @@ Read status outcomes, install message interception hooks, and format status mess
 | [StatusCode](StatusCode.md) | StatusCode | Represents the outcome of an operation as a numeric code paired with a human-readable message. |
 | [StatusProvider](Provider.md) | Provider | Formats and records status messages with `printf`-style interpolation, running each argument through an optional hook before formatting. |
 
-### Compile-time index sequences
+### Status provider internals
 
-Template metaprogramming utilities for building and working with compile-time integer index sequences
+Compile-time metaprogramming utilities for variadic argument unpacking in status formatting
 
 | API | Module | Summary |
 |-----|--------|---------|
