@@ -11,8 +11,15 @@ namespace trio {
 
 /**
     @brief In-memory stream.
+    @note
+        The stream's storage is contiguous, so the mapped region always spans the whole stream, and does so regardless of open
+        state. Any write that grows the stream may reallocate and thereby invalidate the pointer.
+    @note
+        A write from a Readable grows the storage to the whole requested size before any byte is read, and keeps only what the
+        source delivered. A size taken from untrusted input is therefore committed as memory whether or not that much data
+        exists to fill it - validate such sizes before passing them in.
 */
-class TRIOAPI MemoryStream : public BoundedIOStream {
+class TRIOAPI_TYPE MemoryStream : public BoundedIOStream, public Mappable {
 public:
     /**
         @brief Factory method for creation of a MemoryStream instance.
@@ -24,7 +31,7 @@ public:
             User is responsible for releasing the returned pointer by calling destroy.
         @see destroy
     */
-    static MemoryStream* create(MemoryResource* memRes = nullptr);
+    TRIOAPI_MEMBER static MemoryStream* create(MemoryResource* memRes = nullptr);
     /**
         @brief Factory method for creation of a MemoryStream instance.
         @param initialSize
@@ -37,17 +44,17 @@ public:
             User is responsible for releasing the returned pointer by calling destroy.
         @see destroy
     */
-    static MemoryStream* create(std::size_t initialSize, MemoryResource* memRes = nullptr);
+    TRIOAPI_MEMBER static MemoryStream* create(std::size_t initialSize, MemoryResource* memRes = nullptr);
     /**
         @brief Method for freeing a MemoryStream instance.
         @param instance
             Instance of MemoryStream to be freed.
         @see create
     */
-    static void destroy(MemoryStream* instance);
+    TRIOAPI_MEMBER static void destroy(MemoryStream* instance);
 
     MemoryStream() = default;
-    ~MemoryStream() override;
+    TRIOAPI_MEMBER ~MemoryStream() override;
 
     MemoryStream(const MemoryStream&) = delete;
     MemoryStream& operator=(const MemoryStream&) = delete;

@@ -21,3 +21,17 @@ TEST(PolyAllocIntegrationTest, InstantiateTypes) {
     pma::UnorderedMap<int, int> umap;
     ASSERT_TRUE(true);
 }
+
+TEST(PolyAllocIntegrationTest, StringKeysHashInUnorderedContainers) {
+    pma::UnorderedMap<pma::String<char>, int> umap;
+    umap[pma::String<char>{"key"}] = 1;
+    ASSERT_EQ(umap.at(pma::String<char>{"key"}), 1);
+
+    pma::UnorderedSet<pma::String<char>> uset;
+    uset.insert(pma::String<char>{"key"});
+    ASSERT_EQ(uset.count(pma::String<char>{"key"}), 1ul);
+
+    const std::hash<pma::String<char>> hasher;
+    ASSERT_EQ(hasher(pma::String<char>{"abc"}), hasher(pma::String<char>{"abc"}));
+    ASSERT_NE(hasher(pma::String<char>{"abc"}), hasher(pma::String<char>{"abd"}));
+}

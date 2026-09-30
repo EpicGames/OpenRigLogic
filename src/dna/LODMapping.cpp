@@ -71,9 +71,11 @@ ConstArrayView<std::uint16_t> LODMapping::getIndices(std::uint16_t lod) const {
     if (lod >= lods.size()) {
         return {};
     }
-    assert(lods[lod] < indices.size());
+    if (lods[lod] >= indices.size()) {
+        return {};
+    }
     const auto it = extd::advanced(indices.cbegin(), lods[lod]);
-    return (it == indices.cend() ? ConstArrayView<std::uint16_t>{} : ConstArrayView<std::uint16_t>{it->data(), it->size()});
+    return ConstArrayView<std::uint16_t>{it->data(), it->size()};
 }
 
 std::uint16_t LODMapping::getIndexListCount() const {

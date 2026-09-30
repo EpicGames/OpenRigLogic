@@ -12,22 +12,17 @@ namespace rl4 {
 namespace bpcm {
 
 struct JointGroup {
-    // Start of non-zero values in storage
     std::uint32_t valuesOffset;
-    // Start of sub-matrix col -> input vector mapping in storage
     std::uint32_t inputIndicesOffset;
-    // Start of sub-matrix row -> output vector mapping in storage
     std::uint32_t outputIndicesOffset;
-    // Start of LODs in storage
     std::uint32_t lodsOffset;
-    // Start of output rotation indices in storage
     std::uint32_t outputRotationIndicesOffset;
-    // Start of output rotation index LODs in storage
     std::uint32_t outputRotationLODsOffset;
-    // Sizes associated with start offsets
     std::uint32_t valuesSize;
     std::uint32_t colCount;
     std::uint32_t rowCount;
+    // Block height this group's storage was optimized for; selects the kernel width.
+    std::uint32_t blockHeight;
 
     template<class Archive>
     void serialize(Archive& archive) {
@@ -39,7 +34,8 @@ struct JointGroup {
                 outputRotationLODsOffset,
                 valuesSize,
                 colCount,
-                rowCount);
+                rowCount,
+                blockHeight);
     }
 };
 

@@ -173,6 +173,7 @@ class TestBoundedIOStream(TestLibrary):
             "close": [],
             "tell": [],
             "seek": ["position"],
+            "flush": [],
             "size": [],
             "read": [],
             "write": []
@@ -798,6 +799,43 @@ class TestBinaryStreamWriter(TestLibrary):
             }
         )
     }
+
+
+
+class TestCharPtrArguments(TestClass):
+    """Anything but str for a const char* parameter must raise TypeError (used to segfault)."""
+
+    def setUp(self):
+        self.stream = dna.MemoryStream()
+        self.writer = dna.BinaryStreamWriter(self.stream)
+
+    def testNonStringIsRejected(self):
+        for value in (0, 1.5, b"bytes", [], None):
+            with self.subTest(value=value):
+                with self.assertRaises(TypeError):
+                    self.writer.setName(value)
+
+    def testNoneIsRejectedForEveryStringParameter(self):
+        with self.assertRaises(TypeError):
+            self.writer.setJointName(0, None)
+        with self.assertRaises(TypeError):
+            self.writer.setMetaData(None, "value")
+        with self.assertRaises(TypeError):
+            dna.FileStream(None, dna.FileStream.AccessMode_Read, dna.FileStream.OpenMode_Binary)
+
+    def testNoneMetaDataValueDeletesKey(self):
+        # Documented DescriptorWriter contract; the only const char* parameter where None is legal.
+        self.writer.setMetaData("key", "value")
+        self.writer.setMetaData("key", None)
+        self.writer.write()
+        self.assertTrue(dna.Status.isOk())
+        self.stream.seek(0)
+        reader = dna.BinaryStreamReader(self.stream, dna.DataLayer_All)
+        reader.read()
+        self.assertTrue(dna.Status.isOk())
+        self.assertEqual(reader.getMetaDataCount(), 0)
+        with self.assertRaises(TypeError):
+            reader.getMetaDataValue(None)
 
 
 if __name__ == '__main__':

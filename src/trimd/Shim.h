@@ -2,7 +2,7 @@
 
 #pragma once
 
-#if defined(TRIMD_ENABLE_AVX) || defined(TRIMD_ENABLE_SSE)
+#if defined(TRIMD_ENABLE_AVX) || defined(TRIMD_ENABLE_SSE) || defined(TRIMD_ENABLE_AVX512F)
     #include <immintrin.h>
 
     #include <cstdint>
@@ -36,7 +36,24 @@ inline void _mm_storeu_si64(void* dest, __m128i source) {
 }
     #endif
 
-#endif  // defined(TRIMD_ENABLE_AVX) || defined(TRIMD_ENABLE_SSE)
+    #if defined(TRIMD_ENABLE_AVX512F) && !defined(__clang__) && defined(__GNUC__) && __GNUC__ < 7
+// GCC < 7 ships AVX-512F intrinsics but omits the _mm512_reduce_* family
+// (added in GCC 7.0). Recreate it from AVX-512F + SSE3 primitives that GCC 6
+// does provide: four 128-bit lane extracts, vector-add them down to one __m128,
+// then horizontal-sum that __m128 the same way sse::TF128::sum() does.
+inline float _mm512_reduce_add_ps(__m512 v) {
+    const __m128 q0 = _mm512_extractf32x4_ps(v, 0);
+    const __m128 q1 = _mm512_extractf32x4_ps(v, 1);
+    const __m128 q2 = _mm512_extractf32x4_ps(v, 2);
+    const __m128 q3 = _mm512_extractf32x4_ps(v, 3);
+    const __m128 sum128 = _mm_add_ps(_mm_add_ps(q0, q1), _mm_add_ps(q2, q3));
+    const __m128 shuf = _mm_movehdup_ps(sum128);
+    const __m128 sums = _mm_add_ps(sum128, shuf);
+    return _mm_cvtss_f32(_mm_add_ss(sums, _mm_movehl_ps(shuf, sums)));
+}
+    #endif
+
+#endif  // defined(TRIMD_ENABLE_AVX) || defined(TRIMD_ENABLE_SSE) || defined(TRIMD_ENABLE_AVX512F)
 
 #ifdef TRIMD_ENABLE_NEON
     #include <arm_neon.h>

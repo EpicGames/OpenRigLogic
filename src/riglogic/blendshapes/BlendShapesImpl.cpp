@@ -2,9 +2,12 @@
 
 #include "riglogic/blendshapes/BlendShapesImpl.h"
 
+#include "riglogic/SerializationContext.h"
 #include "riglogic/TypeDefs.h"
 #include "riglogic/blendshapes/BlendShapesOutputInstance.h"
+#include "riglogic/blendshapes/BlendShapesValidator.h"
 #include "riglogic/controls/ControlsInputInstance.h"
+#include "riglogic/riglogic/RigMetadata.h"
 
 #include <cassert>
 #include <cstdint>
@@ -26,7 +29,12 @@ BlendShapesOutputInstance::Pointer BlendShapesImpl::createInstance(MemoryResourc
 }
 
 ConstArrayView<std::uint16_t> BlendShapesImpl::getBlendShapeChannelIndicesForLOD(std::uint16_t lod) const {
+    // lod reaches here unclamped from the public API (RigLogicImpl forwards it as given), so bound it rather than
+    // relying on the assert - an OOB lods[lod] would otherwise become the returned view's length.
     assert(lod < lods.size());
+    if (lod >= lods.size()) {
+        return {};
+    }
     return {outputIndices.data(), lods[lod]};
 }
 
@@ -42,8 +50,13 @@ void BlendShapesImpl::calculate(const ControlsInputInstance* inputs,
     }
 }
 
-void BlendShapesImpl::load(terse::BinaryInputArchive<BoundedIOStream>& archive) {
+void BlendShapesImpl::load(BoundedInputArchive& archive) {
     archive(lods, inputIndices, outputIndices);
+    const SerializationContext* context = static_cast<SerializationContext*>(archive.getUserData());
+    const RigMetadata& metadata = *context->metadata;
+    if (!BlendShapesValidator::validate(lods, inputIndices, outputIndices, metadata)) {
+        archive.markMalformed();
+    }
 }
 
 void BlendShapesImpl::save(terse::BinaryOutputArchive<BoundedIOStream>& archive) {

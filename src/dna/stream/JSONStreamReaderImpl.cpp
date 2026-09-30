@@ -9,6 +9,7 @@
     #include "dna/stream/JSONStreamReaderImpl.h"
 
     #include "dna/TypeDefs.h"
+    #include "dna/stream/Validator.h"
     #include "dna/types/Limits.h"
 
     #include <status/Provider.h>
@@ -97,6 +98,10 @@ void JSONStreamReaderImpl::read() {
     }
     if (!dna.version.supported()) {
         status.set(VersionMismatchError, dna.version.generation, dna.version.version);
+        return;
+    }
+
+    if (!Validator::validate(dna)) {
         return;
     }
 }

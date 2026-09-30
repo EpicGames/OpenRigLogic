@@ -26,7 +26,7 @@ public:
                            JointsOutputInstance* outputs,
                            std::uint16_t lod,
                            std::uint16_t jointGroupIndex) const = 0;
-    virtual void load(terse::BinaryInputArchive<BoundedIOStream>& archive) = 0;
+    virtual void load(BoundedInputArchive& archive) = 0;
     virtual void save(terse::BinaryOutputArchive<BoundedIOStream>& archive) = 0;
 };
 

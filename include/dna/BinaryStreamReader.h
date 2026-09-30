@@ -9,7 +9,7 @@
 
 namespace dna {
 
-class DNAAPI BinaryStreamReader : public StreamReader {
+class DNAAPI_TYPE BinaryStreamReader : public StreamReader {
 public:
     /**
         @brief Factory method for creation of BinaryStreamReader
@@ -25,9 +25,9 @@ public:
             User is responsible for releasing the returned pointer by calling destroy.
         @see destroy
     */
-    static BinaryStreamReader* create(BoundedIOStream* stream,
-                                      const Configuration& config = {},
-                                      MemoryResource* memRes = nullptr);
+    DNAAPI_MEMBER static BinaryStreamReader* create(BoundedIOStream* stream,
+                                                    const Configuration& config = {},
+                                                    MemoryResource* memRes = nullptr);
     /**
         @brief Factory method for creation of BinaryStreamReader
         @param stream
@@ -56,11 +56,11 @@ public:
             User is responsible for releasing the returned pointer by calling destroy.
         @see destroy
     */
-    static BinaryStreamReader* create(BoundedIOStream* stream,
-                                      DataLayer layer,
-                                      UnknownLayerPolicy policy = UnknownLayerPolicy::Preserve,
-                                      std::uint16_t maxLOD = 0u,
-                                      MemoryResource* memRes = nullptr);
+    DNAAPI_MEMBER static BinaryStreamReader* create(BoundedIOStream* stream,
+                                                    DataLayer layer,
+                                                    UnknownLayerPolicy policy = UnknownLayerPolicy::Preserve,
+                                                    std::uint16_t maxLOD = 0u,
+                                                    MemoryResource* memRes = nullptr);
     /**
         @brief Factory method for creation of BinaryStreamReader
         @param stream
@@ -91,12 +91,12 @@ public:
             User is responsible for releasing the returned pointer by calling destroy.
         @see destroy
     */
-    static BinaryStreamReader* create(BoundedIOStream* stream,
-                                      DataLayer layer,
-                                      UnknownLayerPolicy policy,
-                                      std::uint16_t maxLOD,
-                                      std::uint16_t minLOD,
-                                      MemoryResource* memRes = nullptr);
+    DNAAPI_MEMBER static BinaryStreamReader* create(BoundedIOStream* stream,
+                                                    DataLayer layer,
+                                                    UnknownLayerPolicy policy,
+                                                    std::uint16_t maxLOD,
+                                                    std::uint16_t minLOD,
+                                                    MemoryResource* memRes = nullptr);
     /**
         @brief Factory method for creation of BinaryStreamReader
         @param stream
@@ -128,21 +128,21 @@ public:
             User is responsible for releasing the returned pointer by calling destroy.
         @see destroy
     */
-    static BinaryStreamReader* create(BoundedIOStream* stream,
-                                      DataLayer layer,
-                                      UnknownLayerPolicy policy,
-                                      std::uint16_t* lods,
-                                      std::uint16_t lodCount,
-                                      MemoryResource* memRes = nullptr);
+    DNAAPI_MEMBER static BinaryStreamReader* create(BoundedIOStream* stream,
+                                                    DataLayer layer,
+                                                    UnknownLayerPolicy policy,
+                                                    std::uint16_t* lods,
+                                                    std::uint16_t lodCount,
+                                                    MemoryResource* memRes = nullptr);
     /**
         @brief Method for freeing a BinaryStreamReader instance.
         @param instance
             Instance of BinaryStreamReader to be freed.
         @see create
     */
-    static void destroy(BinaryStreamReader* instance);
+    DNAAPI_MEMBER static void destroy(BinaryStreamReader* instance);
 
-    ~BinaryStreamReader() override;
+    DNAAPI_MEMBER ~BinaryStreamReader() override;
 };
 
 }  // namespace dna

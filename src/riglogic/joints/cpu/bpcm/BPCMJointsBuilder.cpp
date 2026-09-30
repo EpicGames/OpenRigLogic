@@ -9,6 +9,7 @@
 #include "riglogic/joints/JointsNullEvaluator.h"
 #include "riglogic/joints/cpu/bpcm/BPCMCalculationStrategy.h"
 #include "riglogic/joints/cpu/bpcm/BPCMJointsEvaluator.h"
+#include "riglogic/joints/cpu/bpcm/BPCMJointsStrategyFactory.h"
 #include "riglogic/joints/cpu/bpcm/RotationAdapters.h"
 #include "riglogic/joints/cpu/bpcm/Storage.h"
 #include "riglogic/joints/cpu/utils/JointGroupOptimizer.h"
@@ -36,9 +37,6 @@
 namespace rl4 {
 
 namespace bpcm {
-
-template<typename TF256, typename TF128>
-using TBPCMVec = typename std::conditional<std::is_same<TF256, trimd::fallback::T256<TF128>>::value, TF128, TF256>::type;
 
 template<typename TFVec>
 static constexpr std::uint32_t BlockHeight() {
@@ -74,145 +72,78 @@ struct VectorizationParameters {
     std::uint32_t stride;
 };
 
-template<typename T, typename TF256, typename TF128>
+// Storage rows the kernel loads for a view of viewRows out of a group padded to paddedRows; must mirror the
+// full-block / masked-block / half-block loop structure of processJointGroupBlock4 and PaddedBlockView.
+static std::uint32_t touchedRowCount(std::uint32_t viewRows, std::uint32_t paddedRows, std::uint32_t blockHeight) {
+    if (viewRows == 0u) {
+        return 0u;
+    }
+    const std::uint32_t halfBlockHeight = blockHeight / 2u;
+    const RowLOD view{viewRows, paddedRows, blockHeight, halfBlockHeight};
+    std::uint32_t touched = view.sizePaddedToLastFullBlock;
+    if (viewRows > view.sizePaddedToLastFullBlock) {
+        touched += extd::roundUp(viewRows - view.sizePaddedToLastFullBlock, halfBlockHeight);
+    }
+    return touched;
+}
+
+template<typename T, typename TF512, typename TF256, typename TF128>
 struct DetectVectorizationParameters {
 
-    VectorizationParameters operator()() {
-        using TFVec = TBPCMVec<TF256, TF128>;
+    VectorizationParameters operator()(ConstArrayView<LODRegion> lods, std::uint32_t unpaddedRowCount) {
+        // Pick the block height minimizing estimated cost over all LODs: the kernel is bandwidth-bound, so cost is rows
+        // streamed, plus an instruction penalty for sub-8-lane blocks (measured: quarter width must at least halve the
+        // rows touched to win). Ties resolve to the widest block.
+        static constexpr std::uint32_t eightLaneBlockHeight = 16u;
+        using TFWidest = TBPCMVec<TF512, TF256, TF128>;
+        std::uint32_t blockHeight = BlockHeight<TF128>();
+        std::uint64_t leastCost = ~0ull;
+        for (std::uint32_t candidate = BlockHeight<TFWidest>(); candidate >= BlockHeight<TF128>(); candidate /= 2u) {
+            const std::uint32_t paddedRows = extd::roundUp(unpaddedRowCount, candidate / 2u);
+            const std::uint64_t costPerTouchedRow = (candidate >= eightLaneBlockHeight) ? 4u : 6u;
+            std::uint64_t cost = {};
+            for (const auto& lodRegion : lods) {
+                cost += costPerTouchedRow * touchedRowCount(lodRegion.outputLODs.size, paddedRows, candidate);
+            }
+            if (cost < leastCost) {
+                leastCost = cost;
+                blockHeight = candidate;
+            }
+        }
         VectorizationParameters params = {};
-        params.blockHeight = BlockHeight<TFVec>();
-        params.padTo = PadTo<TFVec>();
-        params.stride = Stride<TFVec>();
+        params.blockHeight = blockHeight;
+        params.padTo = blockHeight / 2u;
+        params.stride = 1u;
         return params;
     }
 };
 
-template<typename T, typename TF256, typename TF128>
+template<typename T, typename TF512, typename TF256, typename TF128>
 struct MatrixOptimizer {
 
-    std::uint32_t operator()(ConstArrayView<float> src, Extent srcDims, Extent dstDims, FloatArray& dst, std::uint32_t offset) {
-        dst.resize<T>(dst.size<T>() + dstDims.size());
-        using TFVec = TBPCMVec<TF256, TF128>;
-        using BPCMOptimizer = bpcm::Optimizer<TFVec, BlockHeight<TFVec>(), PadTo<TFVec>(), Stride<TFVec>()>;
-        return BPCMOptimizer::optimize(dst.data<T>() + offset, src.data(), srcDims);
-    }
-};
-
-template<typename T, typename TF256, typename TF128>
-struct JointGroupLinearStrategyFactory {
-    using BasePointer = UniqueInstance<JointGroupLinearCalculationStrategy>::PointerType;
-
-    BasePointer operator()(RotationType rotationType,
-                           tdm::rot_seq rotationSequence,
-                           const tdm::rot_sign& rotationSigns,
-                           dna::RotationUnit rotationUnit,
-                           MemoryResource* memRes) {
-
-        using TFVec = TBPCMVec<TF256, TF128>;
-
-        if (rotationType == RotationType::EulerAngles) {
-            using CalculationStrategy = VectorizedJointGroupLinearCalculationStrategy<T, TFVec, NoopAdapter>;
-            return UniqueInstance<CalculationStrategy, JointGroupLinearCalculationStrategy>::with(memRes).create(
-                NoopAdapter{rotationSigns});
+    std::uint32_t operator()(ConstArrayView<float> src,
+                             Extent srcDims,
+                             Extent dstDims,
+                             FloatArray& dst,
+                             std::uint32_t offset,
+                             std::uint32_t blockHeight) {
+        // `offset` may exceed the current size (group starts are alignment-padded);
+        // the gap elements are value-initialized and never read
+        dst.resize<T>(offset + dstDims.size());
+        switch (blockHeight) {
+        case BlockHeight<TF512>(): {
+            using BPCMOptimizer = bpcm::Optimizer<TF512, BlockHeight<TF512>(), PadTo<TF512>(), Stride<TF512>()>;
+            return BPCMOptimizer::optimize(dst.data<T>() + offset, src.data(), srcDims);
         }
-
-#ifdef RL_BUILD_WITH_XYZ_ROTATION_ORDER
-        if (rotationSequence == tdm::rot_seq::xyz) {
-            if (rotationUnit == dna::RotationUnit::degrees) {
-                using E2Q = EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>;
-                using CalculationStrategy = VectorizedJointGroupLinearCalculationStrategy<T, TFVec, E2Q>;
-                return UniqueInstance<CalculationStrategy, JointGroupLinearCalculationStrategy>::with(memRes).create(
-                    E2Q{rotationSigns});
-            } else {
-                using E2Q = EulerAnglesToQuaternions<tdm::frad, tdm::rot_seq::xyz>;
-                using CalculationStrategy = VectorizedJointGroupLinearCalculationStrategy<T, TFVec, E2Q>;
-                return UniqueInstance<CalculationStrategy, JointGroupLinearCalculationStrategy>::with(memRes).create(
-                    E2Q{rotationSigns});
-            }
+        case BlockHeight<TF256>(): {
+            using BPCMOptimizer = bpcm::Optimizer<TF256, BlockHeight<TF256>(), PadTo<TF256>(), Stride<TF256>()>;
+            return BPCMOptimizer::optimize(dst.data<T>() + offset, src.data(), srcDims);
         }
-#endif  // RL_BUILD_WITH_XYZ_ROTATION_ORDER
-
-#ifdef RL_BUILD_WITH_XZY_ROTATION_ORDER
-        if (rotationSequence == tdm::rot_seq::xzy) {
-            if (rotationUnit == dna::RotationUnit::degrees) {
-                using E2Q = EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xzy>;
-                using CalculationStrategy = VectorizedJointGroupLinearCalculationStrategy<T, TFVec, E2Q>;
-                return UniqueInstance<CalculationStrategy, JointGroupLinearCalculationStrategy>::with(memRes).create(
-                    E2Q{rotationSigns});
-            } else {
-                using E2Q = EulerAnglesToQuaternions<tdm::frad, tdm::rot_seq::xzy>;
-                using CalculationStrategy = VectorizedJointGroupLinearCalculationStrategy<T, TFVec, E2Q>;
-                return UniqueInstance<CalculationStrategy, JointGroupLinearCalculationStrategy>::with(memRes).create(
-                    E2Q{rotationSigns});
-            }
+        default: {
+            using BPCMOptimizer = bpcm::Optimizer<TF128, BlockHeight<TF128>(), PadTo<TF128>(), Stride<TF128>()>;
+            return BPCMOptimizer::optimize(dst.data<T>() + offset, src.data(), srcDims);
         }
-#endif  // RL_BUILD_WITH_XZY_ROTATION_ORDER
-
-#ifdef RL_BUILD_WITH_YXZ_ROTATION_ORDER
-        if (rotationSequence == tdm::rot_seq::yxz) {
-            if (rotationUnit == dna::RotationUnit::degrees) {
-                using E2Q = EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::yxz>;
-                using CalculationStrategy = VectorizedJointGroupLinearCalculationStrategy<T, TFVec, E2Q>;
-                return UniqueInstance<CalculationStrategy, JointGroupLinearCalculationStrategy>::with(memRes).create(
-                    E2Q{rotationSigns});
-            } else {
-                using E2Q = EulerAnglesToQuaternions<tdm::frad, tdm::rot_seq::yxz>;
-                using CalculationStrategy = VectorizedJointGroupLinearCalculationStrategy<T, TFVec, E2Q>;
-                return UniqueInstance<CalculationStrategy, JointGroupLinearCalculationStrategy>::with(memRes).create(
-                    E2Q{rotationSigns});
-            }
         }
-#endif  // RL_BUILD_WITH_YXZ_ROTATION_ORDER
-
-#ifdef RL_BUILD_WITH_YZX_ROTATION_ORDER
-        if (rotationSequence == tdm::rot_seq::yzx) {
-            if (rotationUnit == dna::RotationUnit::degrees) {
-                using E2Q = EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::yzx>;
-                using CalculationStrategy = VectorizedJointGroupLinearCalculationStrategy<T, TFVec, E2Q>;
-                return UniqueInstance<CalculationStrategy, JointGroupLinearCalculationStrategy>::with(memRes).create(
-                    E2Q{rotationSigns});
-            } else {
-                using E2Q = EulerAnglesToQuaternions<tdm::frad, tdm::rot_seq::yzx>;
-                using CalculationStrategy = VectorizedJointGroupLinearCalculationStrategy<T, TFVec, E2Q>;
-                return UniqueInstance<CalculationStrategy, JointGroupLinearCalculationStrategy>::with(memRes).create(
-                    E2Q{rotationSigns});
-            }
-        }
-#endif  // RL_BUILD_WITH_YZX_ROTATION_ORDER
-
-#ifdef RL_BUILD_WITH_ZXY_ROTATION_ORDER
-        if (rotationSequence == tdm::rot_seq::zxy) {
-            if (rotationUnit == dna::RotationUnit::degrees) {
-                using E2Q = EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zxy>;
-                using CalculationStrategy = VectorizedJointGroupLinearCalculationStrategy<T, TFVec, E2Q>;
-                return UniqueInstance<CalculationStrategy, JointGroupLinearCalculationStrategy>::with(memRes).create(
-                    E2Q{rotationSigns});
-            } else {
-                using E2Q = EulerAnglesToQuaternions<tdm::frad, tdm::rot_seq::zxy>;
-                using CalculationStrategy = VectorizedJointGroupLinearCalculationStrategy<T, TFVec, E2Q>;
-                return UniqueInstance<CalculationStrategy, JointGroupLinearCalculationStrategy>::with(memRes).create(
-                    E2Q{rotationSigns});
-            }
-        }
-#endif  // RL_BUILD_WITH_ZXY_ROTATION_ORDER
-
-#ifdef RL_BUILD_WITH_ZYX_ROTATION_ORDER
-        if (rotationSequence == tdm::rot_seq::zyx) {
-            if (rotationUnit == dna::RotationUnit::degrees) {
-                using E2Q = EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>;
-                using CalculationStrategy = VectorizedJointGroupLinearCalculationStrategy<T, TFVec, E2Q>;
-                return UniqueInstance<CalculationStrategy, JointGroupLinearCalculationStrategy>::with(memRes).create(
-                    E2Q{rotationSigns});
-            } else {
-                using E2Q = EulerAnglesToQuaternions<tdm::frad, tdm::rot_seq::zyx>;
-                using CalculationStrategy = VectorizedJointGroupLinearCalculationStrategy<T, TFVec, E2Q>;
-                return UniqueInstance<CalculationStrategy, JointGroupLinearCalculationStrategy>::with(memRes).create(
-                    E2Q{rotationSigns});
-            }
-        }
-#endif  // RL_BUILD_WITH_ZYX_ROTATION_ORDER
-
-        return nullptr;
     }
 };
 
@@ -235,6 +166,7 @@ void BPCMJointsBuilder::allocateStorage(const JointBehaviorFilter& source) {
     lodCount = source.getLODCount();
     storage.jointGroups.resize(source.getJointGroupCount());
     storage.lodRegions.resize(storage.jointGroups.size() * static_cast<std::size_t>(lodCount));
+    storage.outputRowsPerLOD.resize(lodCount);
     if (config.rotationType == RotationType::Quaternions) {
         storage.outputRotationLODs.resize(storage.lodRegions.size());
     }
@@ -242,6 +174,7 @@ void BPCMJointsBuilder::allocateStorage(const JointBehaviorFilter& source) {
 
 void BPCMJointsBuilder::fillStorage(const JointBehaviorFilter& source) {
     rotationUnit = source.getRotationUnit();
+    const auto features = getActiveFeatures(config);
 
     Vector<float> values{memRes};
     Vector<std::uint16_t> inputIndices{memRes};
@@ -277,21 +210,34 @@ void BPCMJointsBuilder::fillStorage(const JointBehaviorFilter& source) {
         const auto optimizedColCount = static_cast<std::uint32_t>(inputIndices.size());
         const auto optimizedRowCount = static_cast<std::uint32_t>(outputIndices.size());
 
-        RuntimeTemplateInstantiator instantiator{&config};
-        VectorizationParameters vecParams = instantiator.invoke<DetectVectorizationParameters, VectorizationParameters>();
+        VectorizationParameters vecParams =
+            RuntimeTemplateInstantiator::invoke<FloatingPointModel::Precise,
+                                                DetectVectorizationParameters,
+                                                VectorizationParameters>(features,
+                                                                         ConstArrayView<LODRegion>{lods},
+                                                                         optimizedRowCount);
 
         const auto padding = extd::roundUp(optimizedRowCount, vecParams.padTo) - optimizedRowCount;
         const auto paddedRowCount = optimizedRowCount + padding;
-        // Compute padding and actual matrix size after optimization is done
         storage.jointGroups[i].valuesSize = optimizedColCount * paddedRowCount;
         storage.inputIndices.resize(storage.inputIndices.size() + inputIndices.size());
         storage.outputIndices.resize(storage.outputIndices.size() + paddedRowCount);
 
-        // Needs to use the original unpadded rowcount with the number of optimized columns (that were eliminated)
+        // Source extent is the unpadded row count by the optimized column count
         const Extent srcDims{optimizedRowCount, optimizedColCount};
         const Extent dstDims{paddedRowCount, optimizedColCount};
+        // With per-group block heights a preceding group may end on a boundary too small for this group's vector width;
+        // rounding the offset up to the half-block element count keeps every aligned kernel load within the group aligned.
+        valueOffset = extd::roundUp(valueOffset, vecParams.blockHeight / 2u);
         storage.jointGroups[i].valuesOffset = valueOffset;
-        valueOffset += instantiator.invoke<MatrixOptimizer, std::uint32_t>(values, srcDims, dstDims, storage.values, valueOffset);
+        valueOffset += RuntimeTemplateInstantiator::invoke<FloatingPointModel::Precise, MatrixOptimizer, std::uint32_t>(
+            features,
+            values,
+            srcDims,
+            dstDims,
+            storage.values,
+            valueOffset,
+            vecParams.blockHeight);
 
         std::copy(inputIndices.begin(), inputIndices.end(), extd::advanced(storage.inputIndices.begin(), inputOffset));
         storage.jointGroups[i].inputIndicesOffset = inputOffset;
@@ -304,12 +250,14 @@ void BPCMJointsBuilder::fillStorage(const JointBehaviorFilter& source) {
         for (std::uint16_t lod = {}; lod < lodCount; ++lod) {
             auto& lodRegion = lods[lod];
             lodRegion.outputLODs = RowLOD(lodRegion.outputLODs.size, paddedRowCount, vecParams.blockHeight, vecParams.padTo);
+            storage.outputRowsPerLOD[lod] += lodRegion.outputLODs.size;
         }
 
         storage.jointGroups[i].lodsOffset = lodOffset;
         lodOffset += source.getLODCount();
         storage.jointGroups[i].colCount = optimizedColCount;
         storage.jointGroups[i].rowCount = paddedRowCount;
+        storage.jointGroups[i].blockHeight = vecParams.blockHeight;
     }
 
     if (config.rotationType == RotationType::Quaternions) {
@@ -360,7 +308,6 @@ void BPCMJointsBuilder::setOutputRotationIndices(const JointBehaviorFilter& sour
                                         config.rotationPruningThreshold,
                                         config.scalePruningThreshold);
 
-        // Remap output indices from 9-attribute joints to 10-attribute joints rx -> qx
         remapOutputIndicesForQuaternions(outputRotationIndices.begin(), outputRotationIndices.end());
 // Given any rotation indices (qx, qy, qz), return only qx indices for all joints in the group
 #if !defined(__clang__) && defined(__GNUC__)
@@ -383,7 +330,6 @@ void BPCMJointsBuilder::setOutputRotationIndices(const JointBehaviorFilter& sour
                        std::back_inserter(outputRotationBaseIndices),
                        [](std::uint16_t outputIndex) { return static_cast<std::uint16_t>((outputIndex / 10) * 10 + 3); });
         deduplicate(outputRotationBaseIndices);
-        // Copy remapped qx indices into destination storage
         std::copy(outputRotationBaseIndices.begin(),
                   outputRotationBaseIndices.end(),
                   std::back_inserter(storage.outputRotationIndices));
@@ -400,26 +346,33 @@ void BPCMJointsBuilder::setOutputRotationLODs(ConstArrayView<LODRegion> lods,
                                               std::uint16_t jointGroupIndex) {
     const auto offset = static_cast<std::uint32_t>(jointGroupIndex * lodCount);
     for (std::uint16_t lod = {}; lod < lodCount; ++lod) {
-        const auto oldLODRowCount = lods[lod].outputLODs.size;
+        // LOD row counts are raw DNA values; clamp to the rotation rows that exist.
+        const auto oldLODRowCount = std::min(static_cast<std::size_t>(lods[lod].outputLODs.size), outputRotationIndices.size());
         if (oldLODRowCount == 0) {
             storage.outputRotationLODs[offset + lod] = 0;
             continue;
         }
 
-        assert(oldLODRowCount <= outputRotationIndices.size());
-        const auto qxRotationIndexAtOldLODRowCount = (outputRotationIndices[oldLODRowCount - 1ul] / 10) * 10 + 3;
-        auto start = extd::advanced(storage.outputRotationIndices.begin(), outputOffset);
-        auto it = std::find(start, storage.outputRotationIndices.end(), qxRotationIndexAtOldLODRowCount);
-        assert(it != storage.outputRotationIndices.end());
-        const auto newLODRowCount = static_cast<std::uint16_t>(std::distance(start, it) + 1);
-        storage.outputRotationLODs[offset + lod] = newLODRowCount;
+        // The rotation LOD is a prefix of the per-joint qx list, so it must reach the deepest-stored joint among ALL
+        // rows the LOD drives; joint rows may interleave, so the last row's joint alone is not enough.
+        const auto start = extd::advanced(storage.outputRotationIndices.begin(), outputOffset);
+        const auto end = storage.outputRotationIndices.end();
+        std::size_t newLODRowCount = {};
+        for (std::size_t row = {}; row < oldLODRowCount; ++row) {
+            const auto qxRotationIndex = static_cast<std::uint16_t>((outputRotationIndices[row] / 10) * 10 + 3);
+            const auto it = std::find(start, end, qxRotationIndex);
+            if (it != end) {
+                newLODRowCount = std::max(newLODRowCount, static_cast<std::size_t>(std::distance(start, it) + 1));
+            }
+        }
+        storage.outputRotationLODs[offset + lod] = static_cast<std::uint16_t>(newLODRowCount);
     }
     storage.jointGroups[jointGroupIndex].outputRotationLODsOffset = offset;
 }
 
 JointsEvaluator::Pointer BPCMJointsBuilder::build() {
-    const EvaluatorType type =
-        (meta->initializationMethod == InitializationMethod::Restore) ? meta->popFrontEvaluator() : EvaluatorType::Auto;
+    // Auto until this builder writes it on the create path; the deserialized kind on restore.
+    const EvaluatorType type = meta->evaluators.bpcmJoints;
 
     auto jointGroupsEmpty = [this]() {
         for (std::size_t i = {}; i < storage.jointGroups.size(); ++i) {
@@ -431,25 +384,40 @@ JointsEvaluator::Pointer BPCMJointsBuilder::build() {
     };
 
     if ((type == EvaluatorType::Null) || ((type == EvaluatorType::Auto) && jointGroupsEmpty())) {
-        meta->pushBackEvaluator(EvaluatorType::Null);
+        meta->evaluators.bpcmJoints = EvaluatorType::Null;
         return UniqueInstance<JointsNullEvaluator, JointsEvaluator>::with(memRes).create();
     }
 
-    RuntimeTemplateInstantiator instantiator{&config};
     using StrategyPointer = UniqueInstance<JointGroupLinearCalculationStrategy>::PointerType;
-    auto strategy = instantiator.invoke<JointGroupLinearStrategyFactory, StrategyPointer>(config.rotationType,
-                                                                                          meta->rotationSequence,
-                                                                                          meta->rotationSigns,
-                                                                                          rotationUnit,
-                                                                                          memRes);
+    StrategyPointer strategy;
+#ifdef RL_BUILD_WITH_FAST
+    if (config.floatingPointModel == FloatingPointModel::Fast) {
+        strategy = createFastLinearStrategy(config, meta->rotationSequence, meta->rotationSigns, rotationUnit, memRes);
+    }
+#endif  // RL_BUILD_WITH_FAST
+    if (strategy == nullptr) {
+        strategy = createPreciseLinearStrategy(config, meta->rotationSequence, meta->rotationSigns, rotationUnit, memRes);
+    }
 
     if (strategy == nullptr) {
-        meta->pushBackEvaluator(EvaluatorType::Null);
+        meta->evaluators.bpcmJoints = EvaluatorType::Null;
         return UniqueInstance<JointsNullEvaluator, JointsEvaluator>::with(memRes).create();
     }
 
-    meta->pushBackEvaluator(EvaluatorType::Concrete);
-    auto jointGroups = instantiator.invoke<StorageSnapshot, Vector<JointGroupView>>(storage, memRes);
+    // Same StorageValidator as the restore path. Precise tag: validation does no FP math and the block strides it
+    // checks are tag-invariant.
+    if (!RuntimeTemplateInstantiator::invoke<FloatingPointModel::Precise, StorageValidator, bool>(config,
+                                                                                                  storage,
+                                                                                                  *meta,
+                                                                                                  config.rotationType)) {
+        return nullptr;
+    }
+
+    meta->evaluators.bpcmJoints = EvaluatorType::Concrete;
+    auto jointGroups =
+        RuntimeTemplateInstantiator::invoke<FloatingPointModel::Precise, StorageSnapshot, Vector<JointGroupView>>(config,
+                                                                                                                  storage,
+                                                                                                                  memRes);
     auto factory = UniqueInstance<Evaluator, JointsEvaluator>::with(memRes);
     return factory.create(std::move(storage), std::move(jointGroups), std::move(strategy), nullptr, memRes);
 }

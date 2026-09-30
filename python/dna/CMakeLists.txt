@@ -6,7 +6,10 @@ set(PYDNA py3dna)
 set_property(SOURCE DNA.i PROPERTY CPLUSPLUS ON)
 set_property(SOURCE DNA.i PROPERTY SWIG_MODULE_NAME dna)
 set_property(SOURCE DNA.i PROPERTY SWIG_FLAGS "-doxygen")
-set_property(SOURCE DNA.i PROPERTY SWIG_TYPE_TABLE "${PYDNA}-${PROJECT_VERSION}")
+# Plain identifier only: SWIG stringifies this into the runtime capsule name and PyCapsule_Import
+# splits that name on '.', so quotes or dots make every type lookup fail (null-deref on bad args).
+set(PYDNA_TYPE_TABLE "${PYDNA}_${PROJECT_VERSION_MAJOR}_${PROJECT_VERSION_MINOR}_${PROJECT_VERSION_PATCH}")
+set_property(SOURCE DNA.i PROPERTY SWIG_TYPE_TABLE "${PYDNA_TYPE_TABLE}")
 
 option(TYPEMAP_DEBUG "Debug deducing of typemaps" OFF)
 if(TYPEMAP_DEBUG)
@@ -22,7 +25,7 @@ swig_add_library(${PYDNA}
         DNA.i)
 add_library(PyDNA::${PYDNA} ALIAS ${PYDNA})
 
-list(APPEND SWIG_COMPILE_DEFINITIONS SWIG_TYPE_TABLE="${PYDNA}-${PROJECT_VERSION}")
+list(APPEND SWIG_COMPILE_DEFINITIONS SWIG_TYPE_TABLE=${PYDNA_TYPE_TABLE})
 if(DNA_BUILD_WITH_JSON_SUPPORT)
     list(APPEND SWIG_COMPILE_DEFINITIONS DNA_BUILD_WITH_JSON_SUPPORT=ON)
 endif()

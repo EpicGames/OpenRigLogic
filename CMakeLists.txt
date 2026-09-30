@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 ################################################
 # Project setup
 set(RL riglogic4)
-set(RL_VERSION 13.2.9)
+set(RL_VERSION 13.5.0)
 # Prevent in-source-tree builds
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 # Create compilation database
@@ -67,8 +67,16 @@ option(RL_AUTODETECT_SSE "Detect if SSE is supported by examining preprocessor d
 option(RL_BUILD_WITH_SSE "Build with SSE (disregarding autodetection results)" OFF)
 option(RL_AUTODETECT_AVX "Detect if AVX is supported by examining preprocessor definitions" OFF)
 option(RL_BUILD_WITH_AVX "Build with AVX (disregarding autodetection results)" OFF)
+option(RL_AUTODETECT_AVX2 "Detect if AVX2 is supported by examining preprocessor definitions" OFF)
+option(RL_BUILD_WITH_AVX2 "Build with AVX2 (disregarding autodetection results). Applies /arch:AVX2 (MSVC) or -mavx2 (Clang/GCC) library-wide; binary will require an AVX2-capable CPU at runtime." OFF)
+option(RL_AUTODETECT_AVX512F "Detect if AVX-512F is supported by examining preprocessor definitions" OFF)
+option(RL_BUILD_WITH_AVX512F "Build with AVX-512F (disregarding autodetection results). Applies /arch:AVX512 (MSVC) or -mavx512f (Clang/GCC) library-wide; binary will require an AVX-512-capable CPU at runtime." OFF)
+option(RL_AUTODETECT_FMA "Detect if FMA is supported by examining preprocessor definitions" OFF)
+option(RL_BUILD_WITH_FMA "Build with FMA (disregarding autodetection results). On Clang/GCC adds -mfma library-wide; on MSVC FMA3 codegen comes from /arch:AVX2 instead. Always defines TRIMD_ENABLE_FMA so trimd::fma uses the intrinsic branch. Binary will require an FMA-capable CPU at runtime." OFF)
+option(RL_BUILD_WITH_FAST "Build the Fast kernel arm (relaxed floating point contraction, selectable at runtime via Configuration::floatingPointModel)" OFF)
 option(RL_AUTODETECT_NEON "Detect if NEON is supported by examining preprocessor definitions" OFF)
 option(RL_BUILD_WITH_NEON "Build with NEON (disregarding autodetection results)" OFF)
+option(RL_BUILD_WITH_NEON_COMPILER_FLAGS "Add -mfpu NEON compiler flags (32-bit ARM toolchains only; AArch64 has NEON baseline and rejects them)" OFF)
 option(RL_AUTODETECT_HALF_FLOATS "Detect if half-floats are supported by examining preprocessor definitions" OFF)
 option(RL_BUILD_WITH_HALF_FLOATS "Use half-floats (requires F16C on x86 and FP16 on ARM)" OFF)
 # Runtime feature detection will test the above enabled features
@@ -160,6 +168,7 @@ set(SOURCES
     src/riglogic/joints/JointsNullOutputInstance.h
     src/riglogic/joints/JointsOutputInstance.cpp
     src/riglogic/joints/JointsOutputInstance.h
+    src/riglogic/joints/JointsValidator.h
 
     src/riglogic/joints/cpu/CPUJointsBuilder.cpp
     src/riglogic/joints/cpu/CPUJointsBuilder.h
@@ -172,6 +181,9 @@ set(SOURCES
     src/riglogic/joints/cpu/bpcm/BPCMCalculationStrategy.h
     src/riglogic/joints/cpu/bpcm/BPCMJointsBuilder.cpp
     src/riglogic/joints/cpu/bpcm/BPCMJointsBuilder.h
+    src/riglogic/joints/cpu/bpcm/BPCMJointsBuilderFast.cpp
+    src/riglogic/joints/cpu/bpcm/BPCMJointsBuilderPrecise.cpp
+    src/riglogic/joints/cpu/bpcm/BPCMJointsStrategyFactory.h
     src/riglogic/joints/cpu/bpcm/BPCMJointsBuilderFactory.cpp
     src/riglogic/joints/cpu/bpcm/BPCMJointsBuilderFactory.h
     src/riglogic/joints/cpu/bpcm/BPCMJointsEvaluator.cpp
@@ -192,6 +204,9 @@ set(SOURCES
     src/riglogic/joints/cpu/quaternions/QuaternionCalculationStrategy.cpp
     src/riglogic/joints/cpu/quaternions/QuaternionCalculationStrategy.h
     src/riglogic/joints/cpu/quaternions/QuaternionJointsBuilder.cpp
+    src/riglogic/joints/cpu/quaternions/QuaternionJointsBuilderFast.cpp
+    src/riglogic/joints/cpu/quaternions/QuaternionJointsBuilderPrecise.cpp
+    src/riglogic/joints/cpu/quaternions/QuaternionJointsStrategyFactory.h
     src/riglogic/joints/cpu/quaternions/QuaternionJointsBuilder.h
     src/riglogic/joints/cpu/quaternions/QuaternionJointsBuilderFactory.cpp
     src/riglogic/joints/cpu/quaternions/QuaternionJointsBuilderFactory.h
@@ -224,6 +239,8 @@ set(SOURCES
     src/riglogic/ml/cpu/CPUMachineLearnedBehaviorEvaluator.cpp
     src/riglogic/ml/cpu/CPUMachineLearnedBehaviorEvaluator.h
     src/riglogic/ml/cpu/CPUMachineLearnedBehaviorFactory.cpp
+    src/riglogic/ml/cpu/CPUMachineLearnedBehaviorOperationSetFast.cpp
+    src/riglogic/ml/cpu/CPUMachineLearnedBehaviorOperationSetPrecise.cpp
     src/riglogic/ml/cpu/CPUMachineLearnedBehaviorFactory.h
     src/riglogic/ml/cpu/CPUMachineLearnedBehaviorOutputInstance.cpp
     src/riglogic/ml/cpu/CPUMachineLearnedBehaviorOutputInstance.h
@@ -285,8 +302,10 @@ set(SOURCES
 
     src/riglogic/system/simd/Detect.h
     src/riglogic/system/simd/SIMD.h
+    src/riglogic/system/simd/Macros.h
     src/riglogic/system/simd/Utils.h
 
+    src/riglogic/types/BoundedInputArchive.h
     src/riglogic/types/Extent.h
     src/riglogic/types/PaddedBlockView.h
     src/riglogic/types/LODSpec.h
@@ -411,6 +430,10 @@ if(RL_BUILD_WITH_SSE)
     endif()
 endif()
 
+if(RL_AUTODETECT_AVX)
+    target_compile_definitions(${RL} ${RL_FEATURE_VISIBILITY} RL_AUTODETECT_AVX)
+endif()
+
 if(RL_BUILD_WITH_AVX)
     set(TRIMD_ENABLE_AVX ON)
     target_compile_definitions(${RL} ${RL_FEATURE_VISIBILITY} RL_BUILD_WITH_AVX)
@@ -421,6 +444,77 @@ if(RL_BUILD_WITH_AVX)
     endif()
 endif()
 
+if(RL_AUTODETECT_AVX2)
+    target_compile_definitions(${RL} ${RL_FEATURE_VISIBILITY} RL_AUTODETECT_AVX2)
+endif()
+
+if(RL_BUILD_WITH_AVX2)
+    target_compile_definitions(${RL} ${RL_FEATURE_VISIBILITY} RL_BUILD_WITH_AVX2)
+    if(MSVC)
+        target_compile_options(${RL} ${RL_FEATURE_VISIBILITY} "/arch:AVX2")
+    else()
+        target_compile_options(${RL} ${RL_FEATURE_VISIBILITY} "-mavx2")
+    endif()
+endif()
+
+if(RL_AUTODETECT_AVX512F)
+    target_compile_definitions(${RL} ${RL_FEATURE_VISIBILITY} RL_AUTODETECT_AVX512F)
+endif()
+
+if(RL_BUILD_WITH_AVX512F)
+    set(TRIMD_ENABLE_AVX512F ON)
+    target_compile_definitions(${RL} ${RL_FEATURE_VISIBILITY} RL_BUILD_WITH_AVX512F)
+    if(MSVC)
+        target_compile_options(${RL} ${RL_FEATURE_VISIBILITY} "/arch:AVX512")
+    else()
+        target_compile_options(${RL} ${RL_FEATURE_VISIBILITY} "-mavx512f")
+    endif()
+endif()
+
+if(RL_AUTODETECT_FMA)
+    target_compile_definitions(${RL} ${RL_FEATURE_VISIBILITY} RL_AUTODETECT_FMA)
+endif()
+
+if(RL_BUILD_WITH_FMA)
+    set(TRIMD_ENABLE_FMA ON)
+    target_compile_definitions(${RL} ${RL_FEATURE_VISIBILITY} RL_BUILD_WITH_FMA TRIMD_ENABLE_FMA=1)
+    if(NOT MSVC)
+        target_compile_options(${RL} ${RL_FEATURE_VISIBILITY} "-mfma")
+    endif()
+endif()
+
+# FP contraction is pinned twice: TRiMD's scoped pragmas in the kernel TUs (portable), plus
+# these per-source flags (MSVC pragmas cannot relax contraction, only /fp:fast can).
+set(RL_PRECISE_KERNEL_SOURCES
+    src/riglogic/joints/cpu/bpcm/BPCMJointsBuilderPrecise.cpp
+    src/riglogic/joints/cpu/quaternions/QuaternionJointsBuilderPrecise.cpp
+    src/riglogic/ml/cpu/CPUMachineLearnedBehaviorOperationSetPrecise.cpp)
+
+if(MSVC)
+    set_source_files_properties(${RL_PRECISE_KERNEL_SOURCES}
+        PROPERTIES COMPILE_OPTIONS "/fp:precise")
+else()
+    set_source_files_properties(${RL_PRECISE_KERNEL_SOURCES}
+        PROPERTIES COMPILE_OPTIONS "-ffp-contract=off")
+endif()
+
+if(RL_BUILD_WITH_FAST)
+    target_compile_definitions(${RL} ${RL_FEATURE_VISIBILITY} RL_BUILD_WITH_FAST)
+
+    set(RL_FAST_KERNEL_SOURCES
+        src/riglogic/joints/cpu/bpcm/BPCMJointsBuilderFast.cpp
+        src/riglogic/joints/cpu/quaternions/QuaternionJointsBuilderFast.cpp
+        src/riglogic/ml/cpu/CPUMachineLearnedBehaviorOperationSetFast.cpp)
+
+    if(MSVC)
+        set_source_files_properties(${RL_FAST_KERNEL_SOURCES}
+            PROPERTIES COMPILE_OPTIONS "/fp:fast")
+    else()
+        set_source_files_properties(${RL_FAST_KERNEL_SOURCES}
+            PROPERTIES COMPILE_OPTIONS "-ffp-contract=fast")
+    endif()
+endif()
+
 if(RL_AUTODETECT_NEON)
     target_compile_definitions(${RL} ${RL_FEATURE_VISIBILITY} RL_AUTODETECT_NEON)
 endif()
@@ -428,7 +522,7 @@ endif()
 if(RL_BUILD_WITH_NEON)
     set(TRIMD_ENABLE_NEON ON)
     target_compile_definitions(${RL} ${RL_FEATURE_VISIBILITY} RL_BUILD_WITH_NEON)
-    if(NOT MSVC)
+    if(RL_BUILD_WITH_NEON_COMPILER_FLAGS)
         target_compile_options(${RL} ${RL_FEATURE_VISIBILITY} "-mfpu=neon")
     endif()
 endif()
@@ -447,9 +541,11 @@ if(RL_BUILD_WITH_HALF_FLOATS)
         endif()
     elseif(RL_BUILD_WITH_NEON)
         set(TRIMD_ENABLE_NEON_FP16 ON)
-        # Clang can disguise itself as MSVC on windows (clang-cl)
-        if((NOT MSVC) OR (CMAKE_CXX_COMPILER_ID MATCHES "(C|c)lang"))
-            target_compile_options(${RL} ${RL_FEATURE_VISIBILITY} "-mfpu=neon-fp16" "-mfp16-format=ieee")
+        if(RL_BUILD_WITH_NEON_COMPILER_FLAGS)
+            target_compile_options(${RL} ${RL_FEATURE_VISIBILITY} "-mfpu=neon-fp16")
+            if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+                target_compile_options(${RL} ${RL_FEATURE_VISIBILITY} "-mfp16-format=ieee")
+            endif()
         endif()
     endif()
 endif()
@@ -458,6 +554,8 @@ if(RL_DISABLE_RUNTIME_FEATURE_DETECTION)
     target_compile_definitions(${RL} ${RL_FEATURE_VISIBILITY} RL_DISABLE_RUNTIME_FEATURE_DETECTION)
 else()
     set(TRIMD_ENABLE_RUNTIME_FEATURE_DETECTION ON)
+    # For snapshot builds of trimd's own test, this flag needs to be enabled as those don't include the local SIMD.h header
+    target_compile_definitions(${RL} ${RL_FEATURE_VISIBILITY} TRIMD_ENABLE_RUNTIME_FEATURE_DETECTION)
 endif()
 
 if(RL_BUILD_WITH_XYZ_ROTATION_ORDER)
@@ -604,12 +702,31 @@ if(RL_BUILD_EXAMPLES)
 endif()
 
 ################################################
+# Tools
+option(RL_BUILD_TOOLS "Build tools" OFF)
+if(RL_BUILD_TOOLS)
+    if (RL_LIBRARY_TYPE STREQUAL SHARED)
+        message(WARNING "Tools depend on non-exported, private symbols of RigLogic and thus cannot be built when RigLogic is a shared library.")
+        set(RL_BUILD_TOOLS OFF)
+    else()
+        add_subdirectory(tools)
+    endif()
+endif()
+
+################################################
+# Fuzzing (libFuzzer harness over the DNA-factory and snapshot-restore entry points)
+option(RL_BUILD_FUZZER "Build the libFuzzer harness over the untrusted input paths" OFF)
+if(RL_BUILD_FUZZER)
+    add_subdirectory(fuzz)
+endif()
+
+################################################
 # Static analysis and diagnostics
 
 # Enable sanitizers (if command line parameter is present)
 include(Sanitizers)
-sanitize_targets(${RL} ${RL_TEST_TARGETS} ${RL_BENCHMARK_TARGETS} ${RL_EXAMPLES})
+sanitize_targets(${RL} ${RL_TEST_TARGETS} ${RL_TOOL_TARGETS} ${RL_BENCHMARK_TARGETS} ${RL_EXAMPLES} ${RL_FUZZ_TARGETS})
 
 # Add targets for running clang-tidy, cppcheck, ...
 include(Analysis)
-analyze_targets(${RL} ${RL_TEST_LIB} ${RL_TEST_RUNNER} ${RL_BENCHMARK_RUNNER} ${RL_EXAMPLES})
+analyze_targets(${RL} ${RL_TEST_LIB} ${RL_TEST_RUNNER} ${RL_TOOL_TARGETS} ${RL_BENCHMARK_RUNNER} ${RL_EXAMPLES})

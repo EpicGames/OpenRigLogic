@@ -2,15 +2,16 @@
 
 #pragma once
 
+#include "riglogic/SerializationContext.h"
 #include "riglogic/TypeDefs.h"
 #include "riglogic/system/simd/Utils.h"
 
 namespace rl4 {
 
-template<typename T, typename TF256, typename TF128>
+template<typename T, typename TF512, typename TF256, typename TF128>
 struct FloatArrayDeserializer;
 
-template<typename T, typename TF256, typename TF128>
+template<typename T, typename TF512, typename TF256, typename TF128>
 struct FloatArraySerializer;
 
 struct FloatArray {
@@ -24,16 +25,14 @@ struct FloatArray {
 
     template<class Archive>
     void load(Archive& archive) {
-        const Configuration* config = static_cast<Configuration*>(archive.getUserData());
-        RuntimeTemplateInstantiator instantiator{config};
-        instantiator.invoke<FloatArrayDeserializer, void>(*this, archive);
+        const Configuration* config = static_cast<SerializationContext*>(archive.getUserData())->config;
+        RuntimeTemplateInstantiator::invoke<FloatingPointModel::Precise, FloatArrayDeserializer, void>(*config, *this, archive);
     }
 
     template<class Archive>
     void save(Archive& archive) {
-        const Configuration* config = static_cast<Configuration*>(archive.getUserData());
-        RuntimeTemplateInstantiator instantiator{config};
-        instantiator.invoke<FloatArraySerializer, void>(*this, archive);
+        const Configuration* config = static_cast<SerializationContext*>(archive.getUserData())->config;
+        RuntimeTemplateInstantiator::invoke<FloatingPointModel::Precise, FloatArraySerializer, void>(*config, *this, archive);
     }
 
     template<typename T>
@@ -77,8 +76,8 @@ struct FloatArray {
     }
 };
 
-template<typename TF256, typename TF128>
-struct FloatArrayDeserializer<float, TF256, TF128> {
+template<typename TF512, typename TF256, typename TF128>
+struct FloatArrayDeserializer<float, TF512, TF256, TF128> {
 
     template<class TArchive>
     void operator()(FloatArray& instance, TArchive& archive) {
@@ -86,13 +85,18 @@ struct FloatArrayDeserializer<float, TF256, TF128> {
     }
 };
 
-template<typename TF256, typename TF128>
-struct FloatArrayDeserializer<std::uint16_t, TF256, TF128> {
+template<typename TF512, typename TF256, typename TF128>
+struct FloatArrayDeserializer<std::uint16_t, TF512, TF256, TF128> {
 
     template<class TArchive>
     void operator()(FloatArray& instance, TArchive& archive) {
         archive(instance.fp32);
-        assert(instance.fp32.size() % TF128::size() == 0);
+        // The conversion loop reads/writes whole TF128 blocks; a length that is not a multiple of the block size
+        // would over-read fp32 and over-write fp16 on the last block.
+        if ((instance.fp32.size() % TF128::size()) != 0u) {
+            archive.markMalformed();
+            return;
+        }
         instance.fp16.resize(instance.fp32.size());
         for (std::uint32_t blkOffset = {}; blkOffset < instance.fp32.size();
              blkOffset += static_cast<std::uint32_t>(TF128::size())) {
@@ -106,8 +110,8 @@ struct FloatArrayDeserializer<std::uint16_t, TF256, TF128> {
     }
 };
 
-template<typename TF256, typename TF128>
-struct FloatArraySerializer<float, TF256, TF128> {
+template<typename TF512, typename TF256, typename TF128>
+struct FloatArraySerializer<float, TF512, TF256, TF128> {
 
     template<class TArchive>
     void operator()(FloatArray& instance, TArchive& archive) {
@@ -115,8 +119,8 @@ struct FloatArraySerializer<float, TF256, TF128> {
     }
 };
 
-template<typename TF256, typename TF128>
-struct FloatArraySerializer<std::uint16_t, TF256, TF128> {
+template<typename TF512, typename TF256, typename TF128>
+struct FloatArraySerializer<std::uint16_t, TF512, TF256, TF128> {
 
     template<class TArchive>
     void operator()(FloatArray& instance, TArchive& archive) {

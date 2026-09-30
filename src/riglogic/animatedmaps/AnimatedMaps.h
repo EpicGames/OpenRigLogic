@@ -22,7 +22,7 @@ public:
     virtual AnimatedMapsOutputInstance::Pointer createInstance(MemoryResource* memRes) const = 0;
     virtual ConstArrayView<std::uint16_t> getAnimatedMapIndicesForLOD(std::uint16_t /*unused*/) const = 0;
     virtual void calculate(const ControlsInputInstance* inputs, AnimatedMapsOutputInstance* outputs, std::uint16_t lod) const = 0;
-    virtual void load(terse::BinaryInputArchive<BoundedIOStream>& archive) = 0;
+    virtual void load(BoundedInputArchive& archive) = 0;
     virtual void save(terse::BinaryOutputArchive<BoundedIOStream>& archive) = 0;
 };
 

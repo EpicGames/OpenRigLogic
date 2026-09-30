@@ -1598,14 +1598,12 @@ const rl4::Vector<rl4::AlignedMatrix<std::uint16_t>>& Values<std::uint16_t>::bia
 
 namespace input {
 
-// Calculation input values
 const rl4::Vector<float> values = {0.1f, 0.2f, 0.3f, 0.4f, 0.0f, 0.6f, 0.7f, 0.8f, 0.9f, 0.0f, 0.11f, 0.12f, 0.13f};
 
 }  // namespace input
 
 namespace output {
 
-// Expected output results for each LOD
 const rl4::Matrix<float> valuesPerLOD = {{// LOD-0
                                           2.00812602f,  7.61041260f,  7.84075928f,   8.07110691f,  -14.0201883f, -29.2403755f,
                                           -44.4605598f, -59.6807518f, -74.9009399f,  -90.1211243f, 7.32063866f,  9.29418468f,

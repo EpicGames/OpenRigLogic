@@ -1,7 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "riglogic/system/simd/Detect.h"
-
 #include "rltests/Defs.h"
 #include "rltests/joints/bpcm/Assertions.h"
 #include "rltests/joints/bpcm/BPCMFixturesBlock4.h"
@@ -35,7 +33,7 @@ protected:
         using TRotationAdapter = typename std::tuple_element<3, TestTypes>::type;
 
         rl4::Configuration config{};
-        auto meta = rl4::RigMetadata::create(config, &reader, &memRes, rl4::InitializationMethod::Create);
+        auto meta = rl4::RigMetadata::create(config, &reader, &memRes);
         config.calculationType = TCalculationType::get();
         config.rotationType = BPCMRotationOutputTypeSelector<TRotationAdapter>::rotation();
         auto builder = rl4::JointsBuilder::create(config, meta.get(), &memRes);
@@ -79,7 +77,7 @@ using Block4StorageValueTypeList = ::testing::Types<
                trimd::sse::F128,
                TCalculationType<rl4::CalculationType::SSE>,
                rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
-#endif  // RL_BUILD_WITH_AVX || RL_BUILD_WITH_SSE
+#endif  // RL_BUILD_WITH_SSE
 #if defined(RL_BUILD_WITH_NEON)
     std::tuple<StorageValueType, trimd::neon::F128, TCalculationType<rl4::CalculationType::NEON>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,

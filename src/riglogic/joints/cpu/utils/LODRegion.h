@@ -44,4 +44,21 @@ struct LODRegion {
     }
 };
 
+// Final output-cursor position of the kernels' block-strided walk over one LOD region: each loop advances by a WHOLE
+// step while cursor < boundary, so an unaligned boundary is overshot by up to a step and validators must bound by this
+// walk, not the raw fields. 64-bit so hostile 32-bit values cannot wrap; both steps are lane counts, never zero.
+inline std::uint64_t blockWalkEnd(const LODRegion& region, std::uint64_t fullStep, std::uint64_t halfStep) {
+    std::uint64_t cursor = 0u;
+    if (region.outputLODs.sizePaddedToSecondLastFullBlock > cursor) {
+        cursor += (((region.outputLODs.sizePaddedToSecondLastFullBlock - cursor) + fullStep - 1u) / fullStep) * fullStep;
+    }
+    if (region.outputLODs.sizePaddedToLastFullBlock > cursor) {
+        cursor += (((region.outputLODs.sizePaddedToLastFullBlock - cursor) + fullStep - 1u) / fullStep) * fullStep;
+    }
+    if (region.outputLODs.size > cursor) {
+        cursor += (((region.outputLODs.size - cursor) + halfStep - 1u) / halfStep) * halfStep;
+    }
+    return cursor;
+}
+
 }  // namespace rl4

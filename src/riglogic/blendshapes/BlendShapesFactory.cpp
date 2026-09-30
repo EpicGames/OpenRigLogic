@@ -7,6 +7,7 @@
 #include "riglogic/blendshapes/BlendShapesImplOutputInstance.h"
 #include "riglogic/blendshapes/BlendShapesNull.h"
 #include "riglogic/blendshapes/BlendShapesOutputInstance.h"
+#include "riglogic/blendshapes/BlendShapesValidator.h"
 #include "riglogic/controls/Controls.h"
 #include "riglogic/riglogic/Configuration.h"
 #include "riglogic/riglogic/RigMetadata.h"
@@ -33,14 +34,12 @@ static BlendShapesOutputInstance::Factory createBlendShapesOutputInstanceFactory
 }
 
 BlendShapes::Pointer BlendShapesFactory::create(const Configuration& config, RigMetadata* meta, MemoryResource* memRes) {
-    const EvaluatorType type = meta->popFrontEvaluator();
+    const EvaluatorType type = meta->evaluators.blendShapes;
 
     if (type == EvaluatorType::Null) {
-        meta->pushBackEvaluator(EvaluatorType::Null);
         return UniqueInstance<BlendShapesNull, BlendShapes>::with(memRes).create();
     }
 
-    meta->pushBackEvaluator(EvaluatorType::Concrete);
     auto instanceFactory = createBlendShapesOutputInstanceFactory(config, meta->blendShapeCount);
     auto moduleFactory = UniqueInstance<BlendShapesImpl, BlendShapes>::with(memRes);
     return moduleFactory.create(Vector<std::uint16_t>{memRes},
@@ -55,11 +54,11 @@ BlendShapes::Pointer BlendShapesFactory::create(const Configuration& config,
                                                 Controls* controls,
                                                 MemoryResource* memRes) {
     if (!config.loadBlendShapes || (reader->getLODCount() == 0u) || (reader->getBlendShapeChannelLODs().size() == 0u)) {
-        meta->pushBackEvaluator(EvaluatorType::Null);
+        meta->evaluators.blendShapes = EvaluatorType::Null;
         return UniqueInstance<BlendShapesNull, BlendShapes>::with(memRes).create();
     }
 
-    meta->pushBackEvaluator(EvaluatorType::Concrete);
+    meta->evaluators.blendShapes = EvaluatorType::Concrete;
     Vector<std::uint16_t> lods{memRes};
     Vector<std::uint16_t> inputIndices{memRes};
     Vector<std::uint16_t> outputIndices{memRes};
@@ -68,8 +67,13 @@ BlendShapes::Pointer BlendShapesFactory::create(const Configuration& config,
     extd::copy(reader->getBlendShapeChannelInputIndices(), inputIndices);
     extd::copy(reader->getBlendShapeChannelOutputIndices(), outputIndices);
 
+    if (!BlendShapesValidator::validate(lods, inputIndices, outputIndices, *meta)) {
+        return nullptr;
+    }
+
     for (std::uint16_t lod = {}; lod < static_cast<std::uint16_t>(lods.size()); ++lod) {
-        ConstArrayView<std::uint16_t> inputIndicesForLOD(inputIndices.data(), lods[lod]);
+        // No clamp needed: the validator above rejected any lods[lod] exceeding inputIndices.size().
+        const auto inputIndicesForLOD = ConstArrayView<std::uint16_t>{inputIndices}.first(lods[lod]);
         controls->registerControls(lod, inputIndicesForLOD);
     }
 

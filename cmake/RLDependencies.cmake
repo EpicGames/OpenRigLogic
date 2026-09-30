@@ -125,6 +125,8 @@ set(SOURCES
     src/dna/stream/StreamReader.cpp
     src/dna/stream/StreamReaderStatus.h
     src/dna/stream/StreamWriter.cpp
+    src/dna/stream/Validator.cpp
+    src/dna/stream/Validator.h
     src/dna/types/CoordinateSystemConverter.cpp
     src/dna/types/CoordinateSystemConverter.h
     src/dna/types/Limits.h
@@ -136,6 +138,7 @@ set(SOURCES
     src/pma/resources/AlignedMemoryResource.cpp
     src/pma/resources/ArenaMemoryResource.cpp
     src/pma/resources/DefaultMemoryResource.cpp
+    src/riglogic/SerializationContext.h
     src/riglogic/TypeDefs.h
     src/riglogic/animatedmaps/AnimatedMaps.cpp
     src/riglogic/animatedmaps/AnimatedMaps.h
@@ -151,6 +154,7 @@ set(SOURCES
     src/riglogic/animatedmaps/AnimatedMapsNullOutputInstance.h
     src/riglogic/animatedmaps/AnimatedMapsOutputInstance.cpp
     src/riglogic/animatedmaps/AnimatedMapsOutputInstance.h
+    src/riglogic/animatedmaps/AnimatedMapsValidator.h
     src/riglogic/blendshapes/BlendShapes.cpp
     src/riglogic/blendshapes/BlendShapes.h
     src/riglogic/blendshapes/BlendShapesFactory.cpp
@@ -165,14 +169,17 @@ set(SOURCES
     src/riglogic/blendshapes/BlendShapesNullOutputInstance.h
     src/riglogic/blendshapes/BlendShapesOutputInstance.cpp
     src/riglogic/blendshapes/BlendShapesOutputInstance.h
+    src/riglogic/blendshapes/BlendShapesValidator.h
     src/riglogic/conditionaltable/ConditionalTable.cpp
     src/riglogic/conditionaltable/ConditionalTable.h
+    src/riglogic/conditionaltable/ConditionalTableValidator.h
     src/riglogic/controls/Controls.cpp
     src/riglogic/controls/Controls.h
     src/riglogic/controls/ControlsFactory.cpp
     src/riglogic/controls/ControlsFactory.h
     src/riglogic/controls/ControlsInputInstance.cpp
     src/riglogic/controls/ControlsInputInstance.h
+    src/riglogic/controls/ControlsValidator.h
     src/riglogic/controls/instances/StandardControlsInputInstance.cpp
     src/riglogic/controls/instances/StandardControlsInputInstance.h
     src/riglogic/joints/JointBehaviorFilter.cpp
@@ -191,6 +198,7 @@ set(SOURCES
     src/riglogic/joints/JointsNullOutputInstance.h
     src/riglogic/joints/JointsOutputInstance.cpp
     src/riglogic/joints/JointsOutputInstance.h
+    src/riglogic/joints/JointsValidator.h
     src/riglogic/joints/cpu/CPUJointsBuilder.cpp
     src/riglogic/joints/cpu/CPUJointsBuilder.h
     src/riglogic/joints/cpu/CPUJointsEvaluator.cpp
@@ -203,8 +211,11 @@ set(SOURCES
     src/riglogic/joints/cpu/bpcm/BPCMJointsBuilder.h
     src/riglogic/joints/cpu/bpcm/BPCMJointsBuilderFactory.cpp
     src/riglogic/joints/cpu/bpcm/BPCMJointsBuilderFactory.h
+    src/riglogic/joints/cpu/bpcm/BPCMJointsBuilderFast.cpp
+    src/riglogic/joints/cpu/bpcm/BPCMJointsBuilderPrecise.cpp
     src/riglogic/joints/cpu/bpcm/BPCMJointsEvaluator.cpp
     src/riglogic/joints/cpu/bpcm/BPCMJointsEvaluator.h
+    src/riglogic/joints/cpu/bpcm/BPCMJointsStrategyFactory.h
     src/riglogic/joints/cpu/bpcm/JointGroup.h
     src/riglogic/joints/cpu/bpcm/RotationAdapters.h
     src/riglogic/joints/cpu/bpcm/Storage.h
@@ -214,6 +225,7 @@ set(SOURCES
     src/riglogic/joints/cpu/ml/MLJointsBuilderFactory.cpp
     src/riglogic/joints/cpu/ml/MLJointsBuilderFactory.h
     src/riglogic/joints/cpu/ml/MLJointsEvaluator.h
+    src/riglogic/joints/cpu/ml/MLJointsValidator.h
     src/riglogic/joints/cpu/ml/RotationAdapters.h
     src/riglogic/joints/cpu/quaternions/JointGroup.h
     src/riglogic/joints/cpu/quaternions/QuaternionCalculationStrategy.cpp
@@ -222,14 +234,18 @@ set(SOURCES
     src/riglogic/joints/cpu/quaternions/QuaternionJointsBuilder.h
     src/riglogic/joints/cpu/quaternions/QuaternionJointsBuilderFactory.cpp
     src/riglogic/joints/cpu/quaternions/QuaternionJointsBuilderFactory.h
+    src/riglogic/joints/cpu/quaternions/QuaternionJointsBuilderFast.cpp
+    src/riglogic/joints/cpu/quaternions/QuaternionJointsBuilderPrecise.cpp
     src/riglogic/joints/cpu/quaternions/QuaternionJointsEvaluator.cpp
     src/riglogic/joints/cpu/quaternions/QuaternionJointsEvaluator.h
+    src/riglogic/joints/cpu/quaternions/QuaternionJointsStrategyFactory.h
     src/riglogic/joints/cpu/quaternions/RotationAdapters.h
     src/riglogic/joints/cpu/twistswing/TwistSwingJointsBuilder.h
     src/riglogic/joints/cpu/twistswing/TwistSwingJointsBuilderFactory.cpp
     src/riglogic/joints/cpu/twistswing/TwistSwingJointsBuilderFactory.h
     src/riglogic/joints/cpu/twistswing/TwistSwingJointsEvaluator.h
     src/riglogic/joints/cpu/twistswing/TwistSwingSetup.h
+    src/riglogic/joints/cpu/twistswing/TwistSwingValidator.h
     src/riglogic/joints/cpu/utils/JointGroupOptimizer.cpp
     src/riglogic/joints/cpu/utils/JointGroupOptimizer.h
     src/riglogic/joints/cpu/utils/LODRegion.h
@@ -249,8 +265,11 @@ set(SOURCES
     src/riglogic/ml/cpu/CPUMachineLearnedBehaviorEvaluator.h
     src/riglogic/ml/cpu/CPUMachineLearnedBehaviorFactory.cpp
     src/riglogic/ml/cpu/CPUMachineLearnedBehaviorFactory.h
+    src/riglogic/ml/cpu/CPUMachineLearnedBehaviorOperationSetFast.cpp
+    src/riglogic/ml/cpu/CPUMachineLearnedBehaviorOperationSetPrecise.cpp
     src/riglogic/ml/cpu/CPUMachineLearnedBehaviorOutputInstance.cpp
     src/riglogic/ml/cpu/CPUMachineLearnedBehaviorOutputInstance.h
+    src/riglogic/ml/cpu/MLBehaviorValidator.h
     src/riglogic/ml/cpu/NeuralNet.h
     src/riglogic/ml/cpu/Operation.cpp
     src/riglogic/ml/cpu/Operation.h
@@ -275,6 +294,7 @@ set(SOURCES
     src/riglogic/psdnet/PSDNetNullOutputInstance.h
     src/riglogic/psdnet/PSDNetOutputInstance.cpp
     src/riglogic/psdnet/PSDNetOutputInstance.h
+    src/riglogic/psdnet/PSDNetValidator.h
     src/riglogic/rbf/RBFBehavior.cpp
     src/riglogic/rbf/RBFBehavior.h
     src/riglogic/rbf/RBFBehaviorEvaluator.cpp
@@ -295,6 +315,7 @@ set(SOURCES
     src/riglogic/rbf/cpu/CPURBFBehaviorOutputInstance.h
     src/riglogic/rbf/cpu/InterpolativeRBFSolver.cpp
     src/riglogic/rbf/cpu/InterpolativeRBFSolver.h
+    src/riglogic/rbf/cpu/RBFBehaviorValidator.h
     src/riglogic/rbf/cpu/RBFSolver.cpp
     src/riglogic/rbf/cpu/RBFSolver.h
     src/riglogic/riglogic/ConfigurationSerializer.h
@@ -304,8 +325,10 @@ set(SOURCES
     src/riglogic/riglogic/RigLogicImpl.h
     src/riglogic/riglogic/RigMetadata.h
     src/riglogic/system/simd/Detect.h
+    src/riglogic/system/simd/Macros.h
     src/riglogic/system/simd/SIMD.h
     src/riglogic/system/simd/Utils.h
+    src/riglogic/types/BoundedInputArchive.h
     src/riglogic/types/Extent.h
     src/riglogic/types/LODSpec.h
     src/riglogic/types/PaddedBlockView.h
@@ -343,14 +366,15 @@ set(SOURCES
     src/terse/utils/VirtualSerializerProxy.h
     src/terse/version/Version.h
     src/trimd/AVX.h
+    src/trimd/AVX512.h
     src/trimd/Fallback.h
     src/trimd/Macros.h
     src/trimd/NEON.h
     src/trimd/Platform.h
     src/trimd/PlatformWindows.h
-    src/trimd/Polyfill.h
     src/trimd/SSE.h
     src/trimd/Scalar.h
+    src/trimd/Shim.h
     src/trimd/TRiMD.h
     src/trimd/Utils.h
     src/trimd/version/Version.h
@@ -419,21 +443,29 @@ set(TESTS
     tests/rltests/animatedmaps/AnimatedMapFixtures.cpp
     tests/rltests/animatedmaps/AnimatedMapFixtures.h
     tests/rltests/animatedmaps/TestAnimatedMaps.cpp
+    tests/rltests/animatedmaps/TestAnimatedMapsValidator.cpp
     tests/rltests/blendshapes/BlendShapeFixtures.cpp
     tests/rltests/blendshapes/BlendShapeFixtures.h
     tests/rltests/blendshapes/TestBlendShapes.cpp
+    tests/rltests/blendshapes/TestBlendShapesValidator.cpp
     tests/rltests/conditionaltable/ConditionalTableFixtures.cpp
     tests/rltests/conditionaltable/ConditionalTableFixtures.h
     tests/rltests/conditionaltable/TestConditionalTable.cpp
     tests/rltests/controls/ControlFixtures.cpp
     tests/rltests/controls/ControlFixtures.h
     tests/rltests/controls/TestControls.cpp
+    tests/rltests/controls/TestControlsValidator.cpp
     tests/rltests/dna/DNAFixtures.cpp
     tests/rltests/dna/DNAFixtures.h
     tests/rltests/dna/FakeReader.cpp
     tests/rltests/dna/FakeReader.h
+    tests/rltests/dna/SyntheticFullReader.cpp
+    tests/rltests/dna/SyntheticFullReader.h
     tests/rltests/joints/Helpers.h
     tests/rltests/joints/TestJointsFactory.cpp
+    tests/rltests/joints/TestJointsValidator.cpp
+    tests/rltests/joints/TestStorageValidator.cpp
+    tests/rltests/joints/TestStorageWalkValidation.cpp
     tests/rltests/joints/bpcm/Assertions.h
     tests/rltests/joints/bpcm/BPCMFixturesBlock4.cpp
     tests/rltests/joints/bpcm/BPCMFixturesBlock4.h
@@ -444,12 +476,15 @@ set(TESTS
     tests/rltests/joints/bpcm/TestBlock4StorageBuilder.cpp
     tests/rltests/joints/bpcm/TestBlock8CalculationStrategy.cpp
     tests/rltests/joints/bpcm/TestBlock8StorageBuilder.cpp
+    tests/rltests/joints/bpcm/TestCalculationTypeConsistency.cpp
     tests/rltests/joints/quaternions/QuaternionFixtures.cpp
     tests/rltests/joints/quaternions/QuaternionFixtures.h
+    tests/rltests/joints/quaternions/TestQuaternionCalculationTypeConsistency.cpp
     tests/rltests/joints/quaternions/TestQuaternionEvaluator.cpp
     tests/rltests/joints/quaternions/TestQuaternionStorageBuilder.cpp
     tests/rltests/joints/twistswing/TestTwistSwingEvaluator.cpp
     tests/rltests/joints/twistswing/TestTwistSwingStorageBuilder.cpp
+    tests/rltests/joints/twistswing/TestTwistSwingValidator.cpp
     tests/rltests/joints/twistswing/TwistSwingFixtures.cpp
     tests/rltests/joints/twistswing/TwistSwingFixtures.h
     tests/rltests/joints/utils/TestLODRegion.cpp
@@ -459,6 +494,8 @@ set(TESTS
     tests/rltests/ml/cpu/FixturesMLBChained.h
     tests/rltests/ml/cpu/TestInference.cpp
     tests/rltests/ml/cpu/TestMLBChained.cpp
+    tests/rltests/ml/cpu/TestMLBWideGraphs.cpp
+    tests/rltests/ml/cpu/TestMLBehaviorValidator.cpp
     tests/rltests/ml/cpu/TestStorageBuilder.cpp
     tests/rltests/psdnet/TestPSDNet.cpp
     tests/rltests/rbf/cpu/RBFFixtures.cpp
@@ -467,6 +504,8 @@ set(TESTS
     tests/rltests/rbf/cpu/TestRBFSolver.cpp
     tests/rltests/rbf/cpu/TestRBFStorageBuilder.cpp
     tests/rltests/riglogic/TestRigLogic.cpp
+    tests/rltests/riglogic/TestRigMetadata.cpp
+    tests/rltests/riglogic/TestSyntheticDNACoverage.cpp
     tests/sctests/Defs.h
     tests/sctests/TestStatusProviderIntegration.cpp
     tests/tdmtests/Defs.h
@@ -481,6 +520,7 @@ set(TESTS
     tests/tdmtests/TestVec.cpp
     tests/tersetests/Defs.h
     tests/tersetests/FakeStream.h
+    tests/tersetests/archives/TestTraits.cpp
     tests/tersetests/archives/binary/Common.h
     tests/tersetests/archives/binary/TestBinaryInputArchive.cpp
     tests/tersetests/archives/binary/TestBinaryOutputArchive.cpp
@@ -497,7 +537,10 @@ set(TESTS
     tests/trimdtests/TestPlatform.cpp
     tests/trimdtests/TestT128.cpp
     tests/trimdtests/TestT256.cpp
+    tests/trimdtests/TestT512.cpp
     tests/triotests/Defs.h
+    tests/triotests/TestMemoryMappedFileStream.cpp
+    tests/triotests/TestMemoryStream.cpp
     tests/triotests/TestStreams.cpp
     tests/triotests/TestStreams.h
     tests/triotests/TestStreamsIntegration.cpp)

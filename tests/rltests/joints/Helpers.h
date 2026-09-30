@@ -21,8 +21,8 @@ struct RotationOutputTypeSelector<rl4::PassthroughAdapter> {
     }
 };
 
-template<typename T>
-struct RotationOutputTypeSelector<rl4::QuaternionsToEulerAngles<T, tdm::rot_seq::zyx>> {
+template<typename T, tdm::rot_seq TSequence>
+struct RotationOutputTypeSelector<rl4::QuaternionsToEulerAngles<T, TSequence>> {
     static constexpr std::size_t value() {
         return 1ul;
     }

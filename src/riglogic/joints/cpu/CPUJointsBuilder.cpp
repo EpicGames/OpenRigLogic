@@ -10,7 +10,7 @@
 #include "riglogic/joints/cpu/quaternions/QuaternionJointsBuilderFactory.h"
 #include "riglogic/joints/cpu/twistswing/TwistSwingJointsBuilderFactory.h"
 #include "riglogic/riglogic/RigMetadata.h"
-#include "riglogic/system/simd/Detect.h"
+#include "riglogic/system/simd/SIMD.h"
 
 namespace rl4 {
 
@@ -81,6 +81,10 @@ JointsEvaluator::Pointer CPUJointsBuilder::build() {
     auto quaternionEvaluator = quaternionBuilder->build();
     auto twistSwingEvaluator = twistSwingBuilder->build();
     auto mlEvaluator = mlBuilder->build();
+    // A null sub-evaluator signals DNA validation failure (a JointsNullEvaluator is an absent feature); fail the build.
+    if (!bpcmEvaluator || !quaternionEvaluator || !twistSwingEvaluator || !mlEvaluator) {
+        return nullptr;
+    }
     auto factory = UniqueInstance<CPUJointsEvaluator, JointsEvaluator>::with(memRes);
     return factory.create(std::move(bpcmEvaluator),
                           std::move(quaternionEvaluator),

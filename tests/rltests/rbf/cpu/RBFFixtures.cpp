@@ -284,7 +284,6 @@ const pma::Matrix<float> solverPoseScales = {{1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
 
 namespace input {
 
-// Calculation input values
 const rl4::Vector<float> values =
     {0.620591878890991f, 0.382426619529724f, -0.683809995651245f, 0.031930625438690f, 0.0f, 0.0f, -0.47362f, 0.880729f};
 

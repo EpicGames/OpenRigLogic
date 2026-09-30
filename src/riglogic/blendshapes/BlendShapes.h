@@ -22,7 +22,7 @@ public:
     virtual BlendShapesOutputInstance::Pointer createInstance(MemoryResource* instanceMemRes) const = 0;
     virtual ConstArrayView<std::uint16_t> getBlendShapeChannelIndicesForLOD(std::uint16_t lod) const = 0;
     virtual void calculate(const ControlsInputInstance* inputs, BlendShapesOutputInstance* outputs, std::uint16_t lod) const = 0;
-    virtual void load(terse::BinaryInputArchive<BoundedIOStream>& archive) = 0;
+    virtual void load(BoundedInputArchive& archive) = 0;
     virtual void save(terse::BinaryOutputArchive<BoundedIOStream>& archive) = 0;
 };
 

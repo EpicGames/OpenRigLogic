@@ -22,13 +22,13 @@ class Reader;
         structure of the Reader hierarchy, as it's not possible to selectively write only
         specific layers.
 */
-class DNAAPI Writer : public RBFBehaviorWriter,
-                      public GeometryWriter,
-                      public MachineLearnedBehaviorExtWriter,
-                      public JointBehaviorMetadataWriter,
-                      public TwistSwingBehaviorWriter {
+class DNAAPI_TYPE Writer : public RBFBehaviorWriter,
+                           public GeometryWriter,
+                           public MachineLearnedBehaviorExtWriter,
+                           public JointBehaviorMetadataWriter,
+                           public TwistSwingBehaviorWriter {
 public:
-    ~Writer() override;
+    DNAAPI_MEMBER ~Writer() override;
     /**
         @brief Initialize the Writer from the given Reader.
         @note
@@ -46,10 +46,10 @@ public:
         @param memRes
             Optional memory resource to use for temporary allocations during copying.
     */
-    virtual void setFrom(const Reader* source,
-                         DataLayer layer = DataLayer::All,
-                         UnknownLayerPolicy policy = UnknownLayerPolicy::Preserve,
-                         MemoryResource* memRes = nullptr);
+    DNAAPI_MEMBER virtual void setFrom(const Reader* source,
+                                       DataLayer layer = DataLayer::All,
+                                       UnknownLayerPolicy policy = UnknownLayerPolicy::Preserve,
+                                       MemoryResource* memRes = nullptr);
 };
 
 }  // namespace dna

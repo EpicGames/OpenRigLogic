@@ -21,7 +21,7 @@ public:
                    RBFBehaviorOutputInstance* /*unused*/,
                    std::uint16_t /*unused*/,
                    std::uint16_t /*unused*/) const override;
-    void load(terse::BinaryInputArchive<BoundedIOStream>& /*unused*/) override;
+    void load(BoundedInputArchive& /*unused*/) override;
     void save(terse::BinaryOutputArchive<BoundedIOStream>& /*unused*/) override;
 };
 

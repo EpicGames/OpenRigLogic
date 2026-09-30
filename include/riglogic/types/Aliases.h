@@ -21,8 +21,10 @@
 
 namespace rl4 {
 
+using dna::ArrayView;
 using dna::BinaryStreamReader;
 using dna::BinaryStreamWriter;
+using dna::ConstArrayView;
 using dna::DataLayer;
 using dna::StringView;
 using dna::UnknownLayerPolicy;
@@ -35,12 +37,17 @@ using trio::FileStream;
 using trio::MemoryMappedFileStream;
 using trio::MemoryStream;
 
-template<typename T>
-using ArrayView = dna::ArrayView<T>;
-
-template<typename T>
-using ConstArrayView = dna::ConstArrayView<T>;
-
-using namespace pma;
+using pma::AlignedMemoryResource;
+using pma::ArenaMemoryResource;
+using pma::DefaultInstanceCreator;
+using pma::DefaultInstanceDestroyer;
+using pma::DefaultMemoryResource;
+using pma::Delete;
+using pma::FactoryCreate;
+using pma::FactoryDestroy;
+using pma::makeScoped;
+using pma::MemoryResource;
+using pma::New;
+using pma::ScopedPtr;
 
 }  // namespace rl4

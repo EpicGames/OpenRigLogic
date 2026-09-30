@@ -20,9 +20,9 @@ class RigLogic;
         To evaluate / drive the rig instance, it must be passed to the RigLogic::calculate function.
     @see RigLogic
 */
-class RLAPI RigInstance {
+class RLAPI_TYPE RigInstance {
 protected:
-    virtual ~RigInstance();
+    RLAPI_MEMBER virtual ~RigInstance();
 
 public:
     /**
@@ -42,12 +42,12 @@ public:
             User is responsible for releasing the returned pointer by calling destroy.
         @see destroy
     */
-    static RigInstance* create(RigLogic* rigLogic, MemoryResource* memRes = nullptr);
+    RLAPI_MEMBER static RigInstance* create(RigLogic* rigLogic, MemoryResource* memRes = nullptr);
     /**
         @brief Method for freeing rig instances.
         @see create
     */
-    static void destroy(RigInstance* instance);
+    RLAPI_MEMBER static void destroy(RigInstance* instance);
 
     virtual std::uint16_t getGUIControlCount() const = 0;
     virtual float getGUIControl(std::uint16_t index) const = 0;

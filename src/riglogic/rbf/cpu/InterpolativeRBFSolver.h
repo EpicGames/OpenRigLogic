@@ -13,7 +13,7 @@ public:
 
     RBFSolverType getSolverType() const override;
     void solve(ArrayView<float> input, ArrayView<float> intermediateWeights, ArrayView<float> outputWeights) const override;
-    void load(terse::BinaryInputArchive<BoundedIOStream>& archive) override;
+    void load(BoundedInputArchive& archive) override;
     void save(terse::BinaryOutputArchive<BoundedIOStream>& archive) override;
 
     const Matrix<float>& getCoefficients() const;

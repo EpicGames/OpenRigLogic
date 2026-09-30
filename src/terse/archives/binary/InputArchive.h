@@ -52,11 +52,12 @@ private:
 public:
     ExtendableBinaryInputArchive(TExtender* extender, TStream* stream_) :
         BaseArchive{extender},
-        stream{stream_} {
+        stream{stream_},
+        malformed{false} {
     }
 
     bool isOk() {
-        return true;
+        return !malformed;
     }
 
     void sync() {
@@ -194,6 +195,16 @@ protected:
         serialize(*static_cast<TExtender*>(this), dest);
     }
 
+    void process(bool& dest) {
+        std::uint8_t wire = {};
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+        stream->read(reinterpret_cast<char*>(&wire), sizeof(wire));
+        if (wire > 1u) {
+            malformed = true;
+        }
+        dest = (wire != 0u);
+    }
+
     template<typename T>
     typename std::enable_if<!traits::has_load_member<T>::value && !traits::has_serialize_member<T>::value &&
                                 !traits::has_load_function<T>::value && !traits::has_serialize_function<T>::value,
@@ -225,6 +236,17 @@ protected:
     void process(std::vector<T, Args...>& dest) {
         const auto size = processSize();
         processElements(dest, size);
+    }
+
+    template<typename... Args>
+    void process(std::vector<bool, Args...>& dest) {
+        const auto size = processSize();
+        dest.assign(size, false);
+        for (std::size_t i = 0ul; i < size; ++i) {
+            bool value = {};
+            BaseArchive::dispatch(value);
+            dest[i] = value;
+        }
     }
 
     template<typename T, typename... Args>
@@ -324,6 +346,7 @@ private:
 
 private:
     TStream* stream;
+    bool malformed;
 };
 
 template<class TStream, typename TSize = std::uint32_t, typename TOffset = TSize, Endianness EByteOrder = Endianness::Network>

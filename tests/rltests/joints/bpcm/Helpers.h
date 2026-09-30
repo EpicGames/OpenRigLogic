@@ -48,8 +48,8 @@ struct BPCMRotationOutputTypeSelector<rl4::bpcm::NoopAdapter> {
     }
 };
 
-template<typename T>
-struct BPCMRotationOutputTypeSelector<rl4::bpcm::EulerAnglesToQuaternions<T, tdm::rot_seq::zyx>> {
+template<typename T, tdm::rot_seq TSequence>
+struct BPCMRotationOutputTypeSelector<rl4::bpcm::EulerAnglesToQuaternions<T, TSequence>> {
     static constexpr std::size_t value() {
         return 0ul;
     }

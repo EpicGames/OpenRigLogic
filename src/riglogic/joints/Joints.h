@@ -2,9 +2,11 @@
 
 #pragma once
 
+#include "riglogic/SerializationContext.h"
 #include "riglogic/TypeDefs.h"
 #include "riglogic/joints/JointsEvaluator.h"
 #include "riglogic/joints/JointsOutputInstance.h"
+#include "riglogic/joints/JointsValidator.h"
 #include "riglogic/riglogic/RigMetadata.h"
 
 #include <cstdint>
@@ -39,6 +41,14 @@ public:
     void load(Archive& archive) {
         evaluator->load(archive);
         archive >> neutralValues >> variableAttributeIndices >> jointIndices >> jointGroupCount;
+        const SerializationContext* context = static_cast<SerializationContext*>(archive.getUserData());
+        if (!JointsValidator::validate(neutralValues,
+                                       variableAttributeIndices,
+                                       jointIndices,
+                                       *context->metadata,
+                                       context->config->loadJoints)) {
+            archive.markMalformed();
+        }
     }
 
     template<class Archive>

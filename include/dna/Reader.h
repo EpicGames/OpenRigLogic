@@ -21,13 +21,13 @@ namespace dna {
         selectively loaded, it might be convenient to slice-off interfaces which layers were
         not loaded.
 */
-class DNAAPI Reader : public RBFBehaviorReader,
-                      public GeometryReader,
-                      public MachineLearnedBehaviorExtReader,
-                      public JointBehaviorMetadataReader,
-                      public TwistSwingBehaviorReader {
+class DNAAPI_TYPE Reader : public RBFBehaviorReader,
+                           public GeometryReader,
+                           public MachineLearnedBehaviorExtReader,
+                           public JointBehaviorMetadataReader,
+                           public TwistSwingBehaviorReader {
 public:
-    ~Reader() override;
+    DNAAPI_MEMBER ~Reader() override;
     /**
         @brief Unload all data of the specified layer and all layers dependent on it.
         @param layer

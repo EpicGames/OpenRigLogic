@@ -10,6 +10,7 @@
 #include "riglogic/ml/MachineLearnedBehaviorEvaluator.h"
 #include "riglogic/ml/cpu/CPUMachineLearnedBehaviorEvaluator.h"
 #include "riglogic/ml/cpu/CPUMachineLearnedBehaviorOutputInstance.h"
+#include "riglogic/ml/cpu/MLBehaviorValidator.h"
 #include "riglogic/ml/cpu/NeuralNet.h"
 #include "riglogic/ml/cpu/Operation.h"
 #include "riglogic/riglogic/RigMetadata.h"
@@ -22,6 +23,7 @@
     #pragma warning(push)
     #pragma warning(disable : 4365 4987)
 #endif
+#include <algorithm>
 #include <limits>
 #include <numeric>
 #ifdef _MSC_VER
@@ -63,8 +65,8 @@ static Vector<std::uint16_t> getOperationInputIndices(const dna::Reader* reader,
         reader->getMLOperationDependencyOperationSetIndices(mlTypeIndex, mlOperationSetIndex, mlOperationIndex);
     const auto dependencyOperationIndices =
         reader->getMLOperationDependencyOperationIndices(mlTypeIndex, mlOperationSetIndex, mlOperationIndex);
-    assert(dependencyOperationSetIndices.size() == dependencyOperationIndices.size());
-    for (std::size_t i = {}; i < dependencyOperationIndices.size(); ++i) {
+    const auto dependencyCount = std::min(dependencyOperationSetIndices.size(), dependencyOperationIndices.size());
+    for (std::size_t i = {}; i < dependencyCount; ++i) {
         const auto type =
             reader->getMLOperationType(mlTypeIndex, dependencyOperationSetIndices[i], dependencyOperationIndices[i]);
         if (type == dna::MachineLearnedBehaviorOperationType::Gather) {
@@ -95,8 +97,8 @@ static Vector<std::uint16_t> getOperationOutputIndices(const dna::Reader* reader
                     reader->getMLOperationDependencyOperationSetIndices(mlTypeIndex, depOSI, depOI);
                 const auto dependencyOperationIndices =
                     reader->getMLOperationDependencyOperationIndices(mlTypeIndex, depOSI, depOI);
-                assert(dependencyOperationSetIndices.size() == dependencyOperationIndices.size());
-                for (std::size_t i = {}; i < dependencyOperationIndices.size(); ++i) {
+                const auto dependencyCount = std::min(dependencyOperationSetIndices.size(), dependencyOperationIndices.size());
+                for (std::size_t i = {}; i < dependencyCount; ++i) {
                     const auto opSetIdx = dependencyOperationSetIndices[i];
                     const auto opIdx = dependencyOperationIndices[i];
                     if ((opSetIdx == mlOperationSetIndex) && (opIdx == mlOperationIndex)) {
@@ -124,7 +126,8 @@ static Vector<float> getDefaultValues(const dna::Reader* reader,
     auto getTransformType = [reader](dna::MachineLearnedBehaviorParameterKey key, std::uint16_t defaultValue) {
         const auto paramKeys = reader->getMLJointsParameterKeys();
         const auto paramValues = reader->getMLJointsParameterValues();
-        for (std::size_t i = {}; i < paramKeys.size(); ++i) {
+        const auto paramCount = std::min(paramKeys.size(), paramValues.size());
+        for (std::size_t i = {}; i < paramCount; ++i) {
             if (paramKeys[i] == static_cast<std::uint16_t>(key)) {
                 if (key == dna::MachineLearnedBehaviorParameterKey::JointTranslationType) {
                     assert(paramValues[i] == static_cast<std::uint16_t>(dna::TranslationRepresentation::Vector));
@@ -154,8 +157,12 @@ static Vector<float> getDefaultValues(const dna::Reader* reader,
     const auto qwIndex = static_cast<std::uint16_t>(translationType + rotationType - 1);
 
     if (static_cast<RotationType>(rotationType) == RotationType::Quaternions) {
-        for (std::size_t opIdx = {}; opIdx < outputControlIndices.size(); ++opIdx) {
-            for (std::size_t ii = {}; ii < mlJointsInputIndices.size(); ++ii) {
+        const auto mlJointsCount = std::min(mlJointsInputIndices.size(), mlJointsOutputIndices.size());
+        // defaultValues holds outputCount entries while the scatter indices are an independent DNA array that can be
+        // longer; walk only the span both cover, as execute()'s scatter does.
+        const auto scatterCount = std::min(outputControlIndices.size(), static_cast<std::size_t>(outputCount));
+        for (std::size_t opIdx = {}; opIdx < scatterCount; ++opIdx) {
+            for (std::size_t ii = {}; ii < mlJointsCount; ++ii) {
                 if (outputControlIndices[opIdx] == mlJointsInputIndices[ii]) {
                     if (mlJointsOutputIndices[ii] % attrCount == qwIndex) {
                         defaultValues[opIdx] = 1.0f;
@@ -240,14 +247,16 @@ static void createNeuralNet(NeuralNet& neuralNet,
     neuralNet.maskIndex = findMaskIndex();
 
     Vector<std::uint32_t> lods{lodCount, {}, memRes};
+    // params, layerCount and lodCount are independent DNA fields and ArrayView::subview only asserts its bounds, so
+    // require the full layerCount * lodCount span up front; otherwise fall back to the per-layer outputCount.
+    bool hasPerLODRowCounts = false;
     if (params.size() > 1ul) {
         params = params.subview(1ul, params.size() - 1ul);
-        assert(params.size() == static_cast<std::size_t>(layerCount) * static_cast<std::size_t>(lodCount));
+        hasPerLODRowCounts = (params.size() >= (static_cast<std::size_t>(layerCount) * static_cast<std::size_t>(lodCount)));
     }
 
     neuralNet.layers.reserve(layerCount);
 
-    // Build layer descriptors, assign flat-buffer offsets, compute total size.
     std::size_t totalFlatSize = {};
     for (std::uint16_t layerIdx = {}; layerIdx < layerCount; ++layerIdx) {
         const auto biases = reader->getNeuralNetworkLayerBiases(neuralNetIndex, layerIdx);
@@ -255,8 +264,9 @@ static void createNeuralNet(NeuralNet& neuralNet,
         const auto activationFunction = reader->getNeuralNetworkLayerActivationFunction(neuralNetIndex, layerIdx);
         const auto activationFunctionParams = reader->getNeuralNetworkLayerActivationFunctionParameters(neuralNetIndex, layerIdx);
         const auto outputCount = static_cast<std::uint16_t>(biases.size());
-        const auto inputCount = static_cast<std::uint16_t>(weights.size() / outputCount);
-        if (params.size() > 1ul) {
+        const auto inputCount =
+            (outputCount == 0u) ? static_cast<std::uint16_t>(0) : static_cast<std::uint16_t>(weights.size() / outputCount);
+        if (hasPerLODRowCounts) {
             extd::copy(params.subview(static_cast<std::size_t>(layerIdx) * static_cast<std::size_t>(lodCount), lodCount),
                        ArrayView<std::uint32_t>{lods});
         } else {
@@ -272,11 +282,9 @@ static void createNeuralNet(NeuralNet& neuralNet,
         neuralNet.layers.push_back(std::move(layer));
     }
 
-    // Allocate the flat buffer once - all layers share this single allocation.
     neuralNet.flatData.resize<T>(totalFlatSize);
     T* flat = neuralNet.flatData.template data<T>();
 
-    // Write optimized weight/bias data directly into the flat buffer.
     for (std::uint16_t layerIdx = {}; layerIdx < layerCount; ++layerIdx) {
         const auto& layer = neuralNet.layers[layerIdx];
         const auto weights = reader->getNeuralNetworkLayerWeights(neuralNetIndex, layerIdx);
@@ -290,7 +298,7 @@ static void createNeuralNet(NeuralNet& neuralNet,
     }
 }
 
-template<typename T, typename TF256, typename TF128>
+template<typename T, typename TF512, typename TF256, typename TF128>
 struct MLPOperationSetBuilder {
     OperationSetData operator()(const dna::Reader* reader,
                                 std::uint16_t mlTypeIndex,
@@ -302,10 +310,8 @@ struct MLPOperationSetBuilder {
         data.type = OperationSetType::MLP;
 
         static constexpr std::uint32_t kNoMask = static_cast<std::uint32_t>(-1);
-        // Skipped ops (non-MLP type or layer-less nets) are kept as inert, layer-less placeholder entries so
-        // that op indices remain aligned with the DNA (LOD lists and cross-op dependency indices reference
-        // original op indices, and bufferSizes/outputCounts keep their zeroed slots the same way).
-        // execute() skips layer-less ops, so placeholders contribute nothing at runtime.
+        // Skipped ops (non-MLP or layer-less) stay as inert layer-less placeholders so op indices remain aligned with the
+        // DNA (LOD lists and dependency indices reference original op indices); execute() skips them.
         auto pushPlaceholder = [&data, memRes]() {
             MLPOperationData placeholder{memRes};
             placeholder.neuralNet.maskIndex = kNoMask;
@@ -321,6 +327,10 @@ struct MLPOperationSetBuilder {
             }
 
             const auto params = reader->getMLOperationParameters(mlTypeIndex, mlOperationSetIndex, opIdx);
+            if (params.size() == 0u) {
+                pushPlaceholder();
+                continue;
+            }
             const auto neuralNetIndex = static_cast<std::uint16_t>(params[0]);
             const auto layerCount = reader->getNeuralNetworkLayerCount(neuralNetIndex);
             if (layerCount == 0u) {
@@ -330,12 +340,12 @@ struct MLPOperationSetBuilder {
 
             MLPOperationData entry{memRes};
 
-            // Cross-set dependencies are stored as packed (opSetIdx, opIdx) dependency pairs.
             const auto depSetIndices =
                 reader->getMLOperationDependencyOperationSetIndices(mlTypeIndex, mlOperationSetIndex, opIdx);
             const auto depOpIndices = reader->getMLOperationDependencyOperationIndices(mlTypeIndex, mlOperationSetIndex, opIdx);
-            entry.inputDeps.resize(depSetIndices.size());
-            for (std::size_t di = {}; di < depSetIndices.size(); ++di) {
+            const auto depCount = std::min(depSetIndices.size(), depOpIndices.size());
+            entry.inputDeps.resize(depCount);
+            for (std::size_t di = {}; di < depCount; ++di) {
                 entry.inputDeps[di] = {depSetIndices[di], depOpIndices[di]};
             }
 
@@ -346,14 +356,12 @@ struct MLPOperationSetBuilder {
 
             const auto outputCount = static_cast<std::uint16_t>(entry.neuralNet.layers.back().weights.original.rows);
 
-            // Precompute per-LOD output count from last layer's row sizes (avoids chasing 4-pointer deep structure in the hot
-            // loop).
+            // Precomputed so the hot loop does not chase the layer structure.
             const auto& lastRows = entry.neuralNet.layers.back().weights.rows;
             entry.outputCountsPerLOD.resize(lastRows.size());
             if (entry.outputControlIndices.empty()) {
-                // Only allow operations in the final operation set to specify the output count per LOD. Not doing this would
-                // require handling on the inputs as well, e.g. limiting the output count of intermediate MLP would require input
-                // count of weighted sum to be limited as well.
+                // Only scatter ops may vary output count per LOD; trimming an intermediate MLP would require trimming its
+                // weighted-sum consumer's input count too.
                 std::fill(entry.outputCountsPerLOD.begin(), entry.outputCountsPerLOD.end(), outputCount);
             } else {
                 for (std::size_t li = {}; li < lastRows.size(); ++li) {
@@ -369,10 +377,15 @@ struct MLPOperationSetBuilder {
             bufferSizes[mlTypeIndex][mlOperationSetIndex][opIdx] = static_cast<std::uint16_t>(maxSize * 2u);
             outputCounts[mlTypeIndex][mlOperationSetIndex][opIdx] = outputCount;
 
-            // Per-dependency output counts (used for gather-from-buffer inputs)
             entry.outputCounts.resize(entry.inputDeps.size());
             for (std::size_t di = {}; di < entry.inputDeps.size(); ++di) {
-                entry.outputCounts[di] = outputCounts[mlTypeIndex][entry.inputDeps[di].opSetIdx][entry.inputDeps[di].opIdx];
+                const auto& depOutputCounts = outputCounts[mlTypeIndex];
+                const auto depOpSetIdx = entry.inputDeps[di].opSetIdx;
+                const auto depOpIdx = entry.inputDeps[di].opIdx;
+                entry.outputCounts[di] =
+                    ((depOpSetIdx < depOutputCounts.size()) && (depOpIdx < depOutputCounts[depOpSetIdx].size()))
+                        ? depOutputCounts[depOpSetIdx][depOpIdx]
+                        : static_cast<std::uint16_t>(0);
             }
 
             entry.defaultValues = getDefaultValues(reader, entry.outputControlIndices, outputCount, memRes);
@@ -409,6 +422,10 @@ struct WeightedSumOperationSetBuilder {
         data.wsOps.reserve(mlOperationCount);
         for (std::uint16_t opIdx = {}; opIdx < mlOperationCount; ++opIdx) {
             const auto params = reader->getMLOperationParameters(mlTypeIndex, mlOperationSetIndex, opIdx);
+            if (params.size() == 0u) {
+                data.wsOps.push_back(WeightedSumOperationData{memRes});
+                continue;
+            }
             const auto outputCount = static_cast<std::uint16_t>(params[0]);
             const auto weightParams = params.subview(1ul, params.size() - 1ul);
             const auto dependencyCount = weightParams.size();
@@ -421,8 +438,9 @@ struct WeightedSumOperationSetBuilder {
             const auto depSetIndices =
                 reader->getMLOperationDependencyOperationSetIndices(mlTypeIndex, mlOperationSetIndex, opIdx);
             const auto depOpIndices = reader->getMLOperationDependencyOperationIndices(mlTypeIndex, mlOperationSetIndex, opIdx);
-            entry.inputDeps.resize(depSetIndices.size());
-            for (std::size_t di = {}; di < depSetIndices.size(); ++di) {
+            const auto depCount = std::min(depSetIndices.size(), depOpIndices.size());
+            entry.inputDeps.resize(depCount);
+            for (std::size_t di = {}; di < depCount; ++di) {
                 entry.inputDeps[di] = {depSetIndices[di], depOpIndices[di]};
             }
 
@@ -433,8 +451,7 @@ struct WeightedSumOperationSetBuilder {
             data.wsOps.push_back(std::move(entry));
         }
 
-        // Select BlockSize = floor(maxOutputCount / F256::size()) * F256::size(), capped at 64.
-        // Encode into type field so OperationSetFactory selects the right WeightedSumOperationSet<BlockSize>.
+        // BlockSize = floor(maxOutputCount / F256::size()) * F256::size(), capped at 64, encoded in the type field.
         const auto blockSize =
             std::min<std::size_t>(64ul, static_cast<std::size_t>(maxOutputCount) / trimd::F256::size() * trimd::F256::size());
         switch (blockSize) {
@@ -472,7 +489,6 @@ MachineLearnedBehaviorEvaluator::Pointer Factory::create(const Configuration& co
                                                          RigMetadata* meta,
                                                          const dna::Reader* reader,
                                                          MemoryResource* memRes) {
-    RL_UNUSED(meta);
     Matrix<LODSpec<std::uint16_t>> lods{memRes};
     Matrix<OperationSet::Pointer> mlOperations{memRes};
     Vector<Matrix<std::uint16_t>> bufferSizes{memRes};
@@ -494,9 +510,6 @@ MachineLearnedBehaviorEvaluator::Pointer Factory::create(const Configuration& co
     bufferSizes.resize(mlTypeCount);
     outputCounts.resize(mlTypeCount);
 
-    RuntimeTemplateInstantiator instantiator{&config};
-    using BasePointer = UniqueInstance<OperationSet>::PointerType;
-
     for (std::uint16_t mlTypeIndex = {}; mlTypeIndex < mlTypeCount; ++mlTypeIndex) {
         lods[mlTypeIndex] = populateMLLODs(reader, mlTypeIndex, memRes);
         const auto mlOperationSetCount = reader->getMLOperationSetCount(mlTypeIndex);
@@ -504,7 +517,6 @@ MachineLearnedBehaviorEvaluator::Pointer Factory::create(const Configuration& co
         bufferSizes[mlTypeIndex].resize(mlOperationSetCount);
         outputCounts[mlTypeIndex].resize(mlOperationSetCount);
 
-        // Build OperationSetData for each set (one per mlOperationSetIndex, empty if skipped).
         Vector<OperationSetData> mlTypeOpSets{memRes};
         mlTypeOpSets.reserve(mlOperationSetCount);
 
@@ -535,12 +547,15 @@ MachineLearnedBehaviorEvaluator::Pointer Factory::create(const Configuration& co
             }
 
             if (firstOpType == dna::MachineLearnedBehaviorOperationType::MLP) {
-                mlTypeOpSets.push_back(instantiator.invoke<MLPOperationSetBuilder, OperationSetData>(reader,
-                                                                                                     mlTypeIndex,
-                                                                                                     mlOperationSetIndex,
-                                                                                                     bufferSizes,
-                                                                                                     outputCounts,
-                                                                                                     memRes));
+                mlTypeOpSets.push_back(
+                    RuntimeTemplateInstantiator::invoke<FloatingPointModel::Precise, MLPOperationSetBuilder, OperationSetData>(
+                        config,
+                        reader,
+                        mlTypeIndex,
+                        mlOperationSetIndex,
+                        bufferSizes,
+                        outputCounts,
+                        memRes));
             } else {
                 mlTypeOpSets.push_back(WeightedSumOperationSetBuilder()(reader,
                                                                         mlTypeIndex,
@@ -556,8 +571,12 @@ MachineLearnedBehaviorEvaluator::Pointer Factory::create(const Configuration& co
         for (std::uint16_t opSetIdx = {}; opSetIdx < mlOperationSetCount; ++opSetIdx) {
             for (const auto& ws : mlTypeOpSets[opSetIdx].wsOps) {
                 for (const auto& dep : ws.inputDeps) {
-                    assert(dep.opSetIdx < outputCounts[mlTypeIndex].size());
-                    assert(dep.opIdx < outputCounts[mlTypeIndex][dep.opSetIdx].size());
+                    // Enforced, not asserted: an assert on the second condition would itself subscript out of
+                    // bounds when the first one fails.
+                    if ((dep.opSetIdx >= outputCounts[mlTypeIndex].size()) ||
+                        (dep.opIdx >= outputCounts[mlTypeIndex][dep.opSetIdx].size())) {
+                        continue;
+                    }
                     const auto depWidth = outputCounts[mlTypeIndex][dep.opSetIdx][dep.opIdx];
                     if (ws.outputCount <= depWidth) {
                         continue;
@@ -575,7 +594,6 @@ MachineLearnedBehaviorEvaluator::Pointer Factory::create(const Configuration& co
             }
         }
 
-        // Remove empty sets and remap cross-set dependency indices.
         Vector<std::uint16_t> deletedOperationSets{memRes};
         if (mlOperationSetCount > 0u) {
             for (std::uint16_t opSetIdx = mlOperationSetCount; opSetIdx-- > 0u;) {
@@ -603,16 +621,19 @@ MachineLearnedBehaviorEvaluator::Pointer Factory::create(const Configuration& co
             }
         }
 
-        // Construct OperationSet instances from built data.
         mlOperations[mlTypeIndex].reserve(mlTypeOpSets.size());
         for (auto& data : mlTypeOpSets) {
-            mlOperations[mlTypeIndex].push_back(instantiator.invoke<OperationSetFactory, BasePointer>(std::move(data), memRes));
+            mlOperations[mlTypeIndex].push_back(createOperationSet(config, std::move(data), memRes));
         }
     }
 
     std::uint32_t meshRegionCount = {};
     for (std::uint16_t meshIndex = {}; meshIndex < reader->getMeshCount(); ++meshIndex) {
         meshRegionCount += reader->getMeshRegionCount(meshIndex);
+    }
+
+    if (!MLBehaviorValidator::validate(lods, mlOperations, bufferSizes, meshRegionCount, *meta)) {
+        return nullptr;
     }
 
     return evalFactory

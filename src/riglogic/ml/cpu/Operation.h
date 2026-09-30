@@ -10,6 +10,7 @@
 #include "riglogic/ml/cpu/layers/ReLULayerEvaluator.h"
 #include "riglogic/ml/cpu/layers/SigmoidLayerEvaluator.h"
 #include "riglogic/ml/cpu/layers/TanHLayerEvaluator.h"
+#include "riglogic/riglogic/Configuration.h"
 #include "riglogic/utils/Extd.h"
 #include "riglogic/utils/Macros.h"
 
@@ -55,6 +56,17 @@ void save(Archive& archive, OperationSetType& value) {
     archive(static_cast<std::uint16_t>(value));
 }
 
+// Bounds an OperationSet validates its ops against, shared by the build() and load() paths.
+// bufferSizesForType[opSetIdx][opIdx] is the op's full work-buffer width (2*halfSize for MLP, output width for
+// WeightedSum); its per-set size() is the op count, which bounds cross-set dependency (opSetIdx, opIdx) pairs.
+struct MLBehaviorBounds {
+    std::size_t controlInputCount;
+    std::size_t meshRegionCount;
+    std::size_t lodCount;
+    std::size_t opSetIndex;                           // index of the op-set being validated within its ML type
+    const Matrix<std::uint16_t>* bufferSizesForType;  // [opSetIdx][opIdx] -> work-buffer width, whole ML type
+};
+
 struct OperationSet {
     using Pointer = UniqueInstance<OperationSet>::PointerType;
 
@@ -67,11 +79,14 @@ struct OperationSet {
                          std::size_t opSetWorkBufferOffset,
                          ConstArrayView<float*> workBufferPtrs,
                          ConstArrayView<std::uint16_t> workBufferHalfSizes,
-                         ConstArrayView<std::uint16_t> workBufferOffsetsPerOperationSet) const = 0;
+                         ConstArrayView<std::uint32_t> workBufferOffsetsPerOperationSet) const = 0;
 
     virtual OperationSetType getType() const = 0;
 
-    virtual void load(terse::BinaryInputArchive<BoundedIOStream>& archive) = 0;
+    // Reject data that would make execute() read or write out of bounds. Returns false on the first violation.
+    virtual bool validate(const MLBehaviorBounds& bounds) const = 0;
+
+    virtual void load(BoundedInputArchive& archive) = 0;
     virtual void save(terse::BinaryOutputArchive<BoundedIOStream>& archive) = 0;
 };
 
@@ -84,6 +99,12 @@ struct Dependency {
         archive(opSetIdx, opIdx);
     }
 };
+
+// A cross-op-set (opSetIdx, opIdx) dependency must address a real op in the same ML type.
+inline bool isValidDependency(const Dependency& dep, const Matrix<std::uint16_t>& bufferSizesForType) {
+    return (static_cast<std::size_t>(dep.opSetIdx) < bufferSizesForType.size()) &&
+           (static_cast<std::size_t>(dep.opIdx) < bufferSizesForType[dep.opSetIdx].size());
+}
 
 struct MLPOperationData {
     NeuralNet neuralNet;
@@ -169,12 +190,10 @@ struct MLPOperationSet : OperationSet {
                  std::size_t opSetWorkBufferOffset,
                  ConstArrayView<float*> workBufferPtrs,
                  ConstArrayView<std::uint16_t> workBufferHalfSizes,
-                 ConstArrayView<std::uint16_t> workBufferOffsetsPerOperationSet) const override {
+                 ConstArrayView<std::uint32_t> workBufferOffsetsPerOperationSet) const override {
 
-        // workBufferPtrs[opSetWorkBufferOffset + opIdx] gives the ping-pong work buffer for op opIdx in this op-set.
-        // workBufferHalfSizes[opSetWorkBufferOffset + opIdx] = bufferSize/2; the buffer splits into buf1=[ptr,half) and
-        // buf2=[ptr+half,2*half) for ping-pong evaluation across layers - swap after each layer; result = buf1.data() after the
-        // loop. Cross-set deps resolve via workBufferPtrs[workBufferOffsetsPerOperationSet[dep.opSetIdx] + dep.opIdx].
+        // This op's ping-pong buffer is workBufferPtrs[opSetWorkBufferOffset + opIdx], two halves of workBufferHalfSizes[same]
+        // swapped per layer; a dep's buffer is workBufferPtrs[workBufferOffsetsPerOperationSet[dep.opSetIdx] + dep.opIdx].
         float* pInput = inputBuffer.data();
         for (std::size_t k = {}; k < activeOpIndices.size(); ++k) {
             const auto opIdx = activeOpIndices[k];
@@ -209,7 +228,6 @@ struct MLPOperationSet : OperationSet {
                 }
             }
 
-            // gather
             if (!op.inputControlIndices.empty()) {
                 const auto count = op.inputControlIndices.size();
                 const auto* inIndices = op.inputControlIndices.data();
@@ -217,7 +235,6 @@ struct MLPOperationSet : OperationSet {
                     pBuf[i] = pInput[inIndices[i]];
                 }
             } else {
-                // Populate MLP (neural net) inputs from the outputs of all nodes that are dependencies of the MLP
                 for (std::size_t i = {}, offset = {}; i < op.inputDeps.size(); ++i) {
                     const auto dep = op.inputDeps[i];
                     const float* depData =
@@ -228,7 +245,6 @@ struct MLPOperationSet : OperationSet {
                 }
             }
 
-            // evaluate layers
             const auto halfSize = static_cast<std::size_t>(workBufferHalfSizes[opSetWorkBufferOffset + opIdx]);
             auto buf1 = ArrayView<float>{pBuf, halfSize};
             auto buf2 = ArrayView<float>{pBuf + halfSize, halfSize};
@@ -288,8 +304,7 @@ struct MLPOperationSet : OperationSet {
             }
             const float* result = buf1.data();
 
-            // scatter: attenuate outputs by the mask weight - on/off for ML joint rigs, fractional
-            // for blend-shape-channel rigs (weight is never 0 here; that path returned earlier).
+            // Attenuate outputs by the mask weight: on/off for ML joint rigs, fractional for blend-shape-channel rigs.
             const auto outputCount = static_cast<std::uint32_t>(op.outputCountsPerLOD[lod]);
             if (!op.outputControlIndices.empty()) {
                 const auto outIndicesCount = static_cast<std::uint32_t>(op.outputControlIndices.size());
@@ -299,15 +314,12 @@ struct MLPOperationSet : OperationSet {
                     pInput[outIndices[i]] = result[i] * weight;
                 }
             } else if (weight != 1.0f) {
-                // Intermediate-dependency MLP: scale results into pBuf (where downstream gathers read).
-                // This also normalizes when an odd layer count left result in pBuf's upper half.
+                // Intermediate-dependency MLP: scale into pBuf, where downstream gathers read; also folds in an odd layer count.
                 for (std::size_t i = {}; i < outputCount; ++i) {
                     pBuf[i] = result[i] * weight;
                 }
             } else if (result != pBuf) {
-                // Intermediate dep MLP with an odd layer count: the ping-pong evaluation left the result
-                // in the second half of the work buffer (pBuf+halfSize) rather than pBuf.
-                // Downstream dep gathers always read from workBufferPtrs[dep] = pBuf, so normalize here.
+                // An odd layer count left the result in the upper half; downstream gathers always read pBuf.
                 std::memcpy(pBuf, result, outputCount * sizeof(float));
             }
             if (op.tailZeroCount != 0u) {
@@ -321,9 +333,188 @@ struct MLPOperationSet : OperationSet {
         return OperationSetType::MLP;
     }
 
-    void load(terse::BinaryInputArchive<BoundedIOStream>& archive) override {
+    bool validate(const MLBehaviorBounds& bounds) const override {
+        static constexpr std::uint32_t kNoMask = static_cast<std::uint32_t>(-1);
+        const auto& bufferSizesForType = *bounds.bufferSizesForType;
+        // execute() and OutputInstance index this set's ops and its bufferSizes row in lockstep.
+        if (ops.size() != bufferSizesForType[bounds.opSetIndex].size()) {
+            return false;
+        }
+        for (std::size_t opIdx = {}; opIdx < ops.size(); ++opIdx) {
+            const auto& op = ops[opIdx];
+            // Layer-less placeholder ops keep op-index alignment and are skipped by execute(); nothing to bound.
+            if (op.neuralNet.layers.empty()) {
+                continue;
+            }
+
+            // masks[maskIndex] is read when hasMasks; the mask buffer has meshRegionCount entries.
+            if (hasMasks && (op.neuralNet.maskIndex != kNoMask) &&
+                (static_cast<std::size_t>(op.neuralNet.maskIndex) >= bounds.meshRegionCount)) {
+                return false;
+            }
+
+            // outputCountsPerLOD is indexed by lod throughout execute().
+            if (op.outputCountsPerLOD.size() < bounds.lodCount) {
+                return false;
+            }
+
+            const std::size_t bufferSize = static_cast<std::size_t>(bufferSizesForType[bounds.opSetIndex][opIdx]);
+            const std::size_t halfSize = bufferSize / 2u;
+
+            // The factory lays the weight blob out self-consistently, but a snapshot deserializes every field
+            // independently, so offsets and matrix dims may point past flatData.
+            {
+                const std::size_t flatSize = op.neuralNet.flatData.template size<T>();
+                for (const auto& layer : op.neuralNet.layers) {
+                    if (layer.weights.rows.size() < bounds.lodCount) {
+                        return false;
+                    }
+                    // execute()'s switch has no default, so an out-of-range enum would silently no-op the layer;
+                    // leakyrelu also reads activationFunctionParameters[0].
+                    switch (layer.activationFunction) {
+                    case dna::ActivationFunction::linear:
+                    case dna::ActivationFunction::relu:
+                    case dna::ActivationFunction::tanh:
+                    case dna::ActivationFunction::sigmoid:
+                        break;
+                    case dna::ActivationFunction::leakyrelu:
+                        if (layer.activationFunctionParameters.empty()) {
+                            return false;
+                        }
+                        break;
+                    default:
+                        return false;
+                    }
+                    // Reads span the PADDED matrix (rows*cols weights, rows biases) from their offsets and must fit
+                    // flatData; size_t math avoids the uint32 overflow in Extent::size().
+                    const std::size_t paddedRows = static_cast<std::size_t>(layer.weights.padded.rows);
+                    const std::size_t paddedCols = static_cast<std::size_t>(layer.weights.padded.cols);
+                    const std::size_t weightSpan = paddedRows * paddedCols;
+                    if ((layer.weightOffset > flatSize) || (weightSpan > flatSize - layer.weightOffset)) {
+                        return false;
+                    }
+                    if ((layer.biasOffset > flatSize) || (paddedRows > flatSize - layer.biasOffset)) {
+                        return false;
+                    }
+                    // Weights/biases are read in whole TF128 lane groups via aligned loads and the builder places
+                    // both offsets on that grid; a deserialized offset off it faults the first load.
+                    constexpr std::size_t alignElems = TF128::size();
+                    if (((layer.weightOffset % alignElems) != 0ul) || ((layer.biasOffset % alignElems) != 0ul)) {
+                        return false;
+                    }
+                    // The per-LOD strides drive the pointer walk, so they must not exceed the padded dimensions.
+                    if (static_cast<std::size_t>(layer.weights.cols.size) > paddedCols) {
+                        return false;
+                    }
+                    // cols.size is also the INPUT extent calculateBlock4 reads from the halfSize-wide ping-pong half;
+                    // paddedCols above bounds it only against the weight blob.
+                    if (static_cast<std::size_t>(layer.weights.cols.size) > halfSize) {
+                        return false;
+                    }
+                    // The inner loops step WHOLE 4/8-column groups to these boundaries; the weight walk stays in lockstep
+                    // with the cols.size row stride only if each boundary is step-aligned and within cols.size.
+                    if (((layer.weights.cols.sizePaddedToLastFullBlock % 4u) != 0u) ||
+                        (layer.weights.cols.sizePaddedToLastFullBlock > layer.weights.cols.size)) {
+                        return false;
+                    }
+                    if (((layer.weights.cols.sizePaddedToSecondLastFullBlock % 8u) != 0u) ||
+                        (layer.weights.cols.sizePaddedToSecondLastFullBlock > layer.weights.cols.size)) {
+                        return false;
+                    }
+                    for (const auto& rowView : layer.weights.rows) {
+                        // calculateBlock4 walks whole 8-row then 4-row blocks, overshooting an unaligned boundary by up
+                        // to a block, so the WALK, not the raw fields, must fit the spans above and the ping-pong half.
+                        std::uint64_t rowWalk = 0u;
+                        if (rowView.sizePaddedToLastFullBlock > 0u) {
+                            rowWalk = ((static_cast<std::uint64_t>(rowView.sizePaddedToLastFullBlock) + 7u) / 8u) * 8u;
+                        }
+                        if (rowView.size > rowWalk) {
+                            rowWalk += (((rowView.size - rowWalk) + 3u) / 4u) * 4u;
+                        }
+                        if ((rowWalk > paddedRows) || (rowWalk > halfSize)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            // Gather writes into buf1 (halfSize wide): control reads or the concatenated dependency outputs.
+            if (!op.inputControlIndices.empty()) {
+                if (op.inputControlIndices.size() > halfSize) {
+                    return false;
+                }
+                for (const auto controlIndex : op.inputControlIndices) {
+                    if (static_cast<std::size_t>(controlIndex) >= bounds.controlInputCount) {
+                        return false;
+                    }
+                }
+            } else {
+                if (op.outputCounts.size() < op.inputDeps.size()) {
+                    return false;
+                }
+                std::size_t gatherTotal = {};
+                for (std::size_t di = {}; di < op.inputDeps.size(); ++di) {
+                    const auto& dep = op.inputDeps[di];
+                    if (!isValidDependency(dep, bufferSizesForType)) {
+                        return false;
+                    }
+                    // execute() memcpys outputCounts[di] floats FROM the dependency's buffer, so it must fit the SOURCE width.
+                    if (static_cast<std::size_t>(op.outputCounts[di]) >
+                        static_cast<std::size_t>(bufferSizesForType[dep.opSetIdx][dep.opIdx])) {
+                        return false;
+                    }
+                    gatherTotal += static_cast<std::size_t>(op.outputCounts[di]);
+                }
+                if (gatherTotal > halfSize) {
+                    return false;
+                }
+            }
+
+            // Per-LOD output width must fit the ping-pong halves the layers write into.
+            for (const auto perLOD : op.outputCountsPerLOD) {
+                if (static_cast<std::size_t>(perLOD) > halfSize) {
+                    return false;
+                }
+            }
+
+            // The widest per-LOD output bounds both the scatter span and the tail-zero memset below.
+            std::size_t maxOutputCount = {};
+            for (const auto perLOD : op.outputCountsPerLOD) {
+                maxOutputCount = std::max(maxOutputCount, static_cast<std::size_t>(perLOD));
+            }
+
+            // Scatter writes pInput[outputControlIndices[i]] for i < min(outputCountsPerLOD[lod], size); the mask-zero
+            // path writes defaultValues over the same span.
+            if (!op.outputControlIndices.empty()) {
+                for (const auto controlIndex : op.outputControlIndices) {
+                    if (static_cast<std::size_t>(controlIndex) >= bounds.controlInputCount) {
+                        return false;
+                    }
+                }
+                const std::size_t scatterLimit = std::min(maxOutputCount, op.outputControlIndices.size());
+                if (op.defaultValues.size() < scatterLimit) {
+                    return false;
+                }
+            } else if ((op.defaultValues.size() > halfSize) || (op.defaultValues.size() != maxOutputCount)) {
+                // Mask-zero path memcpys defaultValues into buf and skips the tail-zero memset, so the buffer stays clean
+                // only when defaults cover exactly the output extent; a shorter array leaks stale data to the consumer.
+                return false;
+            }
+
+            // Tail-zero memset writes pBuf[outputCount .. outputCount + tailZeroCount) into the full buffer.
+            if (maxOutputCount + static_cast<std::size_t>(op.tailZeroCount) > bufferSize) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void load(BoundedInputArchive& archive) override {
         std::uint32_t count = {};
         archive(count);
+        // count is a raw scalar, not a container length, so BoundedInputArchive does not gate it; cap it against the
+        // stream size so a hostile snapshot cannot drive reserve() into a bad_alloc.
+        count = static_cast<std::uint32_t>(archive.boundSize(count));
         auto memRes = ops.get_allocator().getMemoryResource();
         ops.reserve(count);
         hasMasks = false;
@@ -336,15 +527,17 @@ struct MLPOperationSet : OperationSet {
                     entry.outputCounts,
                     entry.defaultValues,
                     entry.tailZeroCount);
-            if (!entry.neuralNet.layers.empty()) {
+            // rows is deserialized separately from layers, so a hostile snapshot can present layers without any
+            // per-LOD row views; require both before indexing lastRows.
+            if (!entry.neuralNet.layers.empty() && !entry.neuralNet.layers.back().weights.rows.empty()) {
                 const auto& lastRows = entry.neuralNet.layers.back().weights.rows;
                 entry.outputCountsPerLOD.resize(lastRows.size());
-                // Mirror the factory rule: intermediate MLPs (no scatter output) use a fixed count across all LODs so
-                // that dep-gathers and weighted sum reads are consistent with the normalization-fix memcpy.
+                // Must mirror the factory: intermediate MLPs use the last layer's full original row count for all LODs
+                // (not lastRows[0].size); defaultValues is sized from that count and validate() demands equality.
                 if (entry.outputControlIndices.empty()) {
                     std::fill(entry.outputCountsPerLOD.begin(),
                               entry.outputCountsPerLOD.end(),
-                              static_cast<std::uint16_t>(lastRows[0].size));
+                              static_cast<std::uint16_t>(entry.neuralNet.layers.back().weights.original.rows));
                 } else {
                     for (std::size_t li = {}; li < lastRows.size(); ++li) {
                         entry.outputCountsPerLOD[li] = static_cast<std::uint16_t>(lastRows[li].size);
@@ -410,12 +603,9 @@ struct WeightedSumOperationSet : OperationSet {
                  std::size_t opSetWorkBufferOffset,
                  ConstArrayView<float*> workBufferPtrs,
                  ConstArrayView<std::uint16_t> workBufferHalfSizes,
-                 ConstArrayView<std::uint16_t> workBufferOffsetsPerOperationSet) const override {
+                 ConstArrayView<std::uint32_t> workBufferOffsetsPerOperationSet) const override {
 
-        // workBufferPtrs[opSetWorkBufferOffset + opIdx] is the destination work slot for this op.
-        // Cross-set dep pointers resolve via workBufferPtrs[workBufferOffsetsPerOperationSet[dep.opSetIdx] + dep.opIdx].
-        // Outputs are processed in BlockSize-wide aligned chunks: blockCount = BlockSize / TF256::size() SIMD registers
-        // accumulate weighted dep contributions per chunk; a scalar remainder loop handles the trailing elements.
+        // Outputs accumulate in BlockSize-wide chunks of blockCount SIMD registers; a scalar loop handles the remainder.
         RL_UNUSED(lod);
         RL_UNUSED(masks);
         RL_UNUSED(inputBuffer);
@@ -436,7 +626,6 @@ struct WeightedSumOperationSet : OperationSet {
             for (std::size_t elem = {}; elem < alignedCount; elem += BlockSize) {
                 TF256 sums[blockCount] = {};
                 for (std::size_t di = {}; di < op.inputDeps.size(); ++di) {
-                    // Populate weighted sum inputs from the buffers of the nodes that are its dependencies
                     const auto depBufOffset = workBufferOffsetsPerOperationSet[op.inputDeps[di].opSetIdx];
                     const float* pDepBuf = workBufferPtrs[static_cast<std::size_t>(depBufOffset) + op.inputDeps[di].opIdx];
                     TF256 blocks[blockCount];
@@ -463,30 +652,52 @@ struct WeightedSumOperationSet : OperationSet {
         }
     }
 
-    OperationSetType getType() const override {
-        switch (BlockSize) {
-        case 8:
-            return OperationSetType::WeightedSum8;
-        case 16:
-            return OperationSetType::WeightedSum16;
-        case 24:
-            return OperationSetType::WeightedSum24;
-        case 32:
-            return OperationSetType::WeightedSum32;
-        case 40:
-            return OperationSetType::WeightedSum40;
-        case 48:
-            return OperationSetType::WeightedSum48;
-        case 56:
-            return OperationSetType::WeightedSum56;
-        default:
-            return OperationSetType::WeightedSum64;
+    bool validate(const MLBehaviorBounds& bounds) const override {
+        const auto& bufferSizesForType = *bounds.bufferSizesForType;
+        if (ops.size() != bufferSizesForType[bounds.opSetIndex].size()) {
+            return false;
         }
+        for (std::size_t opIdx = {}; opIdx < ops.size(); ++opIdx) {
+            const auto& op = ops[opIdx];
+            if (op.inputDeps.empty()) {
+                continue;  // execute() skips dependency-less ops.
+            }
+            // Reads op.weights[di] for every dependency.
+            if (op.weights.size() < op.inputDeps.size()) {
+                return false;
+            }
+            // Writes pBuf[elem] for elem < outputCount into this op's own buffer.
+            const std::size_t outputCount = static_cast<std::size_t>(op.outputCount);
+            if (outputCount > static_cast<std::size_t>(bufferSizesForType[bounds.opSetIndex][opIdx])) {
+                return false;
+            }
+            // Reads pDepBuf[elem] for elem < outputCount from every dependency's buffer.
+            for (const auto& dep : op.inputDeps) {
+                if (!isValidDependency(dep, bufferSizesForType) ||
+                    (outputCount > static_cast<std::size_t>(bufferSizesForType[dep.opSetIdx][dep.opIdx]))) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
-    void load(terse::BinaryInputArchive<BoundedIOStream>& archive) override {
+    OperationSetType getType() const override {
+        // BlockSize / 8 avoids MSVC C6326 on a constant switch; WeightedSum8..64 serialize as 1..8.
+        static_assert((BlockSize >= 8u) && (BlockSize <= 64u) && (BlockSize % 8u == 0u),
+                      "WeightedSumOperationSet block size must be a multiple of 8 in [8, 64].");
+        static_assert(static_cast<std::uint16_t>(OperationSetType::WeightedSum8) == 1u,
+                      "WeightedSum8 must serialize as 1 for the BlockSize / 8 mapping.");
+        static_assert(static_cast<std::uint16_t>(OperationSetType::WeightedSum64) == 8u,
+                      "WeightedSum64 must serialize as 8 for the BlockSize / 8 mapping.");
+        return static_cast<OperationSetType>(BlockSize / 8u);
+    }
+
+    void load(BoundedInputArchive& archive) override {
         std::uint32_t count = {};
         archive(count);
+        // Raw scalar, not gated by BoundedInputArchive; cap against the stream size before reserve().
+        count = static_cast<std::uint32_t>(archive.boundSize(count));
         auto memRes = ops.get_allocator().getMemoryResource();
         ops.reserve(count);
         for (std::uint32_t i = {}; i < count; ++i) {
@@ -504,7 +715,7 @@ struct WeightedSumOperationSet : OperationSet {
     }
 };
 
-template<typename T, typename TF256, typename TF128>
+template<typename T, typename TF512, typename TF256, typename TF128>
 struct OperationSetFactory {
     using BasePointer = UniqueInstance<OperationSet>::PointerType;
 
@@ -551,6 +762,29 @@ struct OperationSetFactory {
         }
     }
 };
+
+// Precise/Fast arms live in dedicated TUs. Neither returns null: a Fast TU without relaxed-FP support delegates
+// to the Precise arm itself, so createOperationSet picks exactly one arm and moves `data` exactly once.
+UniqueInstance<OperationSet>::PointerType createPreciseOperationSet(const Configuration& config,
+                                                                    OperationSetData&& data,
+                                                                    MemoryResource* memRes);
+
+#ifdef RL_BUILD_WITH_FAST
+UniqueInstance<OperationSet>::PointerType createFastOperationSet(const Configuration& config,
+                                                                 OperationSetData&& data,
+                                                                 MemoryResource* memRes);
+#endif  // RL_BUILD_WITH_FAST
+
+inline UniqueInstance<OperationSet>::PointerType createOperationSet(const Configuration& config,
+                                                                    OperationSetData&& data,
+                                                                    MemoryResource* memRes) {
+#ifdef RL_BUILD_WITH_FAST
+    if (config.floatingPointModel == FloatingPointModel::Fast) {
+        return createFastOperationSet(config, std::move(data), memRes);
+    }
+#endif  // RL_BUILD_WITH_FAST
+    return createPreciseOperationSet(config, std::move(data), memRes);
+}
 
 }  // namespace cpu
 

@@ -91,6 +91,10 @@ public:
         return unoptimized::rawControlCount;
     }
 
+    std::uint16_t getMLControlCount() const override {
+        return unoptimized::mlControlCount;
+    }
+
     std::uint16_t getLODCount() const override {
         return unoptimized::lodCount;
     }

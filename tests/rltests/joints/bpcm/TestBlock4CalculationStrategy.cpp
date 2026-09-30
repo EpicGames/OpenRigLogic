@@ -4,8 +4,6 @@
     #pragma warning(disable : 4503)
 #endif
 
-#include "riglogic/system/simd/Detect.h"
-
 #include "rltests/Defs.h"
 #include "rltests/controls/ControlFixtures.h"
 #include "rltests/joints/bpcm/BPCMFixturesBlock4.h"
@@ -84,66 +82,66 @@ using Block4JointCalculationTypeList = ::testing::Types<
     std::tuple<StorageValueType,
                trimd::sse::F128,
                TStrategyTestParams<0>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
     std::tuple<StorageValueType, trimd::sse::F128, TStrategyTestParams<1>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
                trimd::sse::F128,
                TStrategyTestParams<1>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
     std::tuple<StorageValueType, trimd::sse::F128, TStrategyTestParams<2>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
                trimd::sse::F128,
                TStrategyTestParams<2>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
     std::tuple<StorageValueType, trimd::sse::F128, TStrategyTestParams<3>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
                trimd::sse::F128,
                TStrategyTestParams<3>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
 #endif  // RL_BUILD_WITH_AVX || RL_BUILD_WITH_SSE
 #if defined(RL_BUILD_WITH_NEON)
     std::tuple<StorageValueType, trimd::neon::F128, TStrategyTestParams<0>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
                trimd::neon::F128,
                TStrategyTestParams<0>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
     std::tuple<StorageValueType, trimd::neon::F128, TStrategyTestParams<1>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
                trimd::neon::F128,
                TStrategyTestParams<1>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
     std::tuple<StorageValueType, trimd::neon::F128, TStrategyTestParams<2>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
                trimd::neon::F128,
                TStrategyTestParams<2>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
     std::tuple<StorageValueType, trimd::neon::F128, TStrategyTestParams<3>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
                trimd::neon::F128,
                TStrategyTestParams<3>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
 #endif  // RL_BUILD_WITH_NEON
 #if !defined(RL_BUILD_WITH_HALF_FLOATS)
     std::tuple<StorageValueType, trimd::scalar::F128, TStrategyTestParams<0>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
                trimd::scalar::F128,
                TStrategyTestParams<0>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
     std::tuple<StorageValueType, trimd::scalar::F128, TStrategyTestParams<1>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
                trimd::scalar::F128,
                TStrategyTestParams<1>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
     std::tuple<StorageValueType, trimd::scalar::F128, TStrategyTestParams<2>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
                trimd::scalar::F128,
                TStrategyTestParams<2>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
     std::tuple<StorageValueType, trimd::scalar::F128, TStrategyTestParams<3>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
                trimd::scalar::F128,
                TStrategyTestParams<3>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
 #endif  // RL_BUILD_WITH_HALF_FLOATS
     std::tuple<>>;
 

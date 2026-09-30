@@ -8,7 +8,7 @@
 
 namespace sc {
 
-struct SCAPI StatusCode {
+struct StatusCode {
     int code;
     const char* message;
 };

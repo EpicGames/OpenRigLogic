@@ -34,12 +34,15 @@ public:
     std::size_t read(Writable* destination, std::size_t size) override;
     std::size_t write(const char* source, std::size_t size) override;
     std::size_t write(Readable* source, std::size_t size) override;
+    const char* mappedData() override;
+    std::uint64_t mappedOffset() override;
+    std::size_t mappedSize() override;
 
     MemoryResource* getMemoryResource();
 
 private:
     StreamStatus status;
-    Vector<char> data;
+    pma::Vector<char> buffer;
     std::size_t position;
     MemoryResource* memRes;
 };

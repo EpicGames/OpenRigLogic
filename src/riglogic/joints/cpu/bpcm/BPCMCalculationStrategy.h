@@ -10,8 +10,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
-// *INDENT-OFF*
 namespace rl4 {
 
 namespace bpcm {
@@ -260,6 +260,65 @@ static FORCE_INLINE void processBlocks4x8(const std::uint16_t* inputIndicesStart
     sum1.alignedStore(outbuf);
 }
 
+template<typename TFVec>
+struct IsSynthesizedWidth : std::false_type {};
+
+template<typename THalfWidth>
+struct IsSynthesizedWidth<trimd::fallback::T256<THalfWidth>> : std::true_type {};
+
+template<typename THalfWidth>
+struct IsSynthesizedWidth<trimd::fallback::T512<THalfWidth>> : std::true_type {};
+
+#if defined(_MSC_VER) && !defined(__clang__)
+    #define RL_SYNTHESIZED_WIDTH_NOINLINE __declspec(noinline)
+#else
+    #define RL_SYNTHESIZED_WIDTH_NOINLINE __attribute__((noinline))
+#endif
+
+template<typename TFVec, typename T, bool IsSynthesized = IsSynthesizedWidth<TFVec>::value>
+struct BlockProcessors {
+
+    static FORCE_INLINE void blocks8x4(const std::uint16_t* inputIndicesStart,
+                                       const std::uint16_t* inputIndicesEndAlignedTo4,
+                                       const std::uint16_t* inputIndicesEnd,
+                                       ConstArrayView<float> inputs,
+                                       const T* values,
+                                       float* outbuf) {
+        processBlocks8x4<TFVec>(inputIndicesStart, inputIndicesEndAlignedTo4, inputIndicesEnd, inputs, values, outbuf);
+    }
+
+    static FORCE_INLINE void blocks4x8(const std::uint16_t* inputIndicesStart,
+                                       const std::uint16_t* inputIndicesEndAlignedTo8,
+                                       const std::uint16_t* inputIndicesEnd,
+                                       ConstArrayView<float> inputs,
+                                       const T* values,
+                                       float* outbuf) {
+        processBlocks4x8<TFVec>(inputIndicesStart, inputIndicesEndAlignedTo8, inputIndicesEnd, inputs, values, outbuf);
+    }
+};
+
+template<typename TFVec, typename T>
+struct BlockProcessors<TFVec, T, true> {
+
+    static RL_SYNTHESIZED_WIDTH_NOINLINE void blocks8x4(const std::uint16_t* inputIndicesStart,
+                                                        const std::uint16_t* inputIndicesEndAlignedTo4,
+                                                        const std::uint16_t* inputIndicesEnd,
+                                                        ConstArrayView<float> inputs,
+                                                        const T* values,
+                                                        float* outbuf) {
+        processBlocks8x4<TFVec>(inputIndicesStart, inputIndicesEndAlignedTo4, inputIndicesEnd, inputs, values, outbuf);
+    }
+
+    static RL_SYNTHESIZED_WIDTH_NOINLINE void blocks4x8(const std::uint16_t* inputIndicesStart,
+                                                        const std::uint16_t* inputIndicesEndAlignedTo8,
+                                                        const std::uint16_t* inputIndicesEnd,
+                                                        ConstArrayView<float> inputs,
+                                                        const T* values,
+                                                        float* outbuf) {
+        processBlocks4x8<TFVec>(inputIndicesStart, inputIndicesEndAlignedTo8, inputIndicesEnd, inputs, values, outbuf);
+    }
+};
+
 /*
  * Orchestrate the execution of the needed block processors for a given joint group
  */
@@ -288,12 +347,12 @@ static FORCE_INLINE void processJointGroupBlock4(const JointGroupView& jointGrou
     for (; outputIndices < outputIndicesEndPaddedToSecondLastFullBlock;
          outputIndices += fullBlockHeight, values += fullBlockSize) {
         alignas(TFVec::alignment()) float outbuf[fullBlockHeight];
-        processBlocks8x4<TFVec>(inputIndices,
-                                inputIndicesEndAlignedTo4,
-                                inputIndicesEnd,
-                                inputs,
-                                values,
-                                static_cast<float*>(outbuf));
+        BlockProcessors<TFVec, T>::blocks8x4(inputIndices,
+                                             inputIndicesEndAlignedTo4,
+                                             inputIndicesEnd,
+                                             inputs,
+                                             values,
+                                             static_cast<float*>(outbuf));
         for (std::size_t i = 0ul; i < fullBlockHeight; ++i) {
             outputs[outputIndices[i]] = outbuf[i];
         }
@@ -302,12 +361,12 @@ static FORCE_INLINE void processJointGroupBlock4(const JointGroupView& jointGrou
     // the output values need to be masked-off because of LODs
     for (; outputIndices < outputIndicesEndPaddedToLastFullBlock; outputIndices += fullBlockHeight, values += fullBlockSize) {
         alignas(TFVec::alignment()) float outbuf[fullBlockHeight];
-        processBlocks8x4<TFVec>(inputIndices,
-                                inputIndicesEndAlignedTo4,
-                                inputIndicesEnd,
-                                inputs,
-                                values,
-                                static_cast<float*>(outbuf));
+        BlockProcessors<TFVec, T>::blocks8x4(inputIndices,
+                                             inputIndicesEndAlignedTo4,
+                                             inputIndicesEnd,
+                                             inputs,
+                                             values,
+                                             static_cast<float*>(outbuf));
         // Ignore results that came from rows after the last LOD row
         for (std::size_t i = 0ul; i < (lodRegion.outputLODs.size % fullBlockHeight); ++i) {
             outputs[outputIndices[i]] = outbuf[i];
@@ -316,12 +375,12 @@ static FORCE_INLINE void processJointGroupBlock4(const JointGroupView& jointGrou
     // Process vertical remainder portion of matrix that's partitionable into 4x8 blocks
     for (; outputIndices < outputIndicesEnd; outputIndices += halfBlockHeight, values += halfBlockSize) {
         alignas(TFVec::alignment()) float outbuf[halfBlockHeight];
-        processBlocks4x8<TFVec>(inputIndices,
-                                inputIndicesEndAlignedTo8,
-                                inputIndicesEnd,
-                                inputs,
-                                values,
-                                static_cast<float*>(outbuf));
+        BlockProcessors<TFVec, T>::blocks4x8(inputIndices,
+                                             inputIndicesEndAlignedTo8,
+                                             inputIndicesEnd,
+                                             inputs,
+                                             values,
+                                             static_cast<float*>(outbuf));
         // Ignore results that came from rows after the last LOD row
         auto maskOffStart = static_cast<std::size_t>(outputIndicesEnd - outputIndices);
         for (std::size_t i = 0; i < maskOffStart; ++i) {
@@ -356,7 +415,45 @@ struct VectorizedJointGroupLinearCalculationStrategy : public JointGroupLinearCa
     }
 };
 
+/*
+ * Dispatches each joint group to the kernel width matching the block height its storage was
+ * optimized for (see JointGroup::blockHeight). Each width runs the unchanged standard block
+ * processors, just instantiated at 16 / 8 / 4 lanes, so small joint groups avoid the padding
+ * of the widest block without degrading the tile shape (accumulator count) of large groups.
+ * Widths that are not native on the current arm are synthesized by trimd's fallback wrappers,
+ * but are never selected by the builder for such arms, so those branches stay cold.
+ */
+template<typename T, typename TF512, typename TF256, typename TF128, class TRotationAdapter>
+struct MultiWidthJointGroupLinearCalculationStrategy : public JointGroupLinearCalculationStrategy {
+    TRotationAdapter rotationAdapter;
+
+    explicit MultiWidthJointGroupLinearCalculationStrategy(TRotationAdapter&& rotationAdapter_) :
+        rotationAdapter{std::move(rotationAdapter_)} {
+    }
+
+    void calculate(const JointGroupView& jointGroup,
+                   ConstArrayView<float> inputs,
+                   ArrayView<float> outputs,
+                   std::uint16_t lod) const override {
+        // Groups with no output rows at this LOD have nothing to compute or convert
+        if (jointGroup.lods[lod].outputLODs.size == 0u) {
+            return;
+        }
+        switch (jointGroup.blockHeight) {
+        case 2u * static_cast<std::uint32_t>(TF512::size()):
+            processJointGroupBlock4<TF512, T>(jointGroup, inputs, outputs, lod);
+            break;
+        case 2u * static_cast<std::uint32_t>(TF256::size()):
+            processJointGroupBlock4<TF256, T>(jointGroup, inputs, outputs, lod);
+            break;
+        default:
+            processJointGroupBlock4<TF128, T>(jointGroup, inputs, outputs, lod);
+            break;
+        }
+        rotationAdapter.forward(jointGroup, outputs, lod);
+    }
+};
+
 }  // namespace bpcm
 
 }  // namespace rl4
-// *INDENT-ON*

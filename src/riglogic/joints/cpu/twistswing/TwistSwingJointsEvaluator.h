@@ -2,17 +2,27 @@
 
 #pragma once
 
+#include "riglogic/SerializationContext.h"
 #include "riglogic/TypeDefs.h"
 #include "riglogic/controls/ControlsInputInstance.h"
 #include "riglogic/joints/JointsEvaluator.h"
 #include "riglogic/joints/JointsOutputInstance.h"
 #include "riglogic/joints/cpu/twistswing/TwistSwingSetup.h"
+#include "riglogic/joints/cpu/twistswing/TwistSwingValidator.h"
+#include "riglogic/riglogic/RigMetadata.h"
 
 #include <tdm/Computations.h>
 #include <tdm/Quat.h>
 
+#ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable : 4365 4987)
+#endif
 #include <cstddef>
 #include <cstdint>
+#ifdef _MSC_VER
+    #pragma warning(pop)
+#endif
 
 namespace rl4 {
 
@@ -50,7 +60,7 @@ public:
                    JointsOutputInstance* outputs,
                    std::uint16_t lod,
                    std::uint16_t jointGroupIndex) const override;
-    void load(terse::BinaryInputArchive<BoundedIOStream>& archive) override;
+    void load(BoundedInputArchive& archive) override;
     void save(terse::BinaryOutputArchive<BoundedIOStream>& archive) override;
 
 private:
@@ -99,8 +109,8 @@ void TwistSwingJointsEvaluator<TValue, TFVec256, TFVec128, TRotationAdapter>::ca
     for (const auto& setup : setups) {
         tdm::fquat invTwist;
 
-        // A TwistSwingSetup instance will only have both twist and swing portions populated if both of them
-        // rely on the same input control indices. Otherwise either the swing or the twist portion will be populated only.
+        // Both portions are populated only when twist and swing share input indices; otherwise just one.
+        // A populated portion carries a full input quad; empty means not populated.
         if (!setup.swingInputIndices.empty()) {
             const tdm::fquat swingInput{inputBuffer[setup.swingInputIndices[0]],
                                         inputBuffer[setup.swingInputIndices[1]],
@@ -111,7 +121,8 @@ void TwistSwingJointsEvaluator<TValue, TFVec256, TFVec128, TRotationAdapter>::ca
             const tdm::fquat swing = swingInput * invTwist;
             const tdm::fquat invSwing = tdm::inverse(swing);
 
-            for (std::size_t si = {}; si < setup.swingBlendWeights.size(); ++si) {
+            const std::size_t swingCount = setup.swingBlendWeights.size();
+            for (std::size_t si = {}; si < swingCount; ++si) {
                 const float swingBlendWeight = setup.swingBlendWeights[si];
                 const tdm::fquat invSwingFraction = tdm::slerp(invSwing, identity, swingBlendWeight);
                 const tdm::fquat swingOutput = invTwist * invSwingFraction;
@@ -122,12 +133,8 @@ void TwistSwingJointsEvaluator<TValue, TFVec256, TFVec128, TRotationAdapter>::ca
         }
 
         if (!setup.twistInputIndices.empty() && setup.swingInputIndices.empty()) {
-            // 1. When swing and twist input indices are the same, both twist and swing setups are merged
-            // into a single setup instance. In this case, twist needs no recalculation, since both
-            // twist and swing rely on the same input joint.
-            // 2. When swing and twist input indices are different, they will be on separate setup instances,
-            // in which case the swing portion will remain empty (when twist data exists), so this part needs
-            // to be executed. This is the "fromEnd" case calculation.
+            // A merged setup (shared inputs) reuses the swing-derived twist; a twist-only setup computes it
+            // from its own input (the "fromEnd" case).
             const tdm::fquat twistInput{inputBuffer[setup.twistInputIndices[0]],
                                         inputBuffer[setup.twistInputIndices[1]],
                                         inputBuffer[setup.twistInputIndices[2]],
@@ -136,8 +143,8 @@ void TwistSwingJointsEvaluator<TValue, TFVec256, TFVec128, TRotationAdapter>::ca
             invTwist = twist;  // No actual inversion is needed here
         }
 
-        assert((setup.twistBlendWeights.size() * 4) == setup.twistOutputIndices.size());
-        for (std::size_t ti = {}; ti < setup.twistBlendWeights.size(); ++ti) {
+        const std::size_t twistCount = setup.twistBlendWeights.size();
+        for (std::size_t ti = {}; ti < twistCount; ++ti) {
             const float twistBlendWeight = setup.twistBlendWeights[ti];
             const tdm::fquat twistOutput = tdm::slerp(invTwist, identity, twistBlendWeight);
             const float outbuf[] = {twistOutput.x, twistOutput.y, twistOutput.z, twistOutput.w};
@@ -155,9 +162,12 @@ void TwistSwingJointsEvaluator<TValue, TFVec256, TFVec128, TRotationAdapter>::ca
 }
 
 template<typename TValue, typename TFVec256, typename TFVec128, class TRotationAdapter>
-void TwistSwingJointsEvaluator<TValue, TFVec256, TFVec128, TRotationAdapter>::load(
-    terse::BinaryInputArchive<BoundedIOStream>& archive) {
+void TwistSwingJointsEvaluator<TValue, TFVec256, TFVec128, TRotationAdapter>::load(BoundedInputArchive& archive) {
     archive(setups);
+    const SerializationContext* context = static_cast<SerializationContext*>(archive.getUserData());
+    if (!TwistSwingValidator::validate(setups, *context->metadata)) {
+        archive.markMalformed();
+    }
 }
 
 template<typename TValue, typename TFVec256, typename TFVec128, class TRotationAdapter>

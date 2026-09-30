@@ -50,7 +50,12 @@ std::uint16_t MachineLearnedBehavior::getMeshCount() const {
 }
 
 std::uint16_t MachineLearnedBehavior::getMeshRegionCount(std::uint16_t meshIndex) const {
+    // meshRegionCounts is read after the evaluator's load() and no validator covers it (a truncated snapshot leaves it
+    // empty), so bound the public-API index here rather than relying on the assert.
     assert(meshIndex < meshRegionCounts.size());
+    if (meshIndex >= meshRegionCounts.size()) {
+        return {};
+    }
     return meshRegionCounts[meshIndex];
 }
 

@@ -18,9 +18,11 @@
     #pragma warning(push)
     #pragma warning(disable : 4365 4987)
 #endif
+#include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <string>
+#include <utility>
 #include <vector>
 #ifdef _MSC_VER
     #pragma warning(pop)
@@ -200,6 +202,140 @@ TEST(BinaryInputArchiveTest, LittleEndianDataDeserialization) {
     archive(dest);
 
     ASSERT_EQ(dest, 1234);
+}
+
+TEST(BinaryInputArchiveTest, BoolDeserialization) {
+    tersetests::FakeStream stream;
+    unsigned char bytes[2ul] = {0x00, 0x01};
+    stream.write(reinterpret_cast<char*>(bytes), sizeof(bytes));
+    stream.seek(0ul);
+
+    terse::BinaryInputArchive<tersetests::FakeStream> archive(&stream);
+    bool first = true;
+    bool second = false;
+    archive(first, second);
+
+    ASSERT_FALSE(first);
+    ASSERT_TRUE(second);
+    ASSERT_TRUE(archive.isOk());
+}
+
+TEST(BinaryInputArchiveTest, InvalidBoolWireByteFlagsMalformed) {
+    tersetests::FakeStream stream;
+    unsigned char bytes[1ul] = {0x41};  // a bool object must never be formed from a byte other than 0/1
+    stream.write(reinterpret_cast<char*>(bytes), sizeof(bytes));
+    stream.seek(0ul);
+
+    terse::BinaryInputArchive<tersetests::FakeStream> archive(&stream);
+    bool dest = false;
+    archive(dest);
+
+    ASSERT_TRUE(dest);  // normalized, not raw-loaded
+    ASSERT_FALSE(archive.isOk());
+}
+
+TEST(BinaryInputArchiveTest, VectorOfBoolDeserialization) {
+    tersetests::FakeStream stream;
+    unsigned char bytes[7ul] = {0x00,
+                                0x00,
+                                0x00,
+                                0x03,  // size = 3
+                                0x00,
+                                0x01,
+                                0x01};
+    stream.write(reinterpret_cast<char*>(bytes), sizeof(bytes));
+    stream.seek(0ul);
+
+    terse::BinaryInputArchive<tersetests::FakeStream> archive(&stream);
+    std::vector<bool> dest;
+    archive(dest);
+
+    ASSERT_EQ(dest.size(), 3ul);
+    ASSERT_FALSE(dest[0]);
+    ASSERT_TRUE(dest[1]);
+    ASSERT_TRUE(dest[2]);
+    ASSERT_TRUE(archive.isOk());
+}
+
+TEST(BinaryInputArchiveTest, VectorOfBoolInvalidWireByteFlagsMalformed) {
+    tersetests::FakeStream stream;
+    unsigned char bytes[6ul] = {0x00,
+                                0x00,
+                                0x00,
+                                0x02,  // size = 2
+                                0x01,
+                                0x02};
+    stream.write(reinterpret_cast<char*>(bytes), sizeof(bytes));
+    stream.seek(0ul);
+
+    terse::BinaryInputArchive<tersetests::FakeStream> archive(&stream);
+    std::vector<bool> dest;
+    archive(dest);
+
+    ASSERT_FALSE(archive.isOk());
+}
+
+namespace {
+
+// Pins extender routing: std::vector<bool> elements must reach the extender's bool overload, not bypass it.
+class BoolCountingInputArchive : public terse::ExtendableBinaryInputArchive<BoolCountingInputArchive,
+                                                                            tersetests::FakeStream,
+                                                                            std::uint32_t,
+                                                                            std::uint32_t,
+                                                                            terse::Endianness::Network> {
+public:
+    using BaseArchive = terse::ExtendableBinaryInputArchive<BoolCountingInputArchive,
+                                                            tersetests::FakeStream,
+                                                            std::uint32_t,
+                                                            std::uint32_t,
+                                                            terse::Endianness::Network>;
+    friend terse::Archive<BoolCountingInputArchive>;
+
+public:
+    explicit BoolCountingInputArchive(tersetests::FakeStream* stream_) :
+        BaseArchive{this, stream_},
+        boolCount{} {
+    }
+
+public:
+    std::size_t boolCount;
+
+private:
+    void process(bool& dest) {
+        ++boolCount;
+        BaseArchive::process(dest);
+    }
+
+    template<typename T>
+    void process(T&& dest) {
+        BaseArchive::process(std::forward<T>(dest));
+    }
+};
+
+}  // namespace
+
+TEST(BinaryInputArchiveTest, VectorOfBoolElementsRouteThroughExtender) {
+    tersetests::FakeStream stream;
+    unsigned char bytes[7ul] = {0x00,
+                                0x00,
+                                0x00,
+                                0x03,  // size = 3
+                                0x00,
+                                0x01,
+                                0x01};
+    stream.write(reinterpret_cast<char*>(bytes), sizeof(bytes));
+    stream.seek(0ul);
+
+    BoolCountingInputArchive archive(&stream);
+    std::vector<bool> dest;
+    archive(dest);
+
+    ASSERT_EQ(archive.boolCount, 3ul);
+    ASSERT_EQ(dest.size(), 3ul);
+    ASSERT_FALSE(dest[0]);
+    ASSERT_TRUE(dest[1]);
+    ASSERT_TRUE(dest[2]);
+    ASSERT_TRUE(archive.isOk());
 }
 
 TEST(BinaryInputArchiveTest, PrimitiveTypeDeserialization) {

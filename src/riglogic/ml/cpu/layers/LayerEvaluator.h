@@ -68,7 +68,6 @@ static FORCE_INLINE void processBlocks8x4(const float* inputVectorStart,
         sum7 += (blk7 * input4);
         sum8 += (blk8 * input4);
     }
-    // Process 8x1 horizontal remainder portion after 8x4 blocks are consumed
     processBlocks8x1(inputVectorEndAlignedTo4, inputVectorEnd, weights, sum1, sum2);
 
     const TF128 bias1 = TF128::fromAlignedSource(biases + TF128::size() * 0);
@@ -148,7 +147,6 @@ static FORCE_INLINE void processBlocks4x8(const float* inputVectorStart,
         sum7 += (blk7 * input7);
         sum8 += (blk8 * input8);
     }
-    // Process 4x1 horizontal remainder portion after 4x8 blocks are consumed
     processBlocks4x1(inputVectorEndAlignedTo8, inputVectorEnd, weights, sum1);
 
     const TF128 bias1 = TF128::fromAlignedSource(biases);
@@ -168,7 +166,6 @@ static FORCE_INLINE void processBlocks4x8(const float* inputVectorStart,
     sum1.alignedStore(outbuf);
 }
 
-// Raw-pointer overload: used by the set-based evaluator with pre-resolved pointers.
 template<typename T, typename TF256, typename TF128, template<class...> class TActivationFunction>
 static FORCE_INLINE void calculateBlock4(const T* weights,
                                          const T* biases,

@@ -9,7 +9,6 @@
 #include "riglogic/joints/cpu/CPUJointsOutputInstance.h"
 #include "riglogic/joints/cpu/quaternions/RotationAdapters.h"
 #include "riglogic/joints/cpu/twistswing/TwistSwingJointsEvaluator.h"
-#include "riglogic/system/simd/Detect.h"
 #include "riglogic/system/simd/SIMD.h"
 
 #include <tuple>

@@ -31,7 +31,9 @@ public:
     }
 
     Pair get(std::size_t index) const {
-        assert(index < size());
+        if (index >= size()) {
+            return {};
+        }
         return {from[index], to[index]};
     }
 
@@ -55,7 +57,10 @@ public:
         auto itFrom = from.begin();
         auto itTo = to.begin();
 
-        while (itFrom != from.end()) {
+        // Both iterators are advanced in lockstep, so the walk must stop at whichever array ends first: the two are
+        // independently deserialized and a malformed DNA can make `to` shorter, in which case running to from.end()
+        // would dereference *itTo past the end and erase() an end() iterator. See size() for the full rationale.
+        while ((itFrom != from.end()) && (itTo != to.end())) {
             if (predicate(*itFrom, *itTo)) {
                 itFrom = from.erase(itFrom);
                 itTo = to.erase(itTo);
@@ -74,9 +79,25 @@ public:
         update(to, mapping);
     }
 
+    // The number of COMPLETE pairs. `from` and `to` are serialized as two independently length-prefixed arrays
+    // (RawSurjectiveMapping::serialize) with nothing cross-checking them, so a malformed DNA can present different
+    // lengths. Returning from.size() behind an assert (which is compiled out in release) let get() pass its
+    // `index >= size()` check and then read to[index] out of bounds - reached in practice through
+    // ReaderImpl::getMeshBlendShapeChannelMapping() during BinaryStreamReader::read(). The minimum is the only
+    // length at which both subscripts in get() are valid, and it is unchanged for well-formed data.
     std::size_t size() const {
         assert(from.size() == to.size());
+        return std::min(from.size(), to.size());
+    }
+
+    // Both sides individually, so the reader's load-path integrity check can report the mismatch (and reject the
+    // DNA) rather than silently evaluating the truncated intersection that size() exposes.
+    std::size_t sourceSize() const {
         return from.size();
+    }
+
+    std::size_t targetSize() const {
+        return to.size();
     }
 
     void clear() {

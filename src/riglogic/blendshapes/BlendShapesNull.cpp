@@ -19,7 +19,7 @@ void BlendShapesNull::calculate(const ControlsInputInstance* /*unused*/,
                                 std::uint16_t /*unused*/) const {
 }
 
-void BlendShapesNull::load(terse::BinaryInputArchive<BoundedIOStream>& /*unused*/) {
+void BlendShapesNull::load(BoundedInputArchive& /*unused*/) {
 }
 
 void BlendShapesNull::save(terse::BinaryOutputArchive<BoundedIOStream>& /*unused*/) {

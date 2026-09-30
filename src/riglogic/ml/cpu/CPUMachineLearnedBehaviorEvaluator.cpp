@@ -2,10 +2,13 @@
 
 #include "riglogic/ml/cpu/CPUMachineLearnedBehaviorEvaluator.h"
 
+#include "riglogic/SerializationContext.h"
 #include "riglogic/TypeDefs.h"
 #include "riglogic/controls/ControlsInputInstance.h"
 #include "riglogic/ml/cpu/CPUMachineLearnedBehaviorOutputInstance.h"
+#include "riglogic/ml/cpu/MLBehaviorValidator.h"
 #include "riglogic/ml/cpu/Operation.h"
+#include "riglogic/riglogic/RigMetadata.h"
 #include "riglogic/system/simd/Utils.h"
 #include "riglogic/types/LODSpec.h"
 
@@ -68,6 +71,13 @@ void Evaluator::calculate(ControlsInputInstance* inputs,
                           std::uint16_t mlTypeIndex,
                           std::uint16_t mlOperationSetIndex,
                           std::uint16_t mlOperationIndex) const {
+    // Bound the caller-supplied selectors of the public single-op API against every container they index.
+    if ((mlTypeIndex >= mlOperations.size()) || (mlOperationSetIndex >= mlOperations[mlTypeIndex].size()) ||
+        (mlTypeIndex >= lods.size()) || (mlOperationSetIndex >= lods[mlTypeIndex].size()) ||
+        (lod >= lods[mlTypeIndex][mlOperationSetIndex].indicesPerLOD.size()) ||
+        (mlOperationIndex >= lods[mlTypeIndex][mlOperationSetIndex].count)) {
+        return;
+    }
     auto* out = static_cast<OutputInstance*>(intermediateOutputs);
     const auto masks = out->getMaskBuffer();
     auto inputBuffer = inputs->getInputBuffer();
@@ -113,21 +123,24 @@ void Evaluator::calculate(ControlsInputInstance* inputs,
     }
 }
 
-void Evaluator::load(terse::BinaryInputArchive<BoundedIOStream>& archive) {
+void Evaluator::load(BoundedInputArchive& archive) {
     archive(lods);
 
     auto memRes = mlOperations.get_allocator().getMemoryResource();
 
+    // mlTypeCount / mlSetCount are raw scalars, not container lengths, so BoundedInputArchive does not gate them; cap
+    // each against the stream size so a hostile snapshot cannot drive resize() into a bad_alloc.
     std::uint32_t mlTypeCount = {};
     archive(mlTypeCount);
+    mlTypeCount = static_cast<std::uint32_t>(archive.boundSize(mlTypeCount));
     mlOperations.resize(mlTypeCount);
 
     using BasePointer = UniqueInstance<OperationSet>::PointerType;
-    RuntimeTemplateInstantiator instantiator{config};
 
     for (std::uint32_t typeIdx = {}; typeIdx < mlTypeCount; ++typeIdx) {
         std::uint32_t mlSetCount = {};
         archive(mlSetCount);
+        mlSetCount = static_cast<std::uint32_t>(archive.boundSize(mlSetCount));
         mlOperations[typeIdx].resize(mlSetCount);
 
         for (std::uint32_t opSetIdx = {}; opSetIdx < mlSetCount; ++opSetIdx) {
@@ -136,7 +149,7 @@ void Evaluator::load(terse::BinaryInputArchive<BoundedIOStream>& archive) {
 
             OperationSetData opSetData{memRes};
             opSetData.type = setType;
-            auto opSet = instantiator.invoke<OperationSetFactory, BasePointer>(std::move(opSetData), memRes);
+            BasePointer opSet = createOperationSet(*config, std::move(opSetData), memRes);
             opSet->load(archive);
             mlOperations[typeIdx][opSetIdx] = std::move(opSet);
         }
@@ -144,6 +157,12 @@ void Evaluator::load(terse::BinaryInputArchive<BoundedIOStream>& archive) {
 
     archive(bufferSizes);
     archive(meshRegionCount);
+
+    const SerializationContext* context = static_cast<SerializationContext*>(archive.getUserData());
+    const RigMetadata& metadata = *context->metadata;
+    if (!MLBehaviorValidator::validate(lods, mlOperations, bufferSizes, meshRegionCount, metadata)) {
+        archive.markMalformed();
+    }
 }
 
 void Evaluator::save(terse::BinaryOutputArchive<BoundedIOStream>& archive) {

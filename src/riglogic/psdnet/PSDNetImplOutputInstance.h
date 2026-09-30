@@ -11,7 +11,8 @@ namespace rl4 {
 
 class PSDNetImplOutputInstance : public PSDNetOutputInstance {
 public:
-    PSDNetImplOutputInstance(std::uint16_t controlCount, MemoryResource* memRes);
+    // Combined raw + PSD + ML + RBF count; the sum can exceed uint16.
+    PSDNetImplOutputInstance(std::size_t controlCount, MemoryResource* memRes);
     void resetClampBuffer() override;
     ArrayView<float> getClampBuffer() override;
 

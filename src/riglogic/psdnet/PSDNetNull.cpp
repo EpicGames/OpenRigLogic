@@ -25,7 +25,7 @@ ConstArrayView<std::uint16_t> PSDNetNull::getPSDOutputIndicesForLOD(std::uint16_
 void PSDNetNull::calculate(ControlsInputInstance* /*unused*/, PSDNetOutputInstance* /*unused*/, std::uint16_t /*unused*/) const {
 }
 
-void PSDNetNull::load(terse::BinaryInputArchive<BoundedIOStream>& /*unused*/) {
+void PSDNetNull::load(BoundedInputArchive& /*unused*/) {
 }
 
 void PSDNetNull::save(terse::BinaryOutputArchive<BoundedIOStream>& /*unused*/) {

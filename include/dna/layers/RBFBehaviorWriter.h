@@ -18,9 +18,9 @@ namespace dna {
         Implementors should inherit from Writer itself and not this class.
     @see Writer
 */
-class DNAAPI RBFBehaviorWriter : public virtual BehaviorWriter {
+class DNAAPI_TYPE RBFBehaviorWriter : public virtual BehaviorWriter {
 protected:
-    virtual ~RBFBehaviorWriter();
+    DNAAPI_MEMBER virtual ~RBFBehaviorWriter();
 
 public:
     /**

@@ -2,7 +2,6 @@
 
 #pragma once
 
-// *INDENT-OFF*
 #ifndef EXTD_GUARD
     #define EXTD_GUARD
 
@@ -187,4 +186,3 @@ typename std::iterator_traits<TIterator>::difference_type advanceWhile(TIterator
 }  // namespace extd
 
 #endif  // EXTD_GUARD
-// *INDENT-ON*

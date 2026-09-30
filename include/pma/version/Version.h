@@ -3,6 +3,6 @@
 #pragma once
 
 #define PMA_MAJOR_VERSION 1
-#define PMA_MINOR_VERSION 3
-#define PMA_PATCH_VERSION 18
-#define PMA_VERSION_STRING "1.3.18"
+#define PMA_MINOR_VERSION 5
+#define PMA_PATCH_VERSION 1
+#define PMA_VERSION_STRING "1.5.1"

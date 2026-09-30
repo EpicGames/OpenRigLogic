@@ -82,7 +82,7 @@ struct Configuration {
     // system.
     CoordinateSystemTransformPolicy coordinateSystemTransformPolicy = CoordinateSystemTransformPolicy::Preserve;
     // The axis directions for all coordinate axes.
-    CoordinateSystem coordinateSystem = {};
+    CoordinateSystem coordinateSystem = {Direction::left, Direction::up, Direction::front};
     // The rotation sequence applied globally.
     RotationSequence rotationSequence = RotationSequence::xyz;
     // Rotation direction per each coordinate axis.

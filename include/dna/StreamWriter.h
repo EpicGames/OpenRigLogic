@@ -8,9 +8,9 @@
 
 namespace dna {
 
-class DNAAPI StreamWriter : public Writer {
+class DNAAPI_TYPE StreamWriter : public Writer {
 public:
-    ~StreamWriter() override;
+    DNAAPI_MEMBER ~StreamWriter() override;
     /**
         @brief Write data to stream from internal structures.
      */

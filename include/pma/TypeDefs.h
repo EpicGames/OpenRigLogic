@@ -9,10 +9,12 @@
     #pragma warning(disable : 4365)
 #endif
 #include <cstddef>
+#include <cstdint>
 #include <list>
 #include <map>
 #include <set>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -47,3 +49,18 @@ template<typename K, typename V, typename Allocator = PolyAllocator<std::pair<co
 using UnorderedMap = std::unordered_map<K, V, std::hash<K>, std::equal_to<K>, Allocator>;
 
 }  // namespace pma
+
+// libstdc++ before GCC 13 (LWG 3705) specializes std::hash only for std::allocator strings
+#if defined(__GLIBCXX__) && (!defined(_GLIBCXX_RELEASE) || (_GLIBCXX_RELEASE < 13))
+namespace std {
+
+template<std::size_t Alignment, class TDefaultMemoryResource>
+struct hash<basic_string<char, char_traits<char>, pma::PolyAllocator<char, Alignment, TDefaultMemoryResource>>> {
+    size_t operator()(const basic_string<char, char_traits<char>, pma::PolyAllocator<char, Alignment, TDefaultMemoryResource>>&
+                          str) const noexcept {
+        return _Hash_impl::hash(str.data(), str.size());
+    }
+};
+
+}  // namespace std
+#endif  // defined(__GLIBCXX__) && (!defined(_GLIBCXX_RELEASE) || (_GLIBCXX_RELEASE < 13))

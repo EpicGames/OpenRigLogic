@@ -156,3 +156,11 @@ SWIGRUNTIME swig_module_info* SWIG_Python_GetModule_Patched(void *SWIGUNUSEDPARM
 #undef SWIG_GetModule
 #define SWIG_GetModule(clientdata) SWIG_Python_GetModule_Patched(clientdata)
 %}
+
+%init %{
+    // SWIG_InitializeModule publishes this module's own type-table capsule only when it is the first
+    // SWIG module in the interpreter; the patched SWIG_GetModule always finds py3dna first, so the
+    // stock SWIG_Python_TypeQuery (compiled before the patch) would find no capsule and dereference
+    // null, e.g. on any wrong-type argument to a const char* parameter.
+    SWIG_Python_SetModule(&swig_module);
+%}

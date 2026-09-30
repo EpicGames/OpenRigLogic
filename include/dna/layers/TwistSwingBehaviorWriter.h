@@ -17,9 +17,9 @@ namespace dna {
         Implementors should inherit from Writer itself and not this class.
     @see Writer
 */
-class DNAAPI TwistSwingBehaviorWriter : public virtual DefinitionWriter {
+class DNAAPI_TYPE TwistSwingBehaviorWriter : public virtual DefinitionWriter {
 protected:
-    virtual ~TwistSwingBehaviorWriter();
+    DNAAPI_MEMBER virtual ~TwistSwingBehaviorWriter();
 
 public:
     /**

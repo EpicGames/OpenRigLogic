@@ -68,7 +68,7 @@ protected:
         using TF256 = typename std::tuple_element<1, TTestTypes>::type;
         using TF128 = typename std::tuple_element<2, TTestTypes>::type;
         rl4::Configuration config = {};
-        auto meta = rl4::RigMetadata::create(config, &reader, &memRes, rl4::InitializationMethod::Create);
+        auto meta = rl4::RigMetadata::create(config, &reader, &memRes);
         auto evaluator = rl4::rbf::cpu::Factory<T, TF256, TF128>::create(meta.get(), &reader, &memRes);
         auto evaluatorImpl = static_cast<rl4::rbf::cpu::Evaluator<T, TF256, TF128>*>(evaluator.get());
         rl4::rbf::cpu::Evaluator<T, TF256, TF128>::Accessor::assertRawDataEqual(*evaluatorImpl);

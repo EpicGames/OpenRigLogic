@@ -45,7 +45,7 @@ void CPUJointsEvaluator::calculate(ControlsInputInstance* inputs,
     // No twist swing or ML evaluation per joint group
 }
 
-void CPUJointsEvaluator::load(terse::BinaryInputArchive<BoundedIOStream>& archive) {
+void CPUJointsEvaluator::load(BoundedInputArchive& archive) {
     bpcmEvaluator->load(archive);
     quaternionEvaluator->load(archive);
     twistSwingEvaluator->load(archive);

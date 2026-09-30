@@ -7,6 +7,7 @@
 #include "riglogic/psdnet/PSDNetImpl.h"
 #include "riglogic/psdnet/PSDNetImplOutputInstance.h"
 #include "riglogic/psdnet/PSDNetNull.h"
+#include "riglogic/psdnet/PSDNetValidator.h"
 #include "riglogic/riglogic/Configuration.h"
 #include "riglogic/riglogic/RigMetadata.h"
 #include "riglogic/utils/Extd.h"
@@ -16,7 +17,9 @@
     #pragma warning(push)
     #pragma warning(disable : 4365 4987)
 #endif
+#include <algorithm>
 #include <cstdint>
+#include <limits>
 #include <utility>
 #ifdef _MSC_VER
     #pragma warning(pop)
@@ -26,19 +29,17 @@ namespace rl4 {
 
 PSDNet::Pointer PSDNetFactory::create(const Configuration& config, RigMetadata* meta, MemoryResource* memRes) {
     RL_UNUSED(config);
-    const EvaluatorType type = meta->popFrontEvaluator();
+    const EvaluatorType type = meta->evaluators.psdNet;
 
     if (type == EvaluatorType::Null) {
-        meta->pushBackEvaluator(EvaluatorType::Null);
         return UniqueInstance<PSDNetNull, PSDNet>::with(memRes).create();
     }
 
-    meta->pushBackEvaluator(EvaluatorType::Concrete);
     const auto controlCount = static_cast<std::size_t>(meta->rawControlCount) + static_cast<std::size_t>(meta->psdControlCount) +
                               static_cast<std::size_t>(meta->mlControlCount) + static_cast<std::size_t>(meta->rbfControlCount);
     auto instanceFactory = [controlCount](MemoryResource* instanceMemRes) {
         return UniqueInstance<PSDNetImplOutputInstance, PSDNetOutputInstance>::with(instanceMemRes)
-            .create(static_cast<std::uint16_t>(controlCount), instanceMemRes);
+            .create(controlCount, instanceMemRes);
     };
     return UniqueInstance<PSDNetImpl, PSDNet>::with(memRes).create(instanceFactory, memRes);
 }
@@ -50,11 +51,11 @@ PSDNet::Pointer PSDNetFactory::create(const Configuration& config,
                                       MemoryResource* memRes) {
     RL_UNUSED(config);
     if ((meta->psdControlCount == 0u) || (meta->lodCount == 0u)) {
-        meta->pushBackEvaluator(EvaluatorType::Null);
+        meta->evaluators.psdNet = EvaluatorType::Null;
         return UniqueInstance<PSDNetNull, PSDNet>::with(memRes).create();
     }
 
-    meta->pushBackEvaluator(EvaluatorType::Concrete);
+    meta->evaluators.psdNet = EvaluatorType::Concrete;
 
     Matrix<std::uint16_t> inputLODs{memRes};
     Matrix<std::uint16_t> outputLODs{memRes};
@@ -75,11 +76,21 @@ PSDNet::Pointer PSDNetFactory::create(const Configuration& config,
     if (psdControlCount > 0u) {
         maxPSD = minPSD + psdControlCount - 1ul;
     }
+    // minPSD/maxPSD travel as uint16 from here on, but raw and PSD control counts are independent uint16 DNA scalars
+    // whose sum can exceed the type; reject rather than truncate.
+    if (maxPSD > static_cast<std::size_t>(std::numeric_limits<std::uint16_t>::max())) {
+        return nullptr;
+    }
+
+    const std::size_t entryCount = std::min(psdRows.size(), std::min(psdCols.size(), psdWeights.size()));
 
     psds.resize(psdControlCount);
     inputIndicesPerPSD.reserve(psdCols.size());
-    for (std::size_t start = {}; start < psdRows.size(); ++start) {
+    for (std::size_t start = {}; start < entryCount; ++start) {
         const auto psdOutputIndex = psdRows[start];
+        if ((psdOutputIndex < minPSD) || (psdOutputIndex > maxPSD)) {
+            continue;
+        }
         PSD& psd = psds[static_cast<std::size_t>(psdOutputIndex) - rawControlCount];
         if (psd.size != 0ul) {
             continue;
@@ -87,7 +98,7 @@ PSDNet::Pointer PSDNetFactory::create(const Configuration& config,
 
         psd.weight = 1.0f;
         psd.offset = inputIndicesPerPSD.size();
-        for (std::size_t i = start; i < psdRows.size(); ++i) {
+        for (std::size_t i = start; i < entryCount; ++i) {
             if (psdRows[i] == psdOutputIndex) {
                 const auto psdInputIndex = psdCols[i];
                 inputIndicesPerPSD.push_back(psdInputIndex);
@@ -127,9 +138,20 @@ PSDNet::Pointer PSDNetFactory::create(const Configuration& config,
         outputIndices.erase(std::unique(outputIndices.begin(), outputIndices.end()), outputIndices.end());
     }
 
+    // inputIndicesPerPSD holds raw psdCols values that become runtime subscripts.
+    if (!PSDNetValidator::validate(inputLODs,
+                                   outputLODs,
+                                   inputIndicesPerPSD,
+                                   psds,
+                                   static_cast<std::uint16_t>(minPSD),
+                                   static_cast<std::uint16_t>(maxPSD),
+                                   *meta)) {
+        return nullptr;
+    }
+
     auto instanceFactory = [controlCount](MemoryResource* instanceMemRes) {
         return UniqueInstance<PSDNetImplOutputInstance, PSDNetOutputInstance>::with(instanceMemRes)
-            .create(static_cast<std::uint16_t>(controlCount), instanceMemRes);
+            .create(controlCount, instanceMemRes);
     };
 
     return UniqueInstance<PSDNetImpl, PSDNet>::with(memRes).create(std::move(inputLODs),

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "riglogic/SerializationContext.h"
 #include "riglogic/TypeDefs.h"
 #include "riglogic/controls/ControlsInputInstance.h"
 #include "riglogic/rbf/RBFBehaviorEvaluator.h"
@@ -9,7 +10,9 @@
 #include "riglogic/rbf/cpu/AdditiveRBFSolver.h"
 #include "riglogic/rbf/cpu/CPURBFBehaviorOutputInstance.h"
 #include "riglogic/rbf/cpu/InterpolativeRBFSolver.h"
+#include "riglogic/rbf/cpu/RBFBehaviorValidator.h"
 #include "riglogic/rbf/cpu/RBFSolver.h"
+#include "riglogic/riglogic/RigMetadata.h"
 #include "riglogic/types/LODSpec.h"
 #include "riglogic/utils/Macros.h"
 
@@ -93,7 +96,6 @@ public:
             const auto& inputControlIndices = poseInputControlIndices[pi];
             const auto& outputControlIndices = poseOutputControlIndices[pi];
             const auto& outputControlWeights = poseOutputControlWeights[pi];
-            assert(outputControlIndices.size() == outputControlWeights.size());
 
             float inputWeight = 1.0f;
             for (const auto inputControlIndex : inputControlIndices) {
@@ -137,10 +139,13 @@ public:
         calculate(solverIndex, rawControls, inputBuffer, intermediateWeightsBuffer, outputWeightsBuffer);
     }
 
-    void load(terse::BinaryInputArchive<BoundedIOStream>& archive) override {
+    void load(BoundedInputArchive& archive) override {
         archive(lods);
-        std::size_t solverCount;
+        std::size_t solverCount = {};
         archive(solverCount);
+        // solverCount is a raw scalar, not a container length, so BoundedInputArchive does not gate it; bound it before
+        // reserve().
+        solverCount = archive.boundSize(solverCount);
         solvers.reserve(solverCount);
 
         auto memRes = solvers.get_allocator().getMemoryResource();
@@ -148,10 +153,12 @@ public:
         for (std::size_t i = 0u; i < solverCount; ++i) {
             dna::RBFSolverType solverType;
             archive(solverType);
-            if (solverType == dna::RBFSolverType::Additive) {
-                solvers.emplace_back(UniqueInstance<AdditiveRBFSolver, RBFSolver>::with(memRes).create(memRes));
-            } else if (solverType == dna::RBFSolverType::Interpolative) {
+            // An out-of-range solver type would leave solvers[] short and the load below dereferencing past the end;
+            // default to Additive so the stream stays aligned and let the validator reject the rig.
+            if (solverType == dna::RBFSolverType::Interpolative) {
                 solvers.push_back(UniqueInstance<InterpolativeRBFSolver, RBFSolver>::with(memRes).create(memRes));
+            } else {
+                solvers.emplace_back(UniqueInstance<AdditiveRBFSolver, RBFSolver>::with(memRes).create(memRes));
             }
             solvers[i]->load(archive);
         }
@@ -163,6 +170,22 @@ public:
         archive(poseOutputControlWeights);
         archive(inputCountPerSolver);
         archive(targetCountPerSolver);
+
+        const SerializationContext* context = static_cast<SerializationContext*>(archive.getUserData());
+        const RigMetadata& metadata = *context->metadata;
+        if (!RBFBehaviorValidator::validate(lods,
+                                            solvers,
+                                            solverRawControlInputIndices,
+                                            solverRawControlOutputIndices,
+                                            solverPoseIndices,
+                                            poseInputControlIndices,
+                                            poseOutputControlIndices,
+                                            poseOutputControlWeights,
+                                            inputCountPerSolver,
+                                            targetCountPerSolver,
+                                            metadata)) {
+            archive.markMalformed();
+        }
     }
 
     void save(terse::BinaryOutputArchive<BoundedIOStream>& archive) override {

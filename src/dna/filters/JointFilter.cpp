@@ -9,6 +9,15 @@
 #include "dna/layers/MachineLearnedBehaviorExt.h"
 #include "dna/utils/Extd.h"
 
+#ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable : 4365 4987)
+#endif
+#include <algorithm>
+#ifdef _MSC_VER
+    #pragma warning(pop)
+#endif
+
 namespace dna {
 
 JointFilter::JointFilter(MemoryResource* memRes_) :
@@ -260,7 +269,10 @@ void JointFilter::apply(RawMachineLearnedBehaviorJoints& dest) {
 
     auto getNumMLAttributesPerJoint = [&dest]() {
         std::uint32_t numMLAttributesPerJoint = 0u;
-        for (std::size_t i = {}; i < dest.parameterKeys.size(); ++i) {
+        // Keys and values are independent arrays in the DNA; a hostile file can make them differ in
+        // length, so only the paired prefix is safe to dereference.
+        const auto paramCount = std::min(dest.parameterKeys.size(), dest.parameterValues.size());
+        for (std::size_t i = {}; i < paramCount; ++i) {
             if (dest.parameterKeys[i] == static_cast<std::uint16_t>(MachineLearnedBehaviorParameterKey::JointTranslationType)) {
                 const auto translationType = static_cast<TranslationRepresentation>(dest.parameterValues[i]);
                 if (translationType == TranslationRepresentation::Vector) {

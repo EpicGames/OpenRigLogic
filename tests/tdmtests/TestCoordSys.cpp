@@ -30,8 +30,8 @@ TEST(TestCoordSys, EulerToFromMatExtractionRoundTrip) {
 
     // Test XYZ
     {
-        const auto mat = tdm::impl::euler2mat(input, tdm::rot_seq::xyz, rot_sign_positive);
-        const auto extracted = tdm::impl::mat2euler(mat, tdm::rot_seq::xyz, rot_sign_positive);
+        const auto mat = tdm::euler2mat(input, tdm::rot_seq::xyz, rot_sign_positive);
+        const auto extracted = tdm::mat2euler(mat, tdm::rot_seq::xyz, rot_sign_positive);
         ASSERT_NEAR(tdm::fdeg{extracted[0]}.value, tdm::fdeg{tdm::frad{input[0]}}.value, 0.01f);
         ASSERT_NEAR(tdm::fdeg{extracted[1]}.value, tdm::fdeg{tdm::frad{input[1]}}.value, 0.01f);
         ASSERT_NEAR(tdm::fdeg{extracted[2]}.value, tdm::fdeg{tdm::frad{input[2]}}.value, 0.01f);
@@ -39,8 +39,8 @@ TEST(TestCoordSys, EulerToFromMatExtractionRoundTrip) {
 
     // Test XZY
     {
-        const auto mat = tdm::impl::euler2mat(input, tdm::rot_seq::xzy, rot_sign_positive);
-        const auto extracted = tdm::impl::mat2euler(mat, tdm::rot_seq::xzy, rot_sign_positive);
+        const auto mat = tdm::euler2mat(input, tdm::rot_seq::xzy, rot_sign_positive);
+        const auto extracted = tdm::mat2euler(mat, tdm::rot_seq::xzy, rot_sign_positive);
         ASSERT_NEAR(tdm::fdeg{extracted[0]}.value, tdm::fdeg{tdm::frad{input[0]}}.value, 0.01f);
         ASSERT_NEAR(tdm::fdeg{extracted[1]}.value, tdm::fdeg{tdm::frad{input[1]}}.value, 0.01f);
         ASSERT_NEAR(tdm::fdeg{extracted[2]}.value, tdm::fdeg{tdm::frad{input[2]}}.value, 0.01f);
@@ -48,8 +48,8 @@ TEST(TestCoordSys, EulerToFromMatExtractionRoundTrip) {
 
     // Test YXZ
     {
-        const auto mat = tdm::impl::euler2mat(input, tdm::rot_seq::yxz, rot_sign_positive);
-        const auto extracted = tdm::impl::mat2euler(mat, tdm::rot_seq::yxz, rot_sign_positive);
+        const auto mat = tdm::euler2mat(input, tdm::rot_seq::yxz, rot_sign_positive);
+        const auto extracted = tdm::mat2euler(mat, tdm::rot_seq::yxz, rot_sign_positive);
         ASSERT_NEAR(tdm::fdeg{extracted[0]}.value, tdm::fdeg{tdm::frad{input[0]}}.value, 0.01f);
         ASSERT_NEAR(tdm::fdeg{extracted[1]}.value, tdm::fdeg{tdm::frad{input[1]}}.value, 0.01f);
         ASSERT_NEAR(tdm::fdeg{extracted[2]}.value, tdm::fdeg{tdm::frad{input[2]}}.value, 0.01f);
@@ -57,8 +57,8 @@ TEST(TestCoordSys, EulerToFromMatExtractionRoundTrip) {
 
     // Test YZX
     {
-        const auto mat = tdm::impl::euler2mat(input, tdm::rot_seq::yzx, rot_sign_positive);
-        const auto extracted = tdm::impl::mat2euler(mat, tdm::rot_seq::yzx, rot_sign_positive);
+        const auto mat = tdm::euler2mat(input, tdm::rot_seq::yzx, rot_sign_positive);
+        const auto extracted = tdm::mat2euler(mat, tdm::rot_seq::yzx, rot_sign_positive);
         ASSERT_NEAR(tdm::fdeg{extracted[0]}.value, tdm::fdeg{tdm::frad{input[0]}}.value, 0.01f);
         ASSERT_NEAR(tdm::fdeg{extracted[1]}.value, tdm::fdeg{tdm::frad{input[1]}}.value, 0.01f);
         ASSERT_NEAR(tdm::fdeg{extracted[2]}.value, tdm::fdeg{tdm::frad{input[2]}}.value, 0.01f);
@@ -66,8 +66,8 @@ TEST(TestCoordSys, EulerToFromMatExtractionRoundTrip) {
 
     // Test ZXY
     {
-        const auto mat = tdm::impl::euler2mat(input, tdm::rot_seq::zxy, rot_sign_positive);
-        const auto extracted = tdm::impl::mat2euler(mat, tdm::rot_seq::zxy, rot_sign_positive);
+        const auto mat = tdm::euler2mat(input, tdm::rot_seq::zxy, rot_sign_positive);
+        const auto extracted = tdm::mat2euler(mat, tdm::rot_seq::zxy, rot_sign_positive);
         ASSERT_NEAR(tdm::fdeg{extracted[0]}.value, tdm::fdeg{tdm::frad{input[0]}}.value, 0.01f);
         ASSERT_NEAR(tdm::fdeg{extracted[1]}.value, tdm::fdeg{tdm::frad{input[1]}}.value, 0.01f);
         ASSERT_NEAR(tdm::fdeg{extracted[2]}.value, tdm::fdeg{tdm::frad{input[2]}}.value, 0.01f);
@@ -75,8 +75,8 @@ TEST(TestCoordSys, EulerToFromMatExtractionRoundTrip) {
 
     // Test ZYX
     {
-        const auto mat = tdm::impl::euler2mat(input, tdm::rot_seq::zyx, rot_sign_positive);
-        const auto extracted = tdm::impl::mat2euler(mat, tdm::rot_seq::zyx, rot_sign_positive);
+        const auto mat = tdm::euler2mat(input, tdm::rot_seq::zyx, rot_sign_positive);
+        const auto extracted = tdm::mat2euler(mat, tdm::rot_seq::zyx, rot_sign_positive);
         ASSERT_NEAR(tdm::fdeg{extracted[0]}.value, tdm::fdeg{tdm::frad{input[0]}}.value, 0.01f);
         ASSERT_NEAR(tdm::fdeg{extracted[1]}.value, tdm::fdeg{tdm::frad{input[1]}}.value, 0.01f);
         ASSERT_NEAR(tdm::fdeg{extracted[2]}.value, tdm::fdeg{tdm::frad{input[2]}}.value, 0.01f);

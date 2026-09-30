@@ -18,7 +18,7 @@ RBFSolverType AdditiveRBFSolver::getSolverType() const {
 
 void AdditiveRBFSolver::solve(ArrayView<float> input, ArrayView<float> /*unused*/, ArrayView<float> outputWeights) const {
     convertInput(input);
-    getDistanceWeight(targets, input, outputWeights, radius);
+    getDistanceWeight(getDistanceTargets(), input, outputWeights, radius);
 
     normalizeAndCutOff(outputWeights);
 }

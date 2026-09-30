@@ -27,13 +27,13 @@ MachineLearnedBehavior::Pointer MachineLearnedBehaviorFactory::create(const Conf
                                                                       MemoryResource* memRes) {
     auto moduleFactory = UniqueInstance<MachineLearnedBehavior>::with(memRes);
     if (!config.loadMachineLearnedBehavior || (meta->lodCount == 0u) || (meta->mlTypeCount == 0u)) {
-        meta->pushBackEvaluator(EvaluatorType::Null);
+        meta->evaluators.mlBehavior = EvaluatorType::Null;
         auto evaluator =
             UniqueInstance<MachineLearnedBehaviorNullEvaluator, MachineLearnedBehaviorEvaluator>::with(memRes).create();
         return moduleFactory.create(std::move(evaluator), memRes);
     }
 
-    meta->pushBackEvaluator(EvaluatorType::Concrete);
+    meta->evaluators.mlBehavior = EvaluatorType::Concrete;
 
     Vector<std::uint16_t> meshRegionCount{memRes};
     meshRegionCount.resize(reader->getMeshCount());
@@ -41,23 +41,27 @@ MachineLearnedBehavior::Pointer MachineLearnedBehaviorFactory::create(const Conf
         meshRegionCount[meshIdx] = reader->getMeshRegionCount(meshIdx);
     }
 
-    return moduleFactory.create(createMLEvaluator(config, meta, reader, memRes), std::move(meshRegionCount));
+    auto evaluator = createMLEvaluator(config, meta, reader, memRes);
+    if (!evaluator) {
+        return nullptr;
+    }
+    return moduleFactory.create(std::move(evaluator), std::move(meshRegionCount));
 }
 
 MachineLearnedBehavior::Pointer MachineLearnedBehaviorFactory::create(const Configuration& config,
                                                                       RigMetadata* meta,
                                                                       MemoryResource* memRes) {
     auto moduleFactory = UniqueInstance<MachineLearnedBehavior>::with(memRes);
-    const EvaluatorType type = meta->popFrontEvaluator();
+    const EvaluatorType type = meta->evaluators.mlBehavior;
 
     if (type == EvaluatorType::Null) {
-        meta->pushBackEvaluator(EvaluatorType::Null);
         auto evaluator =
             UniqueInstance<MachineLearnedBehaviorNullEvaluator, MachineLearnedBehaviorEvaluator>::with(memRes).create();
         return moduleFactory.create(std::move(evaluator), memRes);
     }
 
-    meta->pushBackEvaluator(EvaluatorType::Concrete);
+    // No null check needed here, unlike the DNA overload: the CPU factory returns nullptr only on DNA-validation
+    // failures, and with a null reader it returns an empty evaluator populated later by load().
     return moduleFactory.create(createMLEvaluator(config, meta, nullptr, memRes), memRes);
 }
 

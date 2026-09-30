@@ -14,9 +14,9 @@ namespace dna {
         Implementors should inherit from Writer itself and not this class.
     @see Writer
 */
-class DNAAPI HeaderWriter {
+class DNAAPI_TYPE HeaderWriter {
 protected:
-    virtual ~HeaderWriter();
+    DNAAPI_MEMBER virtual ~HeaderWriter();
 
 public:
     virtual void setFileFormatGeneration(std::uint16_t generation) = 0;

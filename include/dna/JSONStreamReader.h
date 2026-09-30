@@ -11,7 +11,7 @@
 
 namespace dna {
 
-class DNAAPI JSONStreamReader : public StreamReader {
+class DNAAPI_TYPE JSONStreamReader : public StreamReader {
 public:
     /**
         @brief Factory method for creation of JSONStreamReader
@@ -25,16 +25,16 @@ public:
             User is responsible for releasing the returned pointer by calling destroy.
         @see destroy
     */
-    static JSONStreamReader* create(BoundedIOStream* stream, MemoryResource* memRes = nullptr);
+    DNAAPI_MEMBER static JSONStreamReader* create(BoundedIOStream* stream, MemoryResource* memRes = nullptr);
     /**
         @brief Method for freeing a JSONStreamReader instance.
         @param instance
             Instance of JSONStreamReader to be freed.
         @see create
     */
-    static void destroy(JSONStreamReader* instance);
+    DNAAPI_MEMBER static void destroy(JSONStreamReader* instance);
 
-    ~JSONStreamReader() override;
+    DNAAPI_MEMBER ~JSONStreamReader() override;
 };
 
 }  // namespace dna

@@ -2,7 +2,6 @@
 
 #pragma once
 
-// *INDENT-OFF*
 #if !defined(TRIO_WINDOWS_FILE_MAPPING_AVAILABLE) && !defined(TRIO_MMAP_AVAILABLE)
 
     #include "trio/streams/FileStream.h"
@@ -40,15 +39,18 @@ public:
     std::size_t write(Readable* source, std::size_t size) override;
     void flush() override;
     void resize(std::uint64_t size) override;
+    const char* mappedData() override;
+    std::uint64_t mappedOffset() override;
+    std::size_t mappedSize() override;
 
     MemoryResource* getMemoryResource();
 
 private:
     pma::ScopedPtr<FileStream> stream;
     MemoryResource* memRes;
+    StreamStatus status;
 };
 
 }  // namespace trio
 
 #endif
-// *INDENT-OFF*

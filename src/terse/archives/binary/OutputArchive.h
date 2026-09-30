@@ -261,10 +261,23 @@ protected:
         processElements(source);
     }
 
+    void process(const bool& source) {
+        const std::uint8_t wire = static_cast<std::uint8_t>(source ? 1u : 0u);
+        process(wire);
+    }
+
     template<typename T, typename... Args>
     void process(const std::vector<T, Args...>& source) {
         processSize(source.size());
         processElements(source);
+    }
+
+    template<typename... Args>
+    void process(const std::vector<bool, Args...>& source) {
+        processSize(source.size());
+        for (const bool value : source) {
+            BaseArchive::dispatch(value);
+        }
     }
 
     template<typename T, typename... Args>

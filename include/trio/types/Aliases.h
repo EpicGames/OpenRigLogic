@@ -11,6 +11,14 @@ namespace trio {
 
 using sc::Status;
 
-using namespace pma;
+using pma::DefaultInstanceCreator;
+using pma::DefaultInstanceDestroyer;
+using pma::Delete;
+using pma::FactoryCreate;
+using pma::FactoryDestroy;
+using pma::makeScoped;
+using pma::MemoryResource;
+using pma::New;
+using pma::ScopedPtr;
 
 }  // namespace trio

@@ -7,13 +7,17 @@
 #include "status/Provider.h"
 #include "trio/streams/FileStream.h"
 #include "trio/streams/MemoryMappedFileStream.h"
+#include "trio/streams/MemoryStream.h"
 
 #ifdef _MSC_VER
     #pragma warning(push)
     #pragma warning(disable : 4365 4987)
 #endif
+#include <algorithm>
 #include <cstdio>
 #include <fstream>
+#include <type_traits>
+#include <vector>
 #ifdef _MSC_VER
     #pragma warning(pop)
 #endif

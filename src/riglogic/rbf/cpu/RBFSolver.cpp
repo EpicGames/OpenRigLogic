@@ -10,10 +10,12 @@
     #pragma warning(push)
     #pragma warning(disable : 4365 4987)
 #endif
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <numeric>
 #ifdef _MSC_VER
     #pragma warning(pop)
@@ -88,6 +90,8 @@ inline void getSwing<TwistAxis::Z>(ArrayView<float> q) {
     q[0] = (w * x - z * y) / q[3];
 }
 
+// TwistAngle keeps only the twist component of each quaternion: the two non-twist vector slots are zeroed and
+// (twist, w) is renormalized, so exactly one vector slot is non-zero afterwards.
 template<TwistAxis TTwistAxis>
 inline void getTwist(ArrayView<float> q) {
     constexpr auto twistIndex = static_cast<std::uint16_t>(TTwistAxis);
@@ -95,10 +99,38 @@ inline void getTwist(ArrayView<float> q) {
     constexpr auto notTwistIndex1 = (twistIndex + 2u) % 3u;
     q[notTwistIndex0] = 0.0f;
     q[notTwistIndex1] = 0.0f;
-    // normalize
-    float magnitude = std::sqrt(q[twistIndex] * q[twistIndex] + q[3] * q[3]);
+    const float magnitude = std::sqrt(q[twistIndex] * q[twistIndex] + q[3] * q[3]);
+    if (magnitude == 0.0f) {
+        // A pure 180-degree swing about a perpendicular axis has no twist component.
+        q[twistIndex] = 0.0f;
+        q[3] = 1.0f;
+        return;
+    }
     q[twistIndex] /= magnitude;
     q[3] /= magnitude;
+}
+
+// Unwound twist angle (radians, [-pi, pi]) of a twist quaternion produced by getTwist.
+// Axis-agnostic: only one vector slot is non-zero, so their sum is the twist component.
+inline float getTwistAngle(ConstArrayView<float> q) {
+    constexpr float pi = static_cast<float>(tdm::pi());
+    float angle = 2.0f * std::atan2(q[0] + q[1] + q[2], q[3]);
+    // 2 * atan2 lies in (-2pi, 2pi]; a single correction unwinds it.
+    if (angle > pi) {
+        angle -= 2.0f * pi;
+    } else if (angle < -pi) {
+        angle += 2.0f * pi;
+    }
+    return angle;
+}
+
+// Angle form of a twist quaternion from getTwist: slot 0 holds the unwound angle and the other three are zero, so a
+// row keeps its 4-per-quaternion width and TwistAngle distances reduce to a plain difference.
+inline void toTwistAngleForm(ArrayView<float> q) {
+    q[0] = getTwistAngle(q);
+    q[1] = 0.0f;
+    q[2] = 0.0f;
+    q[3] = 0.0f;
 }
 
 template<RBFDistanceMethod TDistanceMethod>
@@ -137,6 +169,30 @@ struct DistanceMethodFunctor<RBFDistanceMethod::Quaternion> {
                 auto bQ = rawControlValues.subview(i * 4u, 4u);
                 // quaternions need to be normalized for this
                 distance += pow<2u>(getArcLength(aQ, bQ));
+            }
+            intermediateWeights[ti] = std::sqrt(distance);
+        }
+    }
+};
+
+template<>
+struct DistanceMethodFunctor<RBFDistanceMethod::TwistAngle> {
+    // |twistA - twistB| on unwound angles (range [0, 2pi]), as UE's RBFDistanceMetric::TwistAngle - NOT the arc length
+    // of the twist quaternions: arc length is sign-invariant and wraps at pi, so targets at +120 and -120 degrees would
+    // sit 120 apart instead of 240 and the net interpolates through the wrong neighbors.
+    // The unwound range is discontinuous at +-180 degrees by design (+179 and -179 are 358 apart), exactly as UE's
+    // FQuat::GetTwistAngle: unrolling the circle so that +120 and -120 are distinguishable requires a seam, and a
+    // shortest-arc wrap here would reintroduce the collapse above.
+    // Both sides arrive in angle form (toTwistAngleForm): targets from distanceTargets, the input from convertInput.
+    static inline void getDistance(ConstArrayView<AlignedVector<float>> targets,
+                                   ConstArrayView<float> rawControlValues,
+                                   ArrayView<float> intermediateWeights) {
+        const std::size_t quaternionCount = rawControlValues.size() / 4u;
+        for (std::size_t ti = 0u; ti < targets.size(); ++ti) {
+            auto target = ConstArrayView<float>{targets[ti]};
+            float distance = 0.0f;
+            for (std::size_t i = 0u; i < quaternionCount; ++i) {
+                distance += pow<2u>(target[i * 4u] - rawControlValues[i * 4u]);
             }
             intermediateWeights[ti] = std::sqrt(distance);
         }
@@ -198,6 +254,9 @@ DistanceFun getDistanceFun(RBFDistanceMethod distanceMethod) {
     if (distanceMethod == RBFDistanceMethod::Euclidean) {
         return D<RBFDistanceMethod::Euclidean>::getDistance;
     }
+    if (distanceMethod == RBFDistanceMethod::TwistAngle) {
+        return D<RBFDistanceMethod::TwistAngle>::getDistance;
+    }
     return D<RBFDistanceMethod::Quaternion>::getDistance;
 }
 
@@ -223,6 +282,7 @@ DistanceWeightFun getDistanceWeightFun(RBFFunctionType weightMethod, RBFDistance
 
     constexpr auto Euclidean = RBFDistanceMethod::Euclidean;
     constexpr auto Quaternion = RBFDistanceMethod::Quaternion;
+    constexpr auto TwistAngle = RBFDistanceMethod::TwistAngle;
 
     if (distanceMethod == Euclidean) {
         switch (weightMethod) {
@@ -239,6 +299,22 @@ DistanceWeightFun getDistanceWeightFun(RBFFunctionType weightMethod, RBFDistance
         }
     }
 
+    if (distanceMethod == TwistAngle) {
+        switch (weightMethod) {
+        case Gaussian:
+            return DistanceWeightFunctor<D<TwistAngle>, W<Gaussian>>();
+        case Cubic:
+            return DistanceWeightFunctor<D<TwistAngle>, W<Cubic>>();
+        case Exponential:
+            return DistanceWeightFunctor<D<TwistAngle>, W<Exponential>>();
+        case Linear:
+            return DistanceWeightFunctor<D<TwistAngle>, W<Linear>>();
+        case Quintic:
+            return DistanceWeightFunctor<D<TwistAngle>, W<Quintic>>();
+        }
+    }
+
+    // Quaternion and SwingAngle share the arc-length metric (SwingAngle inputs are pre-converted to swing quaternions).
     switch (weightMethod) {
     case Gaussian:
         return DistanceWeightFunctor<D<Quaternion>, W<Gaussian>>();
@@ -252,31 +328,64 @@ DistanceWeightFun getDistanceWeightFun(RBFFunctionType weightMethod, RBFDistance
         return DistanceWeightFunctor<D<Quaternion>, W<Quintic>>();
     }
 
-    assert(false);  // Should not reach this
-    return nullptr;
+    // Neither switch has a default, so an out-of-range weightMethod lands here; an empty function would make the
+    // Interpolative ctor throw bad_function_call before the validator rejects the enum, so fall back to a default weight.
+    assert(false);
+    return DistanceWeightFunctor<D<Quaternion>, W<Gaussian>>();
 }
 
+// The stored form of a target row (and, except for TwistAngle, of an input). The quaternion count is derived by
+// division, not assumed: this runs during solver construction, before the validator can reject a bad rawControlCount;
+// a trailing partial quaternion is left untouched.
 template<TwistAxis TTwistAxis>
-InputConvertFun getInputConvertFun(RBFDistanceMethod distanceMethod) {
+InputConvertFun getTargetConvertFun(RBFDistanceMethod distanceMethod) {
     switch (distanceMethod) {
     case RBFDistanceMethod::Quaternion:
     case RBFDistanceMethod::Euclidean:
         return [](ArrayView<float> input) { return input; };
     case RBFDistanceMethod::TwistAngle:
         return [](ArrayView<float> input) {
-            assert(input.size() % 4 == 0);
-            for (std::size_t qi = {}; qi < input.size(); qi += 4ul) {
-                getTwist<TTwistAxis>(input.subview(qi, 4ul));
+            const std::size_t quaternionCount = input.size() / 4ul;
+            for (std::size_t q = {}; q < quaternionCount; ++q) {
+                getTwist<TTwistAxis>(input.subview(q * 4ul, 4ul));
             }
         };
     default:
     case RBFDistanceMethod::SwingAngle:
         return [](ArrayView<float> input) {
-            assert(input.size() % 4 == 0);
-            for (std::size_t qi = {}; qi < input.size(); qi += 4ul) {
-                getSwing<TTwistAxis>(input.subview(qi, 4ul));
+            const std::size_t quaternionCount = input.size() / 4ul;
+            for (std::size_t q = {}; q < quaternionCount; ++q) {
+                getSwing<TTwistAxis>(input.subview(q * 4ul, 4ul));
             }
         };
+    }
+}
+
+// TwistAngle inputs continue into angle form so they meet distanceTargets in the same space.
+template<TwistAxis TTwistAxis>
+InputConvertFun getInputConvertFun(RBFDistanceMethod distanceMethod) {
+    if (distanceMethod != RBFDistanceMethod::TwistAngle) {
+        return getTargetConvertFun<TTwistAxis>(distanceMethod);
+    }
+    return [](ArrayView<float> input) {
+        const std::size_t quaternionCount = input.size() / 4ul;
+        for (std::size_t q = {}; q < quaternionCount; ++q) {
+            auto quaternion = input.subview(q * 4ul, 4ul);
+            getTwist<TTwistAxis>(quaternion);
+            toTwistAngleForm(quaternion);
+        }
+    };
+}
+
+InputConvertFun getTargetConvertFun(RBFDistanceMethod distanceMethod, TwistAxis axis) {
+    switch (axis) {
+    default:
+    case TwistAxis::X:
+        return getTargetConvertFun<TwistAxis::X>(distanceMethod);
+    case TwistAxis::Y:
+        return getTargetConvertFun<TwistAxis::Y>(distanceMethod);
+    case TwistAxis::Z:
+        return getTargetConvertFun<TwistAxis::Z>(distanceMethod);
     }
 }
 
@@ -296,6 +405,7 @@ InputConvertFun getInputConvertFun(RBFDistanceMethod distanceMethod, TwistAxis a
 
 RBFSolver::RBFSolver(MemoryResource* memRes) :
     targets{memRes},
+    distanceTargets{memRes},
     targetScale{memRes},
     getDistanceWeight{},
     convertInput{},
@@ -309,6 +419,7 @@ RBFSolver::RBFSolver(MemoryResource* memRes) :
 
 RBFSolver::RBFSolver(const RBFSolverRecipe& recipe, MemoryResource* memRes) :
     targets{memRes},
+    distanceTargets{memRes},
     targetScale{recipe.targetScales.begin(), recipe.targetScales.end(), memRes},
     getDistanceWeight{getDistanceWeightFun(recipe.weightFunction, recipe.distanceMethod)},
     convertInput{getInputConvertFun(recipe.distanceMethod, recipe.twistAxis)},
@@ -319,20 +430,27 @@ RBFSolver::RBFSolver(const RBFSolverRecipe& recipe, MemoryResource* memRes) :
     normalizeMethod{recipe.normalizeMethod},
     twistAxis{recipe.twistAxis} {
 
-    assert(recipe.targetValues.size() % recipe.rawControlCount == 0u);
-    const auto targetCount = static_cast<std::uint16_t>(recipe.targetValues.size() / recipe.rawControlCount);
+    // targetValues and rawControlCount are independent inputs; truncating division drops a partial trailing target.
+    // Targets are indexed by uint16_t, so saturate rather than let the narrowing wrap a quotient of 65536 to 0.
+    const auto targetCount =
+        (recipe.rawControlCount == 0u)
+            ? static_cast<std::uint16_t>(0)
+            : static_cast<std::uint16_t>(std::min(recipe.targetValues.size() / recipe.rawControlCount,
+                                                  static_cast<std::size_t>(std::numeric_limits<std::uint16_t>::max())));
     targets.resize(targetCount);
 
+    const auto convertTarget = getTargetConvertFun(recipe.distanceMethod, recipe.twistAxis);
     for (std::uint16_t ti = 0u; ti < targetCount; ti++) {
         const auto offset = static_cast<std::size_t>(ti) * static_cast<std::size_t>(recipe.rawControlCount);
         const auto targetValues = recipe.targetValues.subview(offset, recipe.rawControlCount);
         targets[ti].assign(targetValues.begin(), targetValues.end());
-        convertInput(targets[ti]);
+        convertTarget(targets[ti]);
     }
+    buildDistanceTargets();
 
     if (recipe.isAutomaticRadius) {
         auto getDistance = getDistanceFun(recipe.distanceMethod);
-        ConstArrayView<AlignedVector<float>> targetsView{targets};
+        ConstArrayView<AlignedVector<float>> targetsView{getDistanceTargets()};
         Vector<float> bufferVec{targets.size(), 0.0f, memRes};
 
         float sumDistance = 0.0f;
@@ -340,7 +458,7 @@ RBFSolver::RBFSolver(const RBFSolverRecipe& recipe, MemoryResource* memRes) :
             const std::size_t offset = i + 1ul;
             const std::size_t count = targetCount - offset;
             ArrayView<float> buffer{bufferVec.data() + offset, count};
-            getDistance(targetsView.subview(offset, count), targets[i], buffer);
+            getDistance(targetsView.subview(offset, count), targetsView[i], buffer);
             sumDistance = std::accumulate(buffer.begin(), buffer.end(), sumDistance);
         }
         const float distancesCount = static_cast<float>(targetCount) * static_cast<float>(targetCount - 1ul) / 2.0f;
@@ -348,8 +466,9 @@ RBFSolver::RBFSolver(const RBFSolverRecipe& recipe, MemoryResource* memRes) :
     }
 }
 
-void RBFSolver::load(terse::BinaryInputArchive<BoundedIOStream>& archive) {
+void RBFSolver::load(BoundedInputArchive& archive) {
     archive(targets);
+    archive(distanceTargets);
     archive(targetScale);
     archive(radius);
     archive(weightThreshold);
@@ -357,12 +476,38 @@ void RBFSolver::load(terse::BinaryInputArchive<BoundedIOStream>& archive) {
     archive(weightFunction);
     archive(normalizeMethod);
     archive(twistAxis);
+    // Every target row is rawControlCount wide in a well-formed snapshot. The quaternion-family distance functors size
+    // their reads of every row by the width of the row they are handed, and RBFBehaviorValidator only checks target
+    // widths after load - so ragged rows are an out-of-bounds read at solve unless flagged here.
+    for (const auto& target : targets) {
+        if (target.size() != targets.front().size()) {
+            archive.markMalformed();
+            break;
+        }
+    }
+    // solve() sizes its weight buffers by targets and reads the distance rows instead, so TwistAngle distance rows that
+    // disagree with targets in count or width are an out-of-bounds access, not a shorter rig. Every other metric leaves
+    // the rows empty (buildDistanceTargets), so a non-empty block there is not a snapshot save() writes.
+    if (distanceMethod == RBFDistanceMethod::TwistAngle) {
+        if (distanceTargets.size() != targets.size()) {
+            archive.markMalformed();
+        }
+        for (const auto& row : distanceTargets) {
+            if (targets.empty() || (row.size() != targets.front().size())) {
+                archive.markMalformed();
+                break;
+            }
+        }
+    } else if (!distanceTargets.empty()) {
+        archive.markMalformed();
+    }
     getDistanceWeight = getDistanceWeightFun(weightFunction, distanceMethod);
     convertInput = getInputConvertFun(distanceMethod, twistAxis);
 }
 
 void RBFSolver::save(terse::BinaryOutputArchive<BoundedIOStream>& archive) {
     archive(targets);
+    archive(distanceTargets);
     archive(targetScale);
     archive(radius);
     archive(weightThreshold);
@@ -388,6 +533,28 @@ void RBFSolver::normalizeAndCutOff(ArrayView<float> outputWeights) const {
             outputWeights[i] = weight;
         } else {
             outputWeights[i] = 0.0f;
+        }
+    }
+}
+
+const AlignedMatrix<float>& RBFSolver::getDistanceTargets() const {
+    if (distanceMethod == RBFDistanceMethod::TwistAngle) {
+        return distanceTargets;
+    }
+    return targets;
+}
+
+void RBFSolver::buildDistanceTargets() {
+    distanceTargets.clear();
+    if (distanceMethod != RBFDistanceMethod::TwistAngle) {
+        return;
+    }
+    distanceTargets.assign(targets.begin(), targets.end());
+    for (auto& target : distanceTargets) {
+        ArrayView<float> row{target};
+        const std::size_t quaternionCount = row.size() / 4ul;
+        for (std::size_t q = {}; q < quaternionCount; ++q) {
+            toTwistAngleForm(row.subview(q * 4ul, 4ul));
         }
     }
 }

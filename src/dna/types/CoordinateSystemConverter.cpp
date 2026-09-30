@@ -12,6 +12,7 @@
     #pragma warning(push)
     #pragma warning(disable : 4365 4987)
 #endif
+#include <algorithm>
 #include <cmath>
 #ifdef _MSC_VER
     #pragma warning(pop)
@@ -181,7 +182,10 @@ void CoordinateSystemConverter::convertJointDeltas(DNA& dna,
         const auto& originalLODs = dna.behavior.joints.jointGroups[jgIndex].lods;
         const auto& originalValues = dna.behavior.joints.jointGroups[jgIndex].values;
         const auto colCount = originalInputIndices.size();
-        const auto rowCount = originalOutputIndices.size();
+        // The coefficient array is an independent DNA array; only rows it actually covers may be converted (the loop
+        // below reads originalValues[row * colCount + col]).
+        const auto rowCount =
+            (colCount == 0ul) ? std::size_t{} : std::min(originalOutputIndices.size(), originalValues.size() / colCount);
         const auto jointCount = [&]() {
             UnorderedSet<std::uint16_t> jointIndices{memRes};
             for (std::size_t row = {}; row < rowCount; ++row) {
@@ -256,13 +260,18 @@ void CoordinateSystemConverter::convertJointDeltas(DNA& dna,
             }
         }
 
-        newLODs[0] = static_cast<std::uint16_t>(newOutputIndices.size());
+        // newLODs mirrors the DNA-supplied per-group LOD array, which may be empty (a group that is never evaluated);
+        // index 0 is only assigned when it exists.
+        if (!newLODs.empty()) {
+            newLODs[0] = static_cast<std::uint16_t>(newOutputIndices.size());
+        }
         // This logic is dependent on the joint group containing output indices in joint order, i.e. no joints are split in half
         // within a joint group.
         for (std::uint16_t li = 1; li < newLODs.size(); ++li) {
-            const std::uint16_t originalRowCount = originalLODs[li];
+            // The per-LOD row count is an independent DNA scalar; clamp it to the rows that actually exist.
+            const auto originalRowCount = std::min(static_cast<std::size_t>(originalLODs[li]), rowCount);
             if (originalRowCount > 0) {
-                const auto jointIndex = originalOutputIndices[static_cast<std::uint16_t>(originalRowCount - 1)] / jointAttrCount;
+                const auto jointIndex = originalOutputIndices[originalRowCount - 1ul] / jointAttrCount;
                 // Find position of last attribute
                 const auto lastAttrPos = std::distance(newOutputIndices.begin(),
                                                        std::find(newOutputIndices.begin(),

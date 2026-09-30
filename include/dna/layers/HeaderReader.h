@@ -13,9 +13,9 @@ namespace dna {
     @warning
         Implementors should inherit from Reader itself and not this class.
 */
-class DNAAPI HeaderReader {
+class DNAAPI_TYPE HeaderReader {
 protected:
-    virtual ~HeaderReader();
+    DNAAPI_MEMBER virtual ~HeaderReader();
 
 public:
     virtual std::uint16_t getFileFormatGeneration() const = 0;

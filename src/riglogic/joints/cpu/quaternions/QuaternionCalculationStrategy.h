@@ -10,7 +10,6 @@
 #include <cstddef>
 #include <cstdint>
 
-// *INDENT-OFF*
 namespace rl4 {
 
 /*
@@ -252,11 +251,24 @@ static FORCE_INLINE void normalize(TFVec& qxACEG, TFVec& qyACEG, TFVec& qzACEG, 
  * E[3]*F[3] - E[0]*F[0] - E[1]*F[1] - E[2]*F[2]
  * G[3]*H[3] - G[0]*H[0] - G[1]*H[1] - G[2]*H[2]
  */
+/*
+ * The VS2019 (v142) x86 optimizer generates wrong code for this kernel when it is force-inlined
+ * into the large calculate() bodies of 32-bit /arch:AVX Release builds (outputs corrupt by up to
+ * ~0.5 absolute, differently per inlined copy). A standalone instantiation compiles correctly,
+ * so keeping the kernel out-of-line on that toolchain sidesteps the bad codegen. VS2022 (14.44+),
+ * x64, and x86 without /arch:AVX are unaffected and keep the forced inlining.
+ */
+#if defined(_MSC_VER) && !defined(__clang__) && defined(_M_IX86) && (_MSC_VER < 1930) && defined(RL_BUILD_WITH_AVX)
+    #define RL_BLEND_QUATERNIONS_INLINE __declspec(noinline)
+#else
+    #define RL_BLEND_QUATERNIONS_INLINE FORCE_INLINE
+#endif
+
 template<typename TFVec, typename T>
-static FORCE_INLINE void blendQuaternions(const T* quaternions,
-                                          ConstArrayView<std::uint16_t> inputIndices,
-                                          ConstArrayView<float> inputs,
-                                          float* outbuf) {
+static RL_BLEND_QUATERNIONS_INLINE void blendQuaternions(const T* quaternions,
+                                                         ConstArrayView<std::uint16_t> inputIndices,
+                                                         ConstArrayView<float> inputs,
+                                                         float* outbuf) {
     // Initialize accumulators to identity quaternion
     TFVec qxBDFH{0.0f};
     TFVec qyBDFH{0.0f};
@@ -309,7 +321,7 @@ struct VectorizedJointGroupQuaternionCalculationStrategy : public JointGroupQuat
                    std::uint16_t lod) const override {
         const T* quaternions = jointGroup.values.data<T>();
         const LODRegion& lodRegion = jointGroup.lods[lod];
-        ConstArrayView<std::uint16_t> inputIndices{jointGroup.inputIndices.data(), lodRegion.inputLODs.size};
+        const auto inputIndices = ConstArrayView<std::uint16_t>{jointGroup.inputIndices}.first(lodRegion.inputLODs.size);
         const std::uint16_t* outputIndices = jointGroup.outputIndices.data();
         const std::uint16_t* const outputIndicesEnd = outputIndices + lodRegion.outputLODs.size;
         const std::uint16_t* const outputIndicesEndPaddedToLastFullBlock =
@@ -346,4 +358,3 @@ struct VectorizedJointGroupQuaternionCalculationStrategy : public JointGroupQuat
 };
 
 }  // namespace rl4
-// *INDENT-ON*

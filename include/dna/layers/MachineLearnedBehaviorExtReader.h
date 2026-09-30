@@ -17,9 +17,9 @@ namespace dna {
         Implementors should inherit from Reader itself and not this class.
     @see Reader
 */
-class DNAAPI MachineLearnedBehaviorExtReader : public virtual MachineLearnedBehaviorReader {
+class DNAAPI_TYPE MachineLearnedBehaviorExtReader : public virtual MachineLearnedBehaviorReader {
 protected:
-    virtual ~MachineLearnedBehaviorExtReader();
+    DNAAPI_MEMBER virtual ~MachineLearnedBehaviorExtReader();
 
 public:
     /**

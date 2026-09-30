@@ -124,6 +124,27 @@ inline void invert(Matrix<float>& m) {
     m = std::move(inv);
 }
 
+inline void buildCoefficients(const AlignedMatrix<float>& targets,
+                              const RBFSolver::DistanceWeightFun& getDistanceWeight,
+                              float radius,
+                              Matrix<float>& coefficients) {
+    const auto targetCount = targets.size();
+    // The diagonal is computed too: the weight function need not return 1.0 for identical coordinates.
+    for (std::size_t i = {}; i < targetCount; ++i) {
+        // Symmetric: compute the upper triangle and mirror it.
+        ArrayView<float> outputWeights{coefficients[i].data() + i, coefficients[i].size() - i};
+        const auto& curTarget = targets[i];
+        ConstArrayView<AlignedVector<float>> targetView{targets.data() + i, targetCount - i};
+        if (targetView.size() > 0ul) {
+            getDistanceWeight(targetView, curTarget, outputWeights, radius);
+        }
+        for (std::size_t j = i + 1ul; j < targetCount; ++j) {
+            coefficients[j][i] = coefficients[i][j];
+        }
+    }
+    invert(coefficients);
+}
+
 }  // namespace
 
 InterpolativeRBFSolver::InterpolativeRBFSolver(MemoryResource* memRes) :
@@ -136,27 +157,7 @@ InterpolativeRBFSolver::InterpolativeRBFSolver(const RBFSolverRecipe& recipe, Me
     coefficients{memRes} {
     const auto targetCount = targets.size();
     coefficients = Matrix<float>{targetCount, Vector<float>{targetCount, 0.0f, memRes}, memRes};
-    // This can also be optimized, we do not need the actual matrix what we are looking for the inverse matrix
-    // We need to include the diagonal itself, since we can't guarantee that the weight
-    // function returns 1.0 for nodes of the same coordinates.
-
-    for (std::size_t i = {}; i < targetCount; ++i) {
-        // matrix is symmetrical so we only need to calculate right side of the matrix and we ll copy it onto the left
-        ArrayView<float> outputWeights{coefficients[i].data() + i, coefficients[i].size() - i};
-        const auto& curTarget = targets[i];
-        ConstArrayView<AlignedVector<float>> targetView{targets.data() + i, targets.size() - i};
-        if (targetView.size() > 0ul) {
-            getDistanceWeight(targetView, curTarget, outputWeights, radius);
-        }
-        // copying
-        for (std::size_t j = i + 1ul; j < targetCount; ++j) {
-            coefficients[j][i] = coefficients[i][j];
-        }
-    }
-    // there are optimized ways of getting inverse of symmetrical matrix
-    // but since this is not in a hot path rather one time call i am not sure if it is
-    // worth it
-    invert(coefficients);
+    buildCoefficients(getDistanceTargets(), getDistanceWeight, radius, coefficients);
 }
 
 RBFSolverType InterpolativeRBFSolver::getSolverType() const {
@@ -168,7 +169,7 @@ void InterpolativeRBFSolver::solve(ArrayView<float> input,
                                    ArrayView<float> outputWeights) const {
     convertInput(input);
     const std::size_t targetSize = targets.size();
-    getDistanceWeight(targets, input, intermediateWeights, radius);
+    getDistanceWeight(getDistanceTargets(), input, intermediateWeights, radius);
 
     for (std::size_t i = {}; i < targetSize; ++i) {
         float weight = 0.0f;
@@ -181,9 +182,20 @@ void InterpolativeRBFSolver::solve(ArrayView<float> input,
     normalizeAndCutOff(outputWeights);
 }
 
-void InterpolativeRBFSolver::load(terse::BinaryInputArchive<BoundedIOStream>& archive) {
+void InterpolativeRBFSolver::load(BoundedInputArchive& archive) {
     RBFSolver::load(archive);
     archive(coefficients);
+    const auto targetCount = targets.size();
+    if (coefficients.size() != targetCount) {
+        archive.markMalformed();
+        return;
+    }
+    for (const auto& row : coefficients) {
+        if (row.size() != targetCount) {
+            archive.markMalformed();
+            return;
+        }
+    }
 }
 
 void InterpolativeRBFSolver::save(terse::BinaryOutputArchive<BoundedIOStream>& archive) {

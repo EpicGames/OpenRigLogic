@@ -64,8 +64,9 @@ struct RangeMap {
     }
 };
 
-class ConditionalTable {
-public:
+// Struct: an internal type whose structural members ConditionalTableValidator reads directly (incl. the raw rowCount)
+// to check a deserialized table's consistency.
+struct ConditionalTable {
     explicit ConditionalTable(MemoryResource* memRes);
     ConditionalTable(Vector<std::uint16_t>&& inputIndices_,
                      Vector<std::uint16_t>&& outputIndices_,
@@ -98,10 +99,12 @@ public:
                 slopeValues,
                 cutValues,
                 inputCount,
-                outputCount);
+                outputCount,
+                rowCount);
     }
 
-private:
+    // Declared first: rangeMaps/intervalsRemaining rely on it during init, and init order follows declaration order.
+    std::uint16_t rowCount;
     Vector<RangeMap> rangeMaps;
     Vector<std::uint16_t> intervalsRemaining;
     Vector<std::uint16_t> inputIndices;

@@ -11,6 +11,7 @@ namespace rl4 {
 struct Stats {
     CalculationType calculationType;
     FloatingPointType floatingPointType;
+    FloatingPointModel floatingPointModel;
     std::uint16_t rbfSolverCount;
     std::uint16_t mlOperationCount;
     std::uint16_t psdCount;

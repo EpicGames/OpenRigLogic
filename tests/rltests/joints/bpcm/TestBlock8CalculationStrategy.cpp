@@ -4,8 +4,6 @@
     #pragma warning(disable : 4503)
 #endif
 
-#include "riglogic/system/simd/Detect.h"
-
 #include "rltests/Defs.h"
 #include "rltests/controls/ControlFixtures.h"
 #include "rltests/joints/bpcm/BPCMFixturesBlock8.h"
@@ -19,6 +17,38 @@
 
 namespace {
 
+// Per-arm SIMD width sets as RuntimeTemplateInstantiator passes them; the fixture storage uses per-group block heights,
+// so the strategies under test are the multi-width ones dispatching on JointGroup::blockHeight.
+#if defined(RL_BUILD_WITH_AVX)
+struct AVXWidths {
+    using TF512 = trimd::fallback::T512<trimd::avx::F256>;
+    using TF256 = trimd::avx::F256;
+    using TF128 = trimd::sse::F128;
+};
+#endif  // RL_BUILD_WITH_AVX
+
+#if defined(RL_BUILD_WITH_AVX) || defined(RL_BUILD_WITH_SSE)
+struct SSEWidths {
+    using TF512 = trimd::fallback::T512<trimd::sse::F256>;
+    using TF256 = trimd::sse::F256;
+    using TF128 = trimd::sse::F128;
+};
+#endif  // RL_BUILD_WITH_AVX || RL_BUILD_WITH_SSE
+
+#if defined(RL_BUILD_WITH_NEON)
+struct NEONWidths {
+    using TF512 = trimd::fallback::T512<trimd::neon::F256>;
+    using TF256 = trimd::neon::F256;
+    using TF128 = trimd::neon::F128;
+};
+#endif  // RL_BUILD_WITH_NEON
+
+struct ScalarWidths {
+    using TF512 = trimd::fallback::T512<trimd::scalar::F256>;
+    using TF256 = trimd::scalar::F256;
+    using TF128 = trimd::scalar::F128;
+};
+
 template<typename TTestTypes>
 class Block8JointCalculationStrategyTest : public ::testing::TestWithParam<StrategyTestParams> {
 protected:
@@ -29,13 +59,17 @@ protected:
     template<typename TestTypes = TTestTypes>
     typename std::enable_if<std::tuple_size<TestTypes>::value != 0ul, void>::type SetUpImpl() {
         using T = typename std::tuple_element<0, TestTypes>::type;
-        using TFVec = typename std::tuple_element<1, TestTypes>::type;
+        using TWidths = typename std::tuple_element<1, TestTypes>::type;
         using TStrategyTestParams = typename std::tuple_element<2, TestTypes>::type;
         using TRotationAdapter = typename std::tuple_element<3, TestTypes>::type;
         params.lod = TStrategyTestParams::lod();
 
         using CalculationStrategyBase = rl4::bpcm::JointGroupLinearCalculationStrategy;
-        using CalculationStrategy = rl4::bpcm::VectorizedJointGroupLinearCalculationStrategy<T, TFVec, TRotationAdapter>;
+        using CalculationStrategy = rl4::bpcm::MultiWidthJointGroupLinearCalculationStrategy<T,
+                                                                                             typename TWidths::TF512,
+                                                                                             typename TWidths::TF256,
+                                                                                             typename TWidths::TF128,
+                                                                                             TRotationAdapter>;
         strategy = pma::UniqueInstance<CalculationStrategy, CalculationStrategyBase>::with(&memRes).create(
             TRotationAdapter{block8::unoptimized::rotationSigns});
 
@@ -79,92 +113,92 @@ protected:
 
 using Block8JointCalculationTypeList = ::testing::Types<
 #if defined(RL_BUILD_WITH_AVX)
-    std::tuple<StorageValueType, trimd::avx::F256, TStrategyTestParams<0>, rl4::bpcm::NoopAdapter>,
+    std::tuple<StorageValueType, AVXWidths, TStrategyTestParams<0>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
-               trimd::avx::F256,
+               AVXWidths,
                TStrategyTestParams<0>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
-    std::tuple<StorageValueType, trimd::avx::F256, TStrategyTestParams<1>, rl4::bpcm::NoopAdapter>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
+    std::tuple<StorageValueType, AVXWidths, TStrategyTestParams<1>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
-               trimd::avx::F256,
+               AVXWidths,
                TStrategyTestParams<1>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
-    std::tuple<StorageValueType, trimd::avx::F256, TStrategyTestParams<2>, rl4::bpcm::NoopAdapter>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
+    std::tuple<StorageValueType, AVXWidths, TStrategyTestParams<2>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
-               trimd::avx::F256,
+               AVXWidths,
                TStrategyTestParams<2>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
-    std::tuple<StorageValueType, trimd::avx::F256, TStrategyTestParams<3>, rl4::bpcm::NoopAdapter>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
+    std::tuple<StorageValueType, AVXWidths, TStrategyTestParams<3>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
-               trimd::avx::F256,
+               AVXWidths,
                TStrategyTestParams<3>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
 #endif  // RL_BUILD_WITH_AVX
 #if defined(RL_BUILD_WITH_AVX) || defined(RL_BUILD_WITH_SSE)
-    std::tuple<StorageValueType, trimd::sse::F256, TStrategyTestParams<0>, rl4::bpcm::NoopAdapter>,
+    std::tuple<StorageValueType, SSEWidths, TStrategyTestParams<0>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
-               trimd::sse::F256,
+               SSEWidths,
                TStrategyTestParams<0>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
-    std::tuple<StorageValueType, trimd::sse::F256, TStrategyTestParams<1>, rl4::bpcm::NoopAdapter>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
+    std::tuple<StorageValueType, SSEWidths, TStrategyTestParams<1>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
-               trimd::sse::F256,
+               SSEWidths,
                TStrategyTestParams<1>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
-    std::tuple<StorageValueType, trimd::sse::F256, TStrategyTestParams<2>, rl4::bpcm::NoopAdapter>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
+    std::tuple<StorageValueType, SSEWidths, TStrategyTestParams<2>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
-               trimd::sse::F256,
+               SSEWidths,
                TStrategyTestParams<2>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
-    std::tuple<StorageValueType, trimd::sse::F256, TStrategyTestParams<3>, rl4::bpcm::NoopAdapter>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
+    std::tuple<StorageValueType, SSEWidths, TStrategyTestParams<3>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
-               trimd::sse::F256,
+               SSEWidths,
                TStrategyTestParams<3>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
 #endif  // RL_BUILD_WITH_AVX || RL_BUILD_WITH_SSE
 #if defined(RL_BUILD_WITH_NEON)
-    std::tuple<StorageValueType, trimd::neon::F256, TStrategyTestParams<0>, rl4::bpcm::NoopAdapter>,
+    std::tuple<StorageValueType, NEONWidths, TStrategyTestParams<0>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
-               trimd::neon::F256,
+               NEONWidths,
                TStrategyTestParams<0>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
-    std::tuple<StorageValueType, trimd::neon::F256, TStrategyTestParams<1>, rl4::bpcm::NoopAdapter>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
+    std::tuple<StorageValueType, NEONWidths, TStrategyTestParams<1>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
-               trimd::neon::F256,
+               NEONWidths,
                TStrategyTestParams<1>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
-    std::tuple<StorageValueType, trimd::neon::F256, TStrategyTestParams<2>, rl4::bpcm::NoopAdapter>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
+    std::tuple<StorageValueType, NEONWidths, TStrategyTestParams<2>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
-               trimd::neon::F256,
+               NEONWidths,
                TStrategyTestParams<2>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
-    std::tuple<StorageValueType, trimd::neon::F256, TStrategyTestParams<3>, rl4::bpcm::NoopAdapter>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
+    std::tuple<StorageValueType, NEONWidths, TStrategyTestParams<3>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
-               trimd::neon::F256,
+               NEONWidths,
                TStrategyTestParams<3>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
 #endif  // RL_BUILD_WITH_NEON
 #if !defined(RL_BUILD_WITH_HALF_FLOATS)
-    std::tuple<StorageValueType, trimd::scalar::F256, TStrategyTestParams<0>, rl4::bpcm::NoopAdapter>,
+    std::tuple<StorageValueType, ScalarWidths, TStrategyTestParams<0>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
-               trimd::scalar::F256,
+               ScalarWidths,
                TStrategyTestParams<0>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
-    std::tuple<StorageValueType, trimd::scalar::F256, TStrategyTestParams<1>, rl4::bpcm::NoopAdapter>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
+    std::tuple<StorageValueType, ScalarWidths, TStrategyTestParams<1>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
-               trimd::scalar::F256,
+               ScalarWidths,
                TStrategyTestParams<1>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
-    std::tuple<StorageValueType, trimd::scalar::F256, TStrategyTestParams<2>, rl4::bpcm::NoopAdapter>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
+    std::tuple<StorageValueType, ScalarWidths, TStrategyTestParams<2>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
-               trimd::scalar::F256,
+               ScalarWidths,
                TStrategyTestParams<2>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
-    std::tuple<StorageValueType, trimd::scalar::F256, TStrategyTestParams<3>, rl4::bpcm::NoopAdapter>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
+    std::tuple<StorageValueType, ScalarWidths, TStrategyTestParams<3>, rl4::bpcm::NoopAdapter>,
     std::tuple<StorageValueType,
-               trimd::scalar::F256,
+               ScalarWidths,
                TStrategyTestParams<3>,
-               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::zyx>>,
+               rl4::bpcm::EulerAnglesToQuaternions<tdm::fdeg, tdm::rot_seq::xyz>>,
 #endif  // RL_BUILD_WITH_HALF_FLOATS
     std::tuple<>>;
 
