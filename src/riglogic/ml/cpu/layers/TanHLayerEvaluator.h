@@ -17,13 +17,32 @@ namespace ml {
 namespace cpu {
 
 template<typename TFVec, typename Enable = void>
-struct TanHActivationFunction;
+struct TanHActivationFunction {
+    void operator()(TFVec& sum, const float* /*unused*/) {
+        alignas(TFVec::alignment()) float buf[TFVec::size()];
+        sum.alignedStore(buf);
+        for (std::size_t i = 0; i < TFVec::size(); ++i) {
+            buf[i] = std::tanh(buf[i]);
+        }
+        sum.alignedLoad(buf);
+    }
+
+    void operator()(TFVec& sum1, TFVec& sum2, const float* /*unused*/) {
+        alignas(TFVec::alignment()) float buf[TFVec::size() * 2];
+        sum1.alignedStore(buf);
+        sum2.alignedStore(buf + TFVec::size());
+        for (std::size_t i = 0; i < TFVec::size() * 2; ++i) {
+            buf[i] = std::tanh(buf[i]);
+        }
+        sum1.alignedLoad(buf);
+        sum2.alignedLoad(buf + TFVec::size());
+    }
+};
 
 template<typename TF128>
 struct TanHActivationFunction<TF128, typename std::enable_if<HasSize<TF128, 4ul>::value>::type> {
 
     void operator()(TF128& sum, const float* /*unused*/) {
-        // FIXME: dangerously inefficient code
         alignas(TF128::alignment()) float buf[TF128::size()];
 
         sum.alignedStore(buf);
@@ -37,7 +56,6 @@ struct TanHActivationFunction<TF128, typename std::enable_if<HasSize<TF128, 4ul>
     }
 
     void operator()(TF128& sum1, TF128& sum2, const float* /*unused*/) {
-        // FIXME: dangerously inefficient code
         alignas(TF128::alignment()) float buf[TF128::size() * 2];
 
         sum1.alignedStore(buf);

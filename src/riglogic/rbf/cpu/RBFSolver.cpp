@@ -163,7 +163,6 @@ struct DistanceMethodFunctor<RBFDistanceMethod::Quaternion> {
             auto target = ConstArrayView<float>{targets[ti]};
             assert(target.size() % 4u == 0);
             float distance = 0.0f;
-            // quaternion count is same for each iteration TODO
             for (std::size_t i = 0u; i < quaternionCount; ++i) {
                 auto aQ = target.subview(i * 4u, 4u);
                 auto bQ = rawControlValues.subview(i * 4u, 4u);
@@ -526,14 +525,18 @@ void RBFSolver::normalizeAndCutOff(ArrayView<float> outputWeights) const {
     if ((sumWeight > 1.0f) || (normalizeMethod == RBFNormalizeMethod::AlwaysNormalize)) {
         normalizationRatio = 1.0f / sumWeight;
     }
-    // vectorize TODO
-    for (std::uint16_t i = 0u; i < outputWeights.size(); i++) {
-        float weight = outputWeights[i] * normalizationRatio * targetScale[i];
-        if (weight > weightThreshold) {
-            outputWeights[i] = weight;
-        } else {
-            outputWeights[i] = 0.0f;
+    const std::size_t outputSize = outputWeights.size();
+    std::size_t i = 0u;
+    for (; i + 4 <= outputSize; i += 4) {
+        for (std::size_t k = 0u; k < 4u; ++k) {
+            const std::size_t idx = i + k;
+            float weight = outputWeights[idx] * normalizationRatio * targetScale[idx];
+            outputWeights[idx] = (weight > weightThreshold) ? weight : 0.0f;
         }
+    }
+    for (; i < outputSize; ++i) {
+        float weight = outputWeights[i] * normalizationRatio * targetScale[i];
+        outputWeights[i] = (weight > weightThreshold) ? weight : 0.0f;
     }
 }
 

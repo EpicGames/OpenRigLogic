@@ -176,6 +176,18 @@ static void cpuidex(int info[4], int functionid, int subfunctionid) {
 }
         #endif
 
+static inline unsigned long long read_xcr0() {
+#if defined(_MSC_VER)
+    return _xgetbv(0);
+#elif defined(__GNUC__) || defined(__clang__)
+    unsigned int eax_val, edx_val;
+    __asm__ __volatile__("xgetbv" : "=a"(eax_val), "=d"(edx_val) : "c"(0));
+    return (static_cast<unsigned long long>(edx_val) << 32) | eax_val;
+#else
+    return 0;
+#endif
+}
+
 inline CPUFeatures getCPUFeatures() {
     CPUFeatures flags = {};
     int info[4];
@@ -186,14 +198,25 @@ inline CPUFeatures getCPUFeatures() {
     flags.SSSE3 = (info[2] & (1 << 9)) != 0;
     flags.SSE41 = (info[2] & (1 << 19)) != 0;
     flags.SSE42 = (info[2] & (1 << 20)) != 0;
-    flags.AVX = (info[2] & (1 << 28)) != 0;
-    flags.F16C = (info[2] & (1 << 29)) != 0;
-    flags.FMA3 = (info[2] & (1 << 12)) != 0;
+
+    // Verify OS enabled XSAVE / YMM / ZMM registers before enabling AVX/AVX2/AVX512
+    const bool osxsave = (info[2] & (1 << 27)) != 0;
+    bool ymm_enabled = false;
+    bool zmm_enabled = false;
+    if (osxsave) {
+        const unsigned long long xcr0 = read_xcr0();
+        ymm_enabled = (xcr0 & 0x6ULL) == 0x6ULL;
+        zmm_enabled = (xcr0 & 0xE6ULL) == 0xE6ULL;
+    }
+
+    flags.AVX = ymm_enabled && ((info[2] & (1 << 28)) != 0);
+    flags.F16C = ymm_enabled && ((info[2] & (1 << 29)) != 0);
+    flags.FMA3 = ymm_enabled && ((info[2] & (1 << 12)) != 0);
     // AVX2 and AVX-512F live in CPUID leaf 7, subleaf 0 (EBX bits)
     int info7[4] = {};
     cpuidex(info7, 7, 0);
-    flags.AVX2 = (info7[1] & (1 << 5)) != 0;
-    flags.AVX512F = (info7[1] & (1 << 16)) != 0;
+    flags.AVX2 = ymm_enabled && ((info7[1] & (1 << 5)) != 0);
+    flags.AVX512F = zmm_enabled && ((info7[1] & (1 << 16)) != 0);
     return flags;
 }
     #endif  // TRIMD_PLATFORM_X86

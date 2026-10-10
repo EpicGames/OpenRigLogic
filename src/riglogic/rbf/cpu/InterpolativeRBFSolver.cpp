@@ -174,8 +174,15 @@ void InterpolativeRBFSolver::solve(ArrayView<float> input,
     for (std::size_t i = {}; i < targetSize; ++i) {
         float weight = 0.0f;
         const auto& targetCoeff = coefficients[i];
-        for (std::size_t j = {}; j < targetSize; ++j) {
-            weight += targetCoeff[j] * intermediateWeights[j];  // Vectorize TODO
+        std::size_t j = {};
+        for (; j + 4 <= targetSize; j += 4) {
+            weight += targetCoeff[j] * intermediateWeights[j]
+                    + targetCoeff[j + 1] * intermediateWeights[j + 1]
+                    + targetCoeff[j + 2] * intermediateWeights[j + 2]
+                    + targetCoeff[j + 3] * intermediateWeights[j + 3];
+        }
+        for (; j < targetSize; ++j) {
+            weight += targetCoeff[j] * intermediateWeights[j];
         }
         outputWeights[i] = extd::clamp(weight, 0.0f, 1.0f);
     }

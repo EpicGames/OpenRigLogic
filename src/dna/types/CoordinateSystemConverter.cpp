@@ -251,9 +251,10 @@ void CoordinateSystemConverter::convertJointDeltas(DNA& dna,
                 newValues[(newRowIndex + 7) * colCount + col] = dstScale[1];
                 newValues[(newRowIndex + 8) * colCount + col] = dstScale[2];
 
-                // TODO: This is wasteful to do for each column as it's the same
-                for (std::uint16_t ri = {}; ri < jointAttrCount; ++ri) {
-                    newOutputIndices[newRowIndex + ri] = static_cast<std::uint16_t>(jointIndex * jointAttrCount + ri);
+                if (col == 0) {
+                    for (std::uint16_t ri = {}; ri < jointAttrCount; ++ri) {
+                        newOutputIndices[newRowIndex + ri] = static_cast<std::uint16_t>(jointIndex * jointAttrCount + ri);
+                    }
                 }
 
                 newRowIndex += jointAttrCount;

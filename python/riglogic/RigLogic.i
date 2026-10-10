@@ -41,6 +41,7 @@ else:
 %include <spyus/Vector3.i>
 
 %include <spyus/ExceptionHandling.i>
+%include <spyus/CharPtr.i>
 
 %pythoncode %{
 if module_loader_cls is not None:

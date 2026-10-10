@@ -32,7 +32,9 @@ static constexpr std::uint16_t jointAttributeCount = 9u;
 
 template<typename TContainer>
 static void removeByIndex(TContainer& container, std::size_t index) {
-    assert(index < container.size());
+    if (index >= container.size()) {
+        return;
+    }
     for (std::size_t i = index; i < (container.size() - 1ul); ++i) {
         container[i] = container[i + 1ul];
     }
@@ -80,7 +82,10 @@ template<class TContainer>
 void FilteredBinaryInputArchive::processSubset(TContainer& dest, std::size_t offset, std::size_t size) {
     using ElementType = typename TContainer::value_type;
     const auto availableSize = processSize();
-    assert(offset + size <= availableSize);
+    if (offset + size > availableSize) {
+        malformed = true;
+        return;
+    }
     const auto startPosition = stream->tell();
     // Skip over first N elements
     stream->seek(startPosition + offset * sizeof(ElementType));
@@ -336,7 +341,10 @@ void FilteredBinaryInputArchive::process(RawVertexSkinWeights& dest) {
     process(dest.jointIndices);
 
     if (lodConstraint.hasImpactOn(unconstrainedLODCount)) {
-        assert(dest.weights.size() == dest.jointIndices.size());
+        if (dest.weights.size() != dest.jointIndices.size()) {
+            malformed = true;
+            return;
+        }
         JointFilter::apply(dest);
     }
 }
