@@ -102,7 +102,7 @@ struct FloatArrayDeserializer<std::uint16_t, TF256, TF128> {
             TF128::fromAlignedSource(instance.fp32.data() + blkOffset).alignedStore(instance.fp16.data() + blkOffset);
 #endif
         }
-        instance.fp32.clear();
+        instance.fp32 = AlignedVector<float>{instance.fp32.get_allocator()};
     }
 };
 
@@ -131,7 +131,7 @@ struct FloatArraySerializer<std::uint16_t, TF256, TF128> {
 #endif
         }
         archive(instance.fp32);
-        instance.fp32.clear();
+        instance.fp32 = AlignedVector<float>{instance.fp32.get_allocator()};
     }
 };
 
