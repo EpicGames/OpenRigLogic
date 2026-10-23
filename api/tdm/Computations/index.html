@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://epicgames.github.io/OpenRigLogic/api/tdm/Computations/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Computations - OpenRigLogic</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Computations";
+        var mkdocs_page_input_path = "api/tdm/Computations.md";
+        var mkdocs_page_url = "/OpenRigLogic/api/tdm/Computations/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> OpenRigLogic
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../release_notes/">Release Notes</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >arrayview</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/ArrayView/">ArrayView</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/StringView/">StringView</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >dna</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/BinaryStreamReader/">BinaryStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/BinaryStreamWriter/">BinaryStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/JSONStreamReader/">JSONStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/JSONStreamWriter/">JSONStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Reader/">Reader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/StreamReader/">StreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/StreamWriter/">StreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Writer/">Writer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/BehaviorReader/">BehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/BehaviorWriter/">BehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DefinitionReader/">DefinitionReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DefinitionWriter/">DefinitionWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Descriptor/">Descriptor</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DescriptorReader/">DescriptorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DescriptorWriter/">DescriptorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Geometry/">Geometry</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/GeometryReader/">GeometryReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/GeometryWriter/">GeometryWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/HeaderReader/">HeaderReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/HeaderWriter/">HeaderWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadata/">JointBehaviorMetadata</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadataReader/">JointBehaviorMetadataReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadataWriter/">JointBehaviorMetadataWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehavior/">MachineLearnedBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorExt</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExtReader/">MachineLearnedBehaviorExtReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExtWriter/">MachineLearnedBehaviorExtWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorReader/">MachineLearnedBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorWriter/">MachineLearnedBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehavior/">RBFBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehaviorReader/">RBFBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehaviorWriter/">RBFBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Twist/">Twist</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/TwistSwingBehaviorReader/">TwistSwingBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/TwistSwingBehaviorWriter/">TwistSwingBehaviorWriter</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/types/Vector3/">Vector3</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >pma</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/MemoryResource/">MemoryResource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/PolyAllocator/">PolyAllocator</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/ScopedPtr/">ScopedPtr</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/TypeDefs/">TypeDefs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >resources</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/AlignedMemoryResource/">AlignedMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/ArenaMemoryResource/">ArenaMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/DefaultMemoryResource/">DefaultMemoryResource</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/utils/ManagedInstance/">ManagedInstance</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >riglogic</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigInstance/">RigInstance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigLogic/">RigLogic</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Stats/">Stats</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/types/Aliases/">Aliases</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >status</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/Provider/">Provider</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/Status/">Status</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/StatusCode/">StatusCode</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >tdm</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Ang/">Ang</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Computations</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#templatedim_t-n-typename-t-matn-n-t-adjointconst-matn-n-t-m">template&lt;dim_t N, typename T&gt; mat&lt;N, N, T&gt; adjoint(const mat&lt;N, N, T&gt;&amp; m)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns">Returns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templatetypename-t-quatt-conjugateconst-quatt-q">template&lt;typename T&gt; quat&lt;T&gt; conjugate(const quat&lt;T&gt;&amp; q)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_1">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_1">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_1">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_1">Returns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templatetypename-t-vec3t-crossconst-vec3t-lhs-const-vec3t-rhs">template&lt;typename T&gt; vec3&lt;T&gt; cross(const vec3&lt;T&gt;&amp; lhs, const vec3&lt;T&gt;&amp; rhs)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_2">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_2">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_2">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_2">Returns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templatedim_t-n-typename-t-bool-decomposematn-n-t-a-vecn-dim_t-permute">template&lt;dim_t N, typename T&gt; bool decompose(mat&lt;N, N, T&gt;&amp; a, vec&lt;N, dim_t&gt;&amp; permute)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_3">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for">Watch out for</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_3">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_3">Returns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templatedim_t-n-typename-t-t-determinantconst-matn-n-t-m">template&lt;dim_t N, typename T&gt; T determinant(const mat&lt;N, N, T&gt;&amp; m)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_4">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_3">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_4">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_4">Returns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#template-t-dot">template&lt;...&gt; T dot(...)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_5">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_4">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_5">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_5">Returns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#template-inverse">template&lt;...&gt; inverse(...)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_6">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for_1">Watch out for</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_5">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_6">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_6">Returns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#template-t-length">template&lt;...&gt; T length(...)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_7">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_6">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_7">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_7">Returns</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#constraints">Constraints</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templatetypename-t-quatt-lerpconst-quatt-q1-const-quatt-q2-t-t">template&lt;typename T&gt; quat&lt;T&gt; lerp(const quat&lt;T&gt;&amp; q1, const quat&lt;T&gt;&amp; q2, T t)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_8">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_7">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_8">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_8">Returns</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for_2">Watch out for</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templatedim_t-n-typename-t-void-minorconst-matn-n-t-input-dim_t-dimensions-dim_t-i-dim_t-j-matn-n-t-output">template&lt;dim_t N, typename T&gt; void minor(const mat&lt;N, N, T&gt;&amp; input, dim_t dimensions, dim_t i, dim_t j, mat&lt;N, N, T&gt;&amp; output)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_9">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for_3">Watch out for</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_9">Parameters</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#template-negate">template&lt;...&gt; negate(...)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_10">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_8">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_10">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_9">Returns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#template-normalize">template&lt;...&gt; normalize(...)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_11">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_9">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_11">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_10">Returns</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#constraints_1">Constraints</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for_4">Watch out for</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templatetypename-t-quatt-slerpconst-quatt-q1-const-quatt-q2-t-t">template&lt;typename T&gt; quat&lt;T&gt; slerp(const quat&lt;T&gt;&amp; q1, const quat&lt;T&gt;&amp; q2, T t)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_12">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for_5">Watch out for</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_10">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_12">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_11">Returns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templatedim_t-n-typename-t-void-substituteconst-matn-n-t-a-const-vecn-dim_t-permute-vecn-t-b">template&lt;dim_t N, typename T&gt; void substitute(const mat&lt;N, N, T&gt;&amp; a, const vec&lt;N, dim_t&gt;&amp; permute, vec&lt;N, T&gt;&amp; b)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_13">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for_6">Watch out for</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_13">Parameters</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templatedim_t-n-typename-t-t-traceconst-matn-n-t-m">template&lt;dim_t N, typename T&gt; T trace(const mat&lt;N, N, T&gt;&amp; m)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_14">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_11">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_14">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_12">Returns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templatedim_t-r-dim_t-c-typename-t-matc-r-t-transposeconst-matr-c-t-m">template&lt;dim_t R, dim_t C, typename T&gt; mat&lt;C, R, T&gt; transpose(const mat&lt;R, C, T&gt;&amp; m)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_15">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_12">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_15">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_13">Returns</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../CoordSys/">CoordSys</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Mat/">Mat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Quat/">Quat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Transforms/">Transforms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Types/">Types</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Vec/">Vec</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >trio</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/Concepts/">Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/Stream/">Stream</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >streams</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/FileStream/">FileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/MemoryMappedFileStream/">MemoryMappedFileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/MemoryStream/">MemoryStream</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/types/Parameters/">Parameters</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/utils/StreamScope/">StreamScope</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">OpenRigLogic</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+          <li class="breadcrumb-item">tdm</li>
+      <li class="breadcrumb-item active">Computations</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="api-reference-tdmcomputations">API Reference — <code>tdm/Computations</code></h1>
+<hr />
+<!-- ink:api name="adjoint" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatedim_t-n-typename-t-matn-n-t-adjointconst-matn-n-t-m"><code>template&lt;dim_t N, typename T&gt; mat&lt;N, N, T&gt; adjoint(const mat&lt;N, N, T&gt;&amp; m)</code></h2>
+<p>Compute the adjoint (adjugate) matrix, the transpose of the cofactor matrix.</p>
+<h3 id="when-to-use-this">When to use this</h3>
+<p>Use this as a building block for computing <code>inverse</code> via the classical adjugate method (<code>inverse = adjoint / determinant</code>) — it is generally not needed directly outside that computation.</p>
+<h3 id="example">Example</h3>
+<pre><code class="language-cpp">tdm::mat3&lt;float&gt; m{ /* ... */ };
+tdm::mat3&lt;float&gt; adj = tdm::impl::adjoint(m);
+// adj can be divided by determinant(m) to get the inverse
+</code></pre>
+<h3 id="parameters">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>m</code></td>
+<td><code>const mat&lt;N, N, T&gt;&amp;</code></td>
+<td>required — the square matrix</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns">Returns</h3>
+<p><code>mat&lt;N, N, T&gt;</code> — the adjoint matrix.</p>
+<!-- ink:api-end name="adjoint" -->
+
+<!-- ink:api name="conjugate" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatetypename-t-quatt-conjugateconst-quatt-q"><code>template&lt;typename T&gt; quat&lt;T&gt; conjugate(const quat&lt;T&gt;&amp; q)</code></h2>
+<p>Compute the conjugate of a quaternion by negating its vector (imaginary) components.</p>
+<h3 id="when-to-use-this_1">When to use this</h3>
+<p>Use this as a building block for computing a quaternion's <code>inverse</code> (for a unit quaternion, the conjugate equals the inverse), or when you need to reverse the rotation direction represented by a quaternion.</p>
+<h3 id="example_1">Example</h3>
+<pre><code class="language-cpp">tdm::quat&lt;float&gt; q{0.0f, 0.0f, 0.7071f, 0.7071f};
+tdm::quat&lt;float&gt; qc = tdm::conjugate(q);
+// qc is {0.0, 0.0, -0.7071, 0.7071}
+</code></pre>
+<h3 id="parameters_1">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>q</code></td>
+<td><code>const quat&lt;T&gt;&amp;</code></td>
+<td>required — the quaternion to conjugate</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_1">Returns</h3>
+<p><code>quat&lt;T&gt;</code> — the conjugate quaternion (x, y, z negated; w unchanged).</p>
+<!-- ink:api-end name="conjugate" -->
+
+<!-- ink:api name="cross" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatetypename-t-vec3t-crossconst-vec3t-lhs-const-vec3t-rhs"><code>template&lt;typename T&gt; vec3&lt;T&gt; cross(const vec3&lt;T&gt;&amp; lhs, const vec3&lt;T&gt;&amp; rhs)</code></h2>
+<p>Compute the cross product of two 3D vectors, producing a vector perpendicular to both.</p>
+<h3 id="when-to-use-this_2">When to use this</h3>
+<p>Use this when you need a vector perpendicular to two others — for example, to derive a surface normal from two edge vectors, or to build an orthogonal basis.</p>
+<h3 id="example_2">Example</h3>
+<pre><code class="language-cpp">tdm::vec3&lt;float&gt; edge1{1.0f, 0.0f, 0.0f};
+tdm::vec3&lt;float&gt; edge2{0.0f, 1.0f, 0.0f};
+tdm::vec3&lt;float&gt; normal = tdm::cross(edge1, edge2);
+// normal is {0, 0, 1}
+</code></pre>
+<h3 id="parameters_2">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lhs</code></td>
+<td><code>const vec3&lt;T&gt;&amp;</code></td>
+<td>required — the first vector</td>
+</tr>
+<tr>
+<td><code>rhs</code></td>
+<td><code>const vec3&lt;T&gt;&amp;</code></td>
+<td>required — the second vector</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_2">Returns</h3>
+<p><code>vec3&lt;T&gt;</code> — a vector orthogonal to both <code>lhs</code> and <code>rhs</code>, following the right-hand rule.</p>
+<!-- ink:api-end name="cross" -->
+
+<!-- ink:api name="decompose" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatedim_t-n-typename-t-bool-decomposematn-n-t-a-vecn-dim_t-permute"><code>template&lt;dim_t N, typename T&gt; bool decompose(mat&lt;N, N, T&gt;&amp; a, vec&lt;N, dim_t&gt;&amp; permute)</code></h2>
+<p>Perform an in-place LU decomposition of a square matrix with partial pivoting, based on the algorithm in <em>Numerical Recipes in C</em>.</p>
+<h3 id="when-to-use-this_3">When to use this</h3>
+<p>Use this together with <code>substitute</code> to solve linear systems or compute a matrix inverse (see <code>lu::inverse</code>) more efficiently than the general adjoint/determinant method for larger matrices.</p>
+<h3 id="watch-out-for">Watch out for</h3>
+<ul>
+<li>Modifies <code>a</code> in place — it is overwritten with the combined L/U factors. Pass a copy if the original matrix must be preserved.</li>
+<li>Returns <code>false</code> if any row is entirely zero (matrix is singular); check the return value before calling <code>substitute</code>.</li>
+</ul>
+<h3 id="parameters_3">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>a</code></td>
+<td><code>mat&lt;N, N, T&gt;&amp;</code></td>
+<td>required — matrix to decompose; overwritten with LU factors</td>
+</tr>
+<tr>
+<td><code>permute</code></td>
+<td><code>vec&lt;N, dim_t&gt;&amp;</code></td>
+<td>required — receives the row permutation performed during partial pivoting</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_3">Returns</h3>
+<p><code>bool</code> — <code>true</code> if decomposition succeeded; <code>false</code> if the matrix is singular.</p>
+<!-- ink:api-end name="decompose" -->
+
+<!-- ink:api name="determinant" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatedim_t-n-typename-t-t-determinantconst-matn-n-t-m"><code>template&lt;dim_t N, typename T&gt; T determinant(const mat&lt;N, N, T&gt;&amp; m)</code></h2>
+<p>Compute the determinant of a square matrix.</p>
+<h3 id="when-to-use-this_4">When to use this</h3>
+<p>Use this to check if a matrix is invertible (non-zero determinant) before calling <code>inverse</code>, or to measure how a transform scales area/volume, or to determine <code>coord_sys</code> handedness via its sign.</p>
+<h3 id="example_3">Example</h3>
+<pre><code class="language-cpp">tdm::mat3&lt;float&gt; m{1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+float det = tdm::determinant(m);
+// det is 1.0 (identity matrix)
+</code></pre>
+<h3 id="parameters_4">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>m</code></td>
+<td><code>const mat&lt;N, N, T&gt;&amp;</code></td>
+<td>required — the square matrix</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_4">Returns</h3>
+<p><code>T</code> — the determinant; zero indicates the matrix is singular (non-invertible).</p>
+<!-- ink:api-end name="determinant" -->
+
+<!-- ink:api name="dot" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="template-t-dot"><code>template&lt;...&gt; T dot(...)</code></h2>
+<p>Compute the dot product of two vectors or quaternions, a scalar measure of how aligned they are.</p>
+<h3 id="when-to-use-this_5">When to use this</h3>
+<p>Use this to measure alignment between two directions (positive means same general direction, negative means opposite), to project one vector onto another, or — for quaternions — to measure similarity between two rotations before interpolating with <code>slerp</code>.</p>
+<h3 id="example_4">Example</h3>
+<pre><code class="language-cpp">tdm::vec3&lt;float&gt; a{1.0f, 0.0f, 0.0f};
+tdm::vec3&lt;float&gt; b{0.0f, 1.0f, 0.0f};
+float alignment = tdm::dot(a, b);
+// alignment is 0.0 (perpendicular)
+</code></pre>
+<h3 id="parameters_5">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lhs</code> / <code>q1</code></td>
+<td><code>const vec&lt;L, T&gt;&amp;</code> or <code>const quat&lt;T&gt;&amp;</code></td>
+<td>required — the first vector or quaternion</td>
+</tr>
+<tr>
+<td><code>rhs</code> / <code>q2</code></td>
+<td><code>const vec&lt;L, T&gt;&amp;</code> or <code>const quat&lt;T&gt;&amp;</code></td>
+<td>required — the second vector or quaternion</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_5">Returns</h3>
+<p><code>T</code> — the scalar dot product.</p>
+<!-- ink:api-end name="dot" -->
+
+<!-- ink:api name="inverse" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="template-inverse"><code>template&lt;...&gt; inverse(...)</code></h2>
+<p>Compute the inverse of a quaternion or a square matrix, undoing its transform.</p>
+<h3 id="when-to-use-this_6">When to use this</h3>
+<p>Use this to reverse a rotation (quaternion) or reverse a linear transform (matrix) — for example, going from world space to local space when you have the local-to-world transform.</p>
+<h3 id="watch-out-for_1">Watch out for</h3>
+<ul>
+<li>The matrix overload returns a default-constructed (zero) matrix when the determinant is exactly zero, rather than throwing — check the input for singularity before relying on the result if that distinction matters.</li>
+<li>The matrix overload checks whether the determinant is zero and returns a default-constructed (zero) matrix in that case. Always verify the result is non-zero before using it in a transform chain.</li>
+<li>The quaternion overload divides by <code>length2()</code>. Passing a zero quaternion causes division by zero.</li>
+</ul>
+<h3 id="example_5">Example</h3>
+<pre><code class="language-cpp">tdm::quat&lt;float&gt; rotation{0.0f, 0.0f, 0.7071f, 0.7071f};
+tdm::quat&lt;float&gt; reversed = tdm::inverse(rotation);
+// reversed undoes the effect of `rotation` when composed with it
+</code></pre>
+<h3 id="parameters_6">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>q</code> / <code>m</code></td>
+<td><code>const quat&lt;T&gt;&amp;</code> or <code>const mat&lt;N, N, T&gt;&amp;</code></td>
+<td>required — the quaternion or square matrix to invert</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_6">Returns</h3>
+<p>Same type as input — the inverse quaternion or matrix.</p>
+<!-- ink:api-end name="inverse" -->
+
+<!-- ink:api name="length" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="template-t-length"><code>template&lt;...&gt; T length(...)</code></h2>
+<p>Compute the magnitude (length) of a vector or quaternion.</p>
+<h3 id="when-to-use-this_7">When to use this</h3>
+<p>Use this to measure the size of a vector — for example, the distance represented by a displacement vector, or to check if a quaternion is normalized (length ≈ 1).</p>
+<h3 id="example_6">Example</h3>
+<pre><code class="language-cpp">tdm::vec3&lt;float&gt; displacement{3.0f, 4.0f, 0.0f};
+float dist = tdm::length(displacement);
+// dist is 5.0
+</code></pre>
+<h3 id="parameters_7">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>v</code> / <code>q</code></td>
+<td><code>const vec&lt;L, T&gt;&amp;</code> or <code>const quat&lt;T&gt;&amp;</code></td>
+<td>required — the value whose length to compute; <code>T</code> must be floating-point</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_7">Returns</h3>
+<p><code>T</code> — the Euclidean length/magnitude.</p>
+<h3 id="constraints">Constraints</h3>
+<ul>
+<li><code>T</code> must satisfy <code>std::is_floating_point&lt;T&gt;</code>. Instantiation with integer element types will not compile.</li>
+</ul>
+<!-- ink:api-end name="length" -->
+
+<!-- ink:api name="lerp" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatetypename-t-quatt-lerpconst-quatt-q1-const-quatt-q2-t-t"><code>template&lt;typename T&gt; quat&lt;T&gt; lerp(const quat&lt;T&gt;&amp; q1, const quat&lt;T&gt;&amp; q2, T t)</code></h2>
+<p>Linearly interpolate between two quaternions.</p>
+<h3 id="when-to-use-this_8">When to use this</h3>
+<p>Use this for cheap, approximate rotation blending where per-frame speed variation near the endpoints is acceptable. Use <code>slerp</code> instead when you need constant angular velocity across the interpolation, such as smooth camera or character rotation animation.</p>
+<h3 id="example_7">Example</h3>
+<pre><code class="language-cpp">tdm::quat&lt;float&gt; start{0.0f, 0.0f, 0.0f, 1.0f};
+tdm::quat&lt;float&gt; end{0.0f, 0.0f, 0.7071f, 0.7071f};
+tdm::quat&lt;float&gt; blended = tdm::lerp(start, end, 0.5f);
+// blended is roughly halfway between start and end (not renormalized)
+</code></pre>
+<h3 id="parameters_8">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>q1</code></td>
+<td><code>const quat&lt;T&gt;&amp;</code></td>
+<td>required — the starting quaternion</td>
+</tr>
+<tr>
+<td><code>q2</code></td>
+<td><code>const quat&lt;T&gt;&amp;</code></td>
+<td>required — the ending quaternion</td>
+</tr>
+<tr>
+<td><code>t</code></td>
+<td><code>T</code></td>
+<td>required — interpolation factor; <code>0</code> returns <code>q1</code>, <code>1</code> returns <code>q2</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_8">Returns</h3>
+<p><code>quat&lt;T&gt;</code> — the linearly interpolated quaternion.</p>
+<h3 id="watch-out-for_2">Watch out for</h3>
+<ul>
+<li>The result is not normalized. Call <code>normalize</code> on the output before using it as a rotation if unit length is required.</li>
+<li>Does not take the shortest path automatically. If <code>dot(q1, q2) &lt; 0</code>, negate one quaternion before calling to avoid rotating the long way around.</li>
+</ul>
+<!-- ink:api-end name="lerp" -->
+
+<!-- ink:api name="minor" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatedim_t-n-typename-t-void-minorconst-matn-n-t-input-dim_t-dimensions-dim_t-i-dim_t-j-matn-n-t-output"><code>template&lt;dim_t N, typename T&gt; void minor(const mat&lt;N, N, T&gt;&amp; input, dim_t dimensions, dim_t i, dim_t j, mat&lt;N, N, T&gt;&amp; output)</code></h2>
+<p>Extract the minor matrix formed by removing row <code>i</code> and column <code>j</code> from a square matrix.</p>
+<h3 id="when-to-use-this_9">When to use this</h3>
+<p>Use this as a building block for cofactor expansion when computing a matrix's <code>determinant</code> or <code>adjoint</code> — it is not typically called directly outside those algorithms.</p>
+<h3 id="watch-out-for_3">Watch out for</h3>
+<ul>
+<li>This is an implementation-detail helper (<code>impl::minor</code>), macro-guarded to avoid colliding with a <code>minor</code> macro defined on some platforms — not part of the stable public API surface.</li>
+</ul>
+<h3 id="parameters_9">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>input</code></td>
+<td><code>const mat&lt;N, N, T&gt;&amp;</code></td>
+<td>required — the source matrix</td>
+</tr>
+<tr>
+<td><code>dimensions</code></td>
+<td><code>dim_t</code></td>
+<td>required — the active size to operate over (may be less than <code>N</code> during recursive determinant computation)</td>
+</tr>
+<tr>
+<td><code>i</code></td>
+<td><code>dim_t</code></td>
+<td>required — row index to exclude</td>
+</tr>
+<tr>
+<td><code>j</code></td>
+<td><code>dim_t</code></td>
+<td>required — column index to exclude</td>
+</tr>
+<tr>
+<td><code>output</code></td>
+<td><code>mat&lt;N, N, T&gt;&amp;</code></td>
+<td>required — receives the resulting minor matrix</td>
+</tr>
+</tbody>
+</table>
+<!-- ink:api-end name="minor" -->
+
+<!-- ink:api name="negate" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="template-negate"><code>template&lt;...&gt; negate(...)</code></h2>
+<p>Compute the negation of a vector, matrix, or quaternion, flipping the sign of every component.</p>
+<h3 id="when-to-use-this_10">When to use this</h3>
+<p>Use this as a free-function form of negation when writing generic code that operates over <code>vec</code>, <code>mat</code>, or <code>quat</code> uniformly, rather than calling each type's own <code>.negate()</code> member directly.</p>
+<h3 id="example_8">Example</h3>
+<pre><code class="language-cpp">tdm::vec3&lt;float&gt; v{1.0f, -2.0f, 3.0f};
+tdm::vec3&lt;float&gt; negated = tdm::negate(v);
+// negated is {-1, 2, -3}
+</code></pre>
+<h3 id="parameters_10">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>v</code> / <code>m</code> / <code>q</code></td>
+<td><code>vec&lt;L, T&gt;</code>, <code>mat&lt;R, C, T&gt;</code>, or <code>quat&lt;T&gt;</code></td>
+<td>required — the value to negate (passed by value)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_9">Returns</h3>
+<p>Same type as the input — every component negated.</p>
+<!-- ink:api-end name="negate" -->
+
+<!-- ink:api name="normalize" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="template-normalize"><code>template&lt;...&gt; normalize(...)</code></h2>
+<p>Scale a vector or quaternion to unit length while preserving its direction.</p>
+<h3 id="when-to-use-this_11">When to use this</h3>
+<p>Use this before using a vector as a direction (e.g. a normal or an axis) or before treating a quaternion as a valid rotation, since many operations assume unit length.</p>
+<h3 id="example_9">Example</h3>
+<pre><code class="language-cpp">tdm::vec3&lt;float&gt; v{3.0f, 4.0f, 0.0f};
+tdm::vec3&lt;float&gt; unit = tdm::normalize(v);
+// unit is {0.6, 0.8, 0.0}, length 1.0
+</code></pre>
+<h3 id="parameters_11">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>v</code> / <code>q</code></td>
+<td><code>vec&lt;L, T&gt;</code> or <code>quat&lt;T&gt;</code></td>
+<td>required — the value to normalize; <code>T</code> must be floating-point</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_10">Returns</h3>
+<p>Same type as input — the unit-length version of the input.</p>
+<h3 id="constraints_1">Constraints</h3>
+<ul>
+<li><code>T</code> must satisfy <code>std::is_floating_point&lt;T&gt;</code>. Integer element types will not compile.</li>
+</ul>
+<h3 id="watch-out-for_4">Watch out for</h3>
+<ul>
+<li>Normalizing a zero vector produces undefined behavior (division by zero). Check that the vector is non-zero before calling.</li>
+</ul>
+<!-- ink:api-end name="normalize" -->
+
+<!-- ink:api name="slerp" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatetypename-t-quatt-slerpconst-quatt-q1-const-quatt-q2-t-t"><code>template&lt;typename T&gt; quat&lt;T&gt; slerp(const quat&lt;T&gt;&amp; q1, const quat&lt;T&gt;&amp; q2, T t)</code></h2>
+<p>Spherically interpolate between two rotations, moving at a constant angular velocity.</p>
+<h3 id="when-to-use-this_12">When to use this</h3>
+<p>Use this for animation and camera work where a smooth, constant-speed rotation blend matters. Use <code>lerp</code> instead when the interpolation is short or performance-critical and speed artifacts near the endpoints are acceptable.</p>
+<h3 id="watch-out-for_5">Watch out for</h3>
+<ul>
+<li>If the dot product of the two quaternions is negative, the function negates one of them internally to take the shorter path — this avoids unwanted long-way-around rotation.</li>
+<li>Falls back to linear interpolation when the quaternions are nearly identical (<code>costheta</code> close to 1), to avoid a division by a near-zero <code>sin(theta)</code>.</li>
+<li>Automatically negates <code>q2</code> when <code>dot(q1, q2) &lt; 0</code> to ensure the shortest-path arc is taken. This means the output quaternion may differ in sign from <code>q2</code> even at <code>t = 1.0</code>.</li>
+</ul>
+<h3 id="example_10">Example</h3>
+<pre><code class="language-cpp">tdm::quat&lt;float&gt; start{0.0f, 0.0f, 0.0f, 1.0f};
+tdm::quat&lt;float&gt; end{0.0f, 0.0f, 0.7071f, 0.7071f};
+tdm::quat&lt;float&gt; mid = tdm::slerp(start, end, 0.5f);
+// mid is the rotation exactly halfway along the shortest arc from start to end
+</code></pre>
+<h3 id="parameters_12">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>q1</code></td>
+<td><code>const quat&lt;T&gt;&amp;</code></td>
+<td>required — the starting rotation</td>
+</tr>
+<tr>
+<td><code>q2</code></td>
+<td><code>const quat&lt;T&gt;&amp;</code></td>
+<td>required — the ending rotation</td>
+</tr>
+<tr>
+<td><code>t</code></td>
+<td><code>T</code></td>
+<td>required — interpolation factor from <code>0</code> (q1) to <code>1</code> (q2)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_11">Returns</h3>
+<p><code>quat&lt;T&gt;</code> — the spherically interpolated quaternion.</p>
+<!-- ink:api-end name="slerp" -->
+
+<!-- ink:api name="substitute" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatedim_t-n-typename-t-void-substituteconst-matn-n-t-a-const-vecn-dim_t-permute-vecn-t-b"><code>template&lt;dim_t N, typename T&gt; void substitute(const mat&lt;N, N, T&gt;&amp; a, const vec&lt;N, dim_t&gt;&amp; permute, vec&lt;N, T&gt;&amp; b)</code></h2>
+<p>Solve a linear system in place using the LU-decomposed matrix and permutation produced by <code>decompose</code>.</p>
+<h3 id="when-to-use-this_13">When to use this</h3>
+<p>Use this immediately after a successful <code>decompose</code> call to solve <code>A x = b</code> for <code>x</code>, applying forward and back substitution against the LU factors.</p>
+<h3 id="watch-out-for_6">Watch out for</h3>
+<ul>
+<li>Must be called with the <code>a</code> and <code>permute</code> outputs from a prior <code>decompose</code> call on the same original matrix — calling it with an unrelated matrix produces meaningless results.</li>
+<li><code>b</code> is overwritten in place with the solution vector <code>x</code>.</li>
+<li>Only safe to call after a successful <code>decompose</code> call (return value <code>true</code>). Calling on a singular decomposition produces undefined results.</li>
+</ul>
+<h3 id="parameters_13">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>a</code></td>
+<td><code>const mat&lt;N, N, T&gt;&amp;</code></td>
+<td>required — the LU-decomposed matrix from <code>decompose</code></td>
+</tr>
+<tr>
+<td><code>permute</code></td>
+<td><code>const vec&lt;N, dim_t&gt;&amp;</code></td>
+<td>required — the permutation vector from <code>decompose</code></td>
+</tr>
+<tr>
+<td><code>b</code></td>
+<td><code>vec&lt;N, T&gt;&amp;</code></td>
+<td>required — right-hand side vector on input; solution vector on output</td>
+</tr>
+</tbody>
+</table>
+<!-- ink:api-end name="substitute" -->
+
+<!-- ink:api name="trace" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatedim_t-n-typename-t-t-traceconst-matn-n-t-m"><code>template&lt;dim_t N, typename T&gt; T trace(const mat&lt;N, N, T&gt;&amp; m)</code></h2>
+<p>Compute the trace of a square matrix, the sum of its diagonal elements.</p>
+<h3 id="when-to-use-this_14">When to use this</h3>
+<p>Use this when you need a quick invariant scalar summary of a matrix — for example, as part of extracting a rotation angle from a rotation matrix.</p>
+<h3 id="example_11">Example</h3>
+<pre><code class="language-cpp">tdm::mat3&lt;float&gt; m{1.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 3.0f};
+float t = tdm::trace(m);
+// t is 6.0
+</code></pre>
+<h3 id="parameters_14">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>m</code></td>
+<td><code>const mat&lt;N, N, T&gt;&amp;</code></td>
+<td>required — the square matrix</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_12">Returns</h3>
+<p><code>T</code> — sum of the diagonal elements.</p>
+<!-- ink:api-end name="trace" -->
+
+<!-- ink:api name="transpose" module="tdm/Computations" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatedim_t-r-dim_t-c-typename-t-matc-r-t-transposeconst-matr-c-t-m"><code>template&lt;dim_t R, dim_t C, typename T&gt; mat&lt;C, R, T&gt; transpose(const mat&lt;R, C, T&gt;&amp; m)</code></h2>
+<p>Flip a matrix's rows and columns.</p>
+<h3 id="when-to-use-this_15">When to use this</h3>
+<p>Use this when you need to convert between row-major and column-major representations of the same linear map, or when building a matrix from column vectors via <code>from_columns</code>.</p>
+<h3 id="example_12">Example</h3>
+<pre><code class="language-cpp">tdm::mat&lt;3, 4, float&gt; m{ /* ... */ };
+tdm::mat&lt;4, 3, float&gt; mt = tdm::transpose(m);
+// mt(j, i) == m(i, j) for all i, j
+</code></pre>
+<h3 id="parameters_15">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>m</code></td>
+<td><code>const mat&lt;R, C, T&gt;&amp;</code></td>
+<td>required — the matrix to transpose</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_13">Returns</h3>
+<p><code>mat&lt;C, R, T&gt;</code> — the transposed matrix, with rows and columns swapped.</p>
+<!-- ink:api-end name="transpose" -->
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../Ang/" class="btn btn-neutral float-left" title="Ang"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../CoordSys/" class="btn btn-neutral float-right" title="CoordSys">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../Ang/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../CoordSys/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

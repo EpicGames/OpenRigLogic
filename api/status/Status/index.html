@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://epicgames.github.io/OpenRigLogic/api/status/Status/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Status - OpenRigLogic</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Status";
+        var mkdocs_page_input_path = "api/status/Status.md";
+        var mkdocs_page_url = "/OpenRigLogic/api/status/Status/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> OpenRigLogic
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../release_notes/">Release Notes</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >arrayview</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/ArrayView/">ArrayView</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/StringView/">StringView</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >dna</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/BinaryStreamReader/">BinaryStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/BinaryStreamWriter/">BinaryStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/JSONStreamReader/">JSONStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/JSONStreamWriter/">JSONStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Reader/">Reader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/StreamReader/">StreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/StreamWriter/">StreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Writer/">Writer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/BehaviorReader/">BehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/BehaviorWriter/">BehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DefinitionReader/">DefinitionReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DefinitionWriter/">DefinitionWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Descriptor/">Descriptor</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DescriptorReader/">DescriptorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DescriptorWriter/">DescriptorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Geometry/">Geometry</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/GeometryReader/">GeometryReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/GeometryWriter/">GeometryWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/HeaderReader/">HeaderReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/HeaderWriter/">HeaderWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadata/">JointBehaviorMetadata</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadataReader/">JointBehaviorMetadataReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadataWriter/">JointBehaviorMetadataWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehavior/">MachineLearnedBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorExt</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExtReader/">MachineLearnedBehaviorExtReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExtWriter/">MachineLearnedBehaviorExtWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorReader/">MachineLearnedBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorWriter/">MachineLearnedBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehavior/">RBFBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehaviorReader/">RBFBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehaviorWriter/">RBFBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Twist/">Twist</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/TwistSwingBehaviorReader/">TwistSwingBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/TwistSwingBehaviorWriter/">TwistSwingBehaviorWriter</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/types/Vector3/">Vector3</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >pma</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/MemoryResource/">MemoryResource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/PolyAllocator/">PolyAllocator</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/ScopedPtr/">ScopedPtr</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/TypeDefs/">TypeDefs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >resources</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/AlignedMemoryResource/">AlignedMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/ArenaMemoryResource/">ArenaMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/DefaultMemoryResource/">DefaultMemoryResource</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/utils/ManagedInstance/">ManagedInstance</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >riglogic</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigInstance/">RigInstance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigLogic/">RigLogic</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Stats/">Stats</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/types/Aliases/">Aliases</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >status</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Provider/">Provider</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Status</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#hookfunction">HookFunction</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#class-scapi-status">class SCAPI Status</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#method-groups">Method groups</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns">Returns</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_1">Relationships</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for">Watch out for</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../StatusCode/">StatusCode</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >tdm</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Ang/">Ang</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Computations/">Computations</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/CoordSys/">CoordSys</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Mat/">Mat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Quat/">Quat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Transforms/">Transforms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Types/">Types</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Vec/">Vec</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >trio</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/Concepts/">Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/Stream/">Stream</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >streams</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/FileStream/">FileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/MemoryMappedFileStream/">MemoryMappedFileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/MemoryStream/">MemoryStream</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/types/Parameters/">Parameters</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/utils/StreamScope/">StreamScope</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">OpenRigLogic</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+          <li class="breadcrumb-item">status</li>
+      <li class="breadcrumb-item active">Status</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="api-reference-statusstatus">API Reference — <code>status/Status</code></h1>
+<hr />
+<!-- ink:api name="HookFunction" module="status/Status" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="hookfunction"><code>HookFunction</code></h2>
+<p>A function pointer type for intercepting and overriding status messages and their interpolation arguments before they are used.</p>
+<h3 id="why-this-exists">Why this exists</h3>
+<p>Callers may want to customize how status messages or their <code>const char*</code> arguments are rendered (for example, translating messages or sanitizing arguments) without modifying <code>StatusProvider</code>/<code>Status</code> themselves. <code>HookFunction</code> defines the fixed signature — <code>(StatusCode, std::size_t, const char*) -&gt; const char*</code> — that any such override must implement, where the <code>std::size_t</code> index distinguishes the message itself (index 0) from each interpolation argument (index 1+).</p>
+<h3 id="relationships">Relationships</h3>
+<ul>
+<li><code>Status</code> — <em>exposes <code>getHook</code>/<code>setHook</code> to install a <code>HookFunction</code>.</em></li>
+<li><code>StatusProvider</code> — <em>invokes the installed hook via <code>execHook</code> while formatting status messages.</em></li>
+</ul>
+<!-- ink:api-end name="HookFunction" -->
+
+<!-- ink:api name="Status" module="status/Status" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="class-scapi-status"><code>class SCAPI Status</code></h2>
+<p>Provides read access to the current status and lets callers install a hook to intercept status messages and arguments.</p>
+<h3 id="when-to-use-this">When to use this</h3>
+<p>Call <code>Status::isOk()</code> or <code>Status::get()</code> after invoking code that reports through <code>StatusProvider</code> to check whether an operation succeeded. Use <code>Status::setHook</code> when you need to intercept or transform status messages/arguments globally — for example, to redact sensitive values before they are formatted.</p>
+<h3 id="method-groups">Method groups</h3>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Methods</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Query</td>
+<td>isOk, get</td>
+</tr>
+<tr>
+<td>Hook</td>
+<td>getHook, setHook</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example">Example</h3>
+<pre><code class="language-cpp">if (!sc::Status::isOk()) {
+    sc::StatusCode code = sc::Status::get();
+    // inspect code.code / code.message
+}
+</code></pre>
+<h3 id="parameters">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hook</code></td>
+<td><code>HookFunction</code></td>
+<td>required (on <code>setHook</code>). The function to invoke for each status message and interpolation argument.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns">Returns</h3>
+<p><code>bool</code> (from <code>isOk</code>) — whether the current status represents success. <code>StatusCode</code> (from <code>get</code>) — the current status code and message. <code>HookFunction</code> (from <code>getHook</code>) — the currently installed hook, if any.</p>
+<h3 id="relationships_1">Relationships</h3>
+<ul>
+<li><code>HookFunction</code> — <em>the callback type installed and retrieved via <code>setHook</code>/<code>getHook</code>.</em></li>
+<li><code>StatusProvider</code> — <em>the counterpart class that reports the statuses <code>Status</code> reads.</em></li>
+</ul>
+<h3 id="watch-out-for">Watch out for</h3>
+<ul>
+<li><code>Status</code> holds global (static) state. In multi-threaded code, concurrent calls to <code>setHook()</code> and <code>isOk()</code> / <code>get()</code> are not guarded by the visible interface — establish external synchronization if the hook may be changed after initialization.</li>
+<li><code>setHook()</code> replaces any previously registered hook silently. If multiple subsystems need hook behavior, compose them manually before registering.</li>
+</ul>
+<!-- ink:api-end name="Status" -->
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../Provider/" class="btn btn-neutral float-left" title="Provider"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../StatusCode/" class="btn btn-neutral float-right" title="StatusCode">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../Provider/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../StatusCode/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

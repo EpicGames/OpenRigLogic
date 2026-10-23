@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://epicgames.github.io/OpenRigLogic/archive/api_ref/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Archived API Reference Entries - OpenRigLogic</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Archived API Reference Entries";
+        var mkdocs_page_input_path = "archive/api_ref.md";
+        var mkdocs_page_url = "/OpenRigLogic/archive/api_ref/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> OpenRigLogic
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../release_notes/">Release Notes</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../api/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >arrayview</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/arrayview/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/arrayview/ArrayView/">ArrayView</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/arrayview/StringView/">StringView</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >dna</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/dna/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/dna/BinaryStreamReader/">BinaryStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/dna/BinaryStreamWriter/">BinaryStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/dna/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/dna/JSONStreamReader/">JSONStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/dna/JSONStreamWriter/">JSONStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/dna/Reader/">Reader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/dna/StreamReader/">StreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/dna/StreamWriter/">StreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/dna/Writer/">Writer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/BehaviorReader/">BehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/BehaviorWriter/">BehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/DefinitionReader/">DefinitionReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/DefinitionWriter/">DefinitionWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/Descriptor/">Descriptor</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/DescriptorReader/">DescriptorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/DescriptorWriter/">DescriptorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/Geometry/">Geometry</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/GeometryReader/">GeometryReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/GeometryWriter/">GeometryWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/HeaderReader/">HeaderReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/HeaderWriter/">HeaderWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/JointBehaviorMetadata/">JointBehaviorMetadata</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/JointBehaviorMetadataReader/">JointBehaviorMetadataReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/JointBehaviorMetadataWriter/">JointBehaviorMetadataWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/MachineLearnedBehavior/">MachineLearnedBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorExt</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/MachineLearnedBehaviorExtReader/">MachineLearnedBehaviorExtReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/MachineLearnedBehaviorExtWriter/">MachineLearnedBehaviorExtWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/MachineLearnedBehaviorReader/">MachineLearnedBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/MachineLearnedBehaviorWriter/">MachineLearnedBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/RBFBehavior/">RBFBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/RBFBehaviorReader/">RBFBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/RBFBehaviorWriter/">RBFBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/Twist/">Twist</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/TwistSwingBehaviorReader/">TwistSwingBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/layers/TwistSwingBehaviorWriter/">TwistSwingBehaviorWriter</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/types/Vector3/">Vector3</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/dna/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >pma</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/pma/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/pma/MemoryResource/">MemoryResource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/pma/PolyAllocator/">PolyAllocator</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/pma/ScopedPtr/">ScopedPtr</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/pma/TypeDefs/">TypeDefs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >resources</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/pma/resources/AlignedMemoryResource/">AlignedMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/pma/resources/ArenaMemoryResource/">ArenaMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/pma/resources/DefaultMemoryResource/">DefaultMemoryResource</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/pma/utils/ManagedInstance/">ManagedInstance</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >riglogic</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/riglogic/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/riglogic/riglogic/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/riglogic/riglogic/RigInstance/">RigInstance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/riglogic/riglogic/RigLogic/">RigLogic</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/riglogic/riglogic/Stats/">Stats</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/riglogic/types/Aliases/">Aliases</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/riglogic/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >status</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/status/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/status/Provider/">Provider</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/status/Status/">Status</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/status/StatusCode/">StatusCode</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >tdm</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tdm/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tdm/Ang/">Ang</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tdm/Computations/">Computations</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tdm/CoordSys/">CoordSys</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tdm/Mat/">Mat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tdm/Quat/">Quat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tdm/Transforms/">Transforms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tdm/Types/">Types</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/tdm/Vec/">Vec</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >trio</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/trio/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/trio/Concepts/">Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../api/trio/Stream/">Stream</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >streams</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/trio/streams/FileStream/">FileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/trio/streams/MemoryMappedFileStream/">MemoryMappedFileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/trio/streams/MemoryStream/">MemoryStream</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/trio/types/Parameters/">Parameters</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../api/trio/utils/StreamScope/">StreamScope</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">OpenRigLogic</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Archived API Reference Entries</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="archived-api-reference-entries">Archived API Reference Entries</h1>
+<hr />
+<!-- ink:archived id="f6a7b8c9" name="const_pointer" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/arrayview/ArrayView.md" -->
+
+<!-- ink:api name="const_pointer" module="arrayview/ArrayView" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="const_pointer"><code>const_pointer</code></h2>
+<p>Read-only pointer-to-element type, returned by the const overloads of <code>data()</code>, <code>cbegin()</code>, and <code>cend()</code>.</p>
+<h3 id="fields">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>const_pointer</code></td>
+<td><code>const T*</code></td>
+<td>Always a const pointer regardless of whether <code>T</code> is itself const.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships">Relationships</h3>
+<ul>
+<li><code>ArrayViewTraits&lt;T&gt;</code> — defines <code>const_pointer</code>; <code>ArrayView&lt;T&gt;</code> re-exports it for const-qualified access methods</li>
+</ul>
+<!-- ink:api-end name="const_pointer" -->
+
+<hr />
+<!-- ink:archived id="d4e5f6a7" name="const_reference" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/arrayview/ArrayView.md" -->
+
+<!-- ink:api name="const_reference" module="arrayview/ArrayView" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="const_reference"><code>const_reference</code></h2>
+<p>Read-only lvalue-reference type for a single element inside an <code>ArrayView</code>.</p>
+<h3 id="fields_1">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>const_reference</code></td>
+<td><code>const T&amp;</code></td>
+<td>Always a const reference regardless of whether <code>T</code> itself is <code>const</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_1">Relationships</h3>
+<ul>
+<li><code>ArrayViewTraits&lt;T&gt;</code> — defines <code>const_reference</code>; <code>ArrayView&lt;T&gt;</code> re-exports it for the const <code>operator[]</code> overload</li>
+</ul>
+<!-- ink:api-end name="const_reference" -->
+
+<hr />
+<!-- ink:archived id="b8c9d0e1" name="difference_type" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/arrayview/ArrayView.md" -->
+
+<!-- ink:api name="difference_type" module="arrayview/ArrayView" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="difference_type"><code>difference_type</code></h2>
+<p>Signed integer type for pointer differences and iterator distance calculations in <code>ArrayView</code>.</p>
+<h3 id="fields_2">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>difference_type</code></td>
+<td><code>std::ptrdiff_t</code></td>
+<td>Platform-native signed difference type. Satisfies the <code>std::random_access_iterator</code> <code>difference_type</code> requirement.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_2">Relationships</h3>
+<ul>
+<li><code>ArrayViewTraits&lt;T&gt;</code> — defines <code>difference_type</code>; re-exported by <code>ArrayView&lt;T&gt;</code> to satisfy iterator concept requirements</li>
+</ul>
+<!-- ink:api-end name="difference_type" -->
+
+<hr />
+<!-- ink:archived id="e5f6a7b8" name="pointer" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/arrayview/ArrayView.md" -->
+
+<!-- ink:api name="pointer" module="arrayview/ArrayView" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="pointer"><code>pointer</code></h2>
+<p>Pointer-to-element type for an <code>ArrayView</code>, used by <code>data()</code>, <code>begin()</code>, and <code>end()</code>.</p>
+<h3 id="fields_3">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pointer</code></td>
+<td><code>T*</code> (primary) / <code>const T*</code> (const specialisation)</td>
+<td>Mutable pointer in the primary template; read-only pointer when <code>T</code> is const-qualified.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_3">Relationships</h3>
+<ul>
+<li><code>ArrayViewTraits&lt;T&gt;</code> — defines <code>pointer</code>; <code>ArrayView&lt;T&gt;</code> re-exports it for <code>data()</code>, <code>begin()</code>, and <code>end()</code> return types</li>
+</ul>
+<!-- ink:api-end name="pointer" -->
+
+<hr />
+<!-- ink:archived id="c3d4e5f6" name="reference" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/arrayview/ArrayView.md" -->
+
+<!-- ink:api name="reference" module="arrayview/ArrayView" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="reference"><code>reference</code></h2>
+<p>Lvalue-reference type for a single element inside an <code>ArrayView</code>.</p>
+<h3 id="fields_4">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>reference</code></td>
+<td><code>T&amp;</code> (primary) / <code>const T&amp;</code> (const specialisation)</td>
+<td>Mutable reference in the primary template; read-only reference when <code>T</code> is const.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_4">Relationships</h3>
+<ul>
+<li><code>ArrayViewTraits&lt;T&gt;</code> — defines <code>reference</code>; <code>ArrayView&lt;T&gt;</code> re-exports it via <code>operator[]</code> return type</li>
+</ul>
+<!-- ink:api-end name="reference" -->
+
+<hr />
+<!-- ink:archived id="a7b8c9d0" name="size_type" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/arrayview/ArrayView.md" -->
+
+<!-- ink:api name="size_type" module="arrayview/ArrayView" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="size_type"><code>size_type</code></h2>
+<p>Unsigned integer type used for element counts and index arithmetic in <code>ArrayView</code>.</p>
+<h3 id="fields_5">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>size_type</code></td>
+<td><code>std::size_t</code></td>
+<td>Platform-native unsigned size type. Matches <code>size_type</code> in standard containers so <code>ArrayView</code> is range-compatible.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_5">Relationships</h3>
+<ul>
+<li><code>ArrayViewTraits&lt;T&gt;</code> — defines <code>size_type</code>; <code>ArrayView&lt;T&gt;</code> uses it for <code>size()</code>, <code>slice()</code>, and <code>operator[]</code> parameters</li>
+</ul>
+<!-- ink:api-end name="size_type" -->
+
+<hr />
+<!-- ink:archived id="b2c3d4e5" name="value_type" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/arrayview/ArrayView.md" -->
+
+<!-- ink:api name="value_type" module="arrayview/ArrayView" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="value_type"><code>value_type</code></h2>
+<p>The underlying element type of an <code>ArrayView&lt;T&gt;</code>, stripped of pointer or reference decoration.</p>
+<h3 id="fields_6">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>value_type</code></td>
+<td><code>T</code> (primary) / <code>const T</code> (const specialisation)</td>
+<td>The bare element type. <code>const T</code> when <code>T</code> is a <code>const</code>-qualified type.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_6">Relationships</h3>
+<ul>
+<li><code>ArrayViewTraits&lt;T&gt;</code> — defines <code>value_type</code>; <code>ArrayView&lt;T&gt;</code> re-exports it</li>
+</ul>
+<!-- ink:api-end name="value_type" -->
+
+<hr />
+<!-- ink:archived id="7c9d5e2a" name="Base" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/arrayview/StringView.md" -->
+
+<!-- ink:api name="Base" module="arrayview/StringView" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="base"><code>Base</code></h2>
+<p>Type alias for <code>ConstArrayView&lt;char&gt;</code>, declared inside <code>StringView</code> to name the immediate base class.</p>
+<h3 id="why-this-exists">Why this exists</h3>
+<p><code>Base</code> is a <code>using</code> declaration that gives the <code>StringView</code> implementation a stable, readable name for its parent type. It allows <code>StringView</code> to inherit <code>ArrayView</code> constructors via <code>using Base::ArrayView</code> without repeating the full template instantiation. This is a class-internal alias and is not part of the public API surface — external code should use <code>ConstArrayView&lt;char&gt;</code> or <code>StringView</code> directly.</p>
+<h3 id="relationships_7">Relationships</h3>
+<ul>
+<li><code>ConstArrayView&lt;char&gt;</code> — the aliased type; <code>Base</code> is exactly this type</li>
+<li><code>StringView</code> — the class that declares this alias</li>
+</ul>
+<!-- ink:api-end name="Base" -->
+
+<hr />
+<!-- ink:archived id="scan_file_./include/dna/JSONStreamReader.h/type" name="type" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/dna/JSONStreamReader.md" -->
+
+<!-- ink:api name="type" module="dna/JSONStreamReader" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="type"><code>type</code></h2>
+<p>Type alias that resolves to <code>pma::FactoryCreate&lt;dna::JSONStreamReader&gt;</code>, the factory creator policy used by <code>pma</code> managed infrastructure to construct <code>JSONStreamReader</code> instances.</p>
+<h3 id="why-this-exists_1">Why this exists</h3>
+<p>The <code>pma</code> customization-point protocol requires a nested <code>type</code> alias inside each <code>DefaultInstanceCreator</code> specialization. This alias is the single token that <code>pma</code> reads when it needs to know how to construct a <code>T</code> — here, delegating to <code>JSONStreamReader::create()</code>.</p>
+<h3 id="relationships_8">Relationships</h3>
+<ul>
+<li><code>DefaultInstanceCreator&lt;dna::JSONStreamReader&gt;</code> — the enclosing policy struct that declares this alias</li>
+<li><code>pma::FactoryCreate&lt;dna::JSONStreamReader&gt;</code> — the resolved type</li>
+</ul>
+<!-- ink:api-end name="type" -->
+
+<hr />
+<!-- ink:archived id="scan_file_./include/dna/JSONStreamWriter.h/type" name="type" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/dna/JSONStreamWriter.md" -->
+
+<!-- ink:api name="type" module="dna/JSONStreamWriter" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="using-type-pmafactorycreatednajsonstreamwriter"><code>using type = pma::FactoryCreate&lt;dna::JSONStreamWriter&gt;</code></h2>
+<p>Member alias inside <code>DefaultInstanceCreator&lt;dna::JSONStreamWriter&gt;</code> that resolves to the concrete factory creator type.</p>
+<h3 id="why-this-exists_2">Why this exists</h3>
+<p>This <code>using type</code> alias is the conventional member name expected by PMA's traits system. PMA utilities look up <code>DefaultInstanceCreator&lt;T&gt;::type</code> to find the factory functor to invoke when constructing a <code>T</code>. This alias makes <code>JSONStreamWriter</code> compatible with those utilities without any additional boilerplate.</p>
+<h3 id="relationships_9">Relationships</h3>
+<ul>
+<li><code>DefaultInstanceCreator&lt;dna::JSONStreamWriter&gt;</code> — the struct that contains this alias</li>
+<li><code>pma::FactoryCreate&lt;dna::JSONStreamWriter&gt;</code> — the concrete type this resolves to</li>
+</ul>
+<!-- ink:api-end name="type" -->
+
+<hr />
+<!-- ink:archived id="scan_file_./include/pma/PolyAllocator.h/rebind" name="rebind" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/pma/PolyAllocator.md" -->
+
+<!-- ink:api name="rebind" module="pma/PolyAllocator" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="rebindu"><code>rebind&lt;U&gt;</code></h2>
+<p>Produce a <code>PolyAllocator</code> for a different element type <code>U</code> while preserving the original alignment and <code>TDefaultMemoryResource</code> policy.</p>
+<h3 id="why-this-exists_3">Why this exists</h3>
+<p>Standard library containers such as <code>std::list</code> and <code>std::map</code> internally allocate node types that differ from the user-facing element type. The <code>rebind</code> mechanism is how the standard mandates that an allocator expose a way to clone itself for these internal types. Without <code>rebind</code>, containers that need to allocate auxiliary objects alongside <code>T</code> cannot use a typed allocator. <code>PolyAllocator::rebind&lt;U&gt;::other</code> satisfies that contract by keeping the same resource and alignment while changing only the element type.</p>
+<h3 id="fields_7">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>other</code></td>
+<td><code>PolyAllocator&lt;U, Alignment, TDefaultMemoryResource&gt;</code></td>
+<td>required — the rebound allocator type for element type <code>U</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_10">Relationships</h3>
+<ul>
+<li><code>PolyAllocator</code> — the outer class that declares this struct; <code>rebind</code> is always accessed as <code>PolyAllocator&lt;T,...&gt;::rebind&lt;U&gt;::other</code></li>
+<li><code>std::allocator_traits</code> — the standard trait layer that queries <code>rebind::other</code> on behalf of containers</li>
+</ul>
+<!-- ink:api-end name="rebind" -->
+
+<hr />
+<!-- ink:archived id="d4e5f6a7" name="type" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/riglogic/riglogic/RigInstance.md" -->
+
+<!-- ink:api name="type" module="riglogic/riglogic/RigInstance" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="type-trait-member-alias-in-pmadefaultinstancecreatorrl4riginstance-and-pmadefaultinstancedestroyerrl4riginstance"><code>type</code> (trait member alias in <code>pma::DefaultInstanceCreator&lt;rl4::RigInstance&gt;</code> and <code>pma::DefaultInstanceDestroyer&lt;rl4::RigInstance&gt;</code>)</h2>
+<p>The conventional C++ traits <code>type</code> member that names the selected creation or destruction policy for <code>rl4::RigInstance</code> within the <code>pma</code> framework.</p>
+<h3 id="why-this-exists_4">Why this exists</h3>
+<p>C++ traits structs expose their result through a nested <code>type</code> member by convention (<code>std::type_traits</code> style). Both <code>DefaultInstanceCreator&lt;rl4::RigInstance&gt;::type</code> (<code>FactoryCreate&lt;rl4::RigInstance&gt;</code>) and <code>DefaultInstanceDestroyer&lt;rl4::RigInstance&gt;::type</code> (<code>FactoryDestroy&lt;rl4::RigInstance&gt;</code>) follow this pattern so the <code>pma</code> framework can uniformly extract the policy via <code>typename Traits::type</code>.</p>
+<h3 id="fields_8">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code> (creator)</td>
+<td><code>FactoryCreate&lt;rl4::RigInstance&gt;</code></td>
+<td>Creation policy; used by <code>pma</code> to allocate <code>RigInstance</code> via the factory</td>
+</tr>
+<tr>
+<td><code>type</code> (destroyer)</td>
+<td><code>FactoryDestroy&lt;rl4::RigInstance&gt;</code></td>
+<td>Destruction policy; used by <code>pma</code> to release <code>RigInstance</code> via the factory</td>
+</tr>
+</tbody>
+</table>
+<!-- ink:api-end name="type" -->
+
+<hr />
+<!-- ink:archived id="scan_file_./include/riglogic/riglogic/RigLogic.h/type" name="type" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/riglogic/riglogic/RigLogic.md" -->
+
+<!-- ink:api name="type" module="riglogic/riglogic/RigLogic" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="type_1"><code>type</code></h2>
+<p>Type alias member within the <code>DefaultInstanceCreator</code> and <code>DefaultInstanceDestroyer</code> specializations for <code>rl4::RigLogic</code>; resolves to the factory strategy type used by the <code>pma</code> ownership infrastructure.</p>
+<h3 id="relationships_11">Relationships</h3>
+<ul>
+<li><code>DefaultInstanceCreator&lt;rl4::RigLogic&gt;</code> — defines <code>type = FactoryCreate&lt;rl4::RigLogic&gt;</code></li>
+<li><code>DefaultInstanceDestroyer&lt;rl4::RigLogic&gt;</code> — defines <code>type = FactoryDestroy&lt;rl4::RigLogic&gt;</code></li>
+</ul>
+<!-- ink:api-end name="type" -->
+
+<hr />
+<!-- ink:archived id="c3d4e5f6" name="Type" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/status/Provider.md" -->
+
+<!-- ink:api name="Type" module="status/Provider" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="make0-offset-istype"><code>Make&lt;0, Offset, Is...&gt;::Type</code></h2>
+<p>Nested type alias that exposes the fully assembled <code>ISeq</code> when <code>Make</code>'s recursion terminates.</p>
+<h3 id="why-this-exists_5">Why this exists</h3>
+<p>C++ template metaprogramming requires a metafunction to expose its result through a nested type alias so callers can retrieve it with <code>typename Make&lt;N, O&gt;::Type</code>. <code>Type</code> is the terminus of <code>Make</code>'s recursion: when <code>Size</code> reaches zero, the accumulated pack <code>Is...</code> is exactly <code>[Offset, Offset+Size)</code>, and <code>Type</code> names the resulting <code>ISeq</code>. The <code>MakeISeq</code> alias exists specifically to hide this <code>::Type</code> access from call sites.</p>
+<h3 id="relationships_12">Relationships</h3>
+<ul>
+<li><code>Make</code> — the metafunction that defines this alias in its base case</li>
+<li><code>ISeq</code> — the concrete type this alias resolves to</li>
+<li><code>MakeISeq</code> — <code>using MakeISeq = typename Make&lt;Size, Offset&gt;::Type</code> — the preferred accessor</li>
+</ul>
+<!-- ink:api-end name="Type" -->
+
+<hr />
+<!-- ink:archived id="scan_file_./include/tdm/Ang.h/value_type" name="value_type" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/tdm/Ang.md" -->
+
+<!-- ink:api name="value_type" module="tdm/Ang" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="value_type_1"><code>value_type</code></h2>
+<p>The numeric scalar type used to store the angle magnitude inside an <code>ang&lt;T, TUnit&gt;</code> instance.</p>
+<h3 id="why-this-exists_6">Why this exists</h3>
+<p><code>value_type</code> exposes the template parameter <code>T</code> as a named member type alias following the standard library convention (<code>std::vector&lt;T&gt;::value_type</code>, etc.). Generic code that operates on <code>ang</code> specializations can use <code>ang&lt;T, TUnit&gt;::value_type</code> to inspect or rebind the underlying scalar type without hard-coding the template argument.</p>
+<h3 id="fields_9">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>value_type</code></td>
+<td>alias for <code>T</code></td>
+<td>required — the scalar floating-point type (e.g., <code>float</code>, <code>double</code>) used to store the angle's numeric magnitude</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_13">Relationships</h3>
+<ul>
+<li><code>ang&lt;T, TUnit&gt;</code> — the containing struct that declares this alias</li>
+<li><code>value</code> — the <code>ang</code> member whose type is <code>value_type</code></li>
+</ul>
+<!-- ink:api-end name="value_type" -->
+
+<hr />
+<!-- ink:archived id="scan_file_./include/tdm/Mat.h/column_type" name="column_type" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/tdm/Mat.md" -->
+
+<!-- ink:api name="column_type" module="tdm/Mat" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="matr-c-tcolumn_type"><code>mat&lt;R, C, T&gt;::column_type</code></h2>
+<p>Type alias for a single column of a <code>mat&lt;R, C, T&gt;</code> matrix — a <code>vec&lt;R, T&gt;</code> vector with R elements.</p>
+<h3 id="why-this-exists_7">Why this exists</h3>
+<p>Names the column vector type with R components, which is distinct from <code>row_type</code> in non-square matrices. The <code>rows()</code> static method returns <code>column_type::dimensions()</code> (R), making explicit that the row count equals the column vector height. Generic code receiving a column vector from matrix operations can use this alias to determine the expected type without inspecting the R template parameter directly.</p>
+<h3 id="relationships_14">Relationships</h3>
+<ul>
+<li><code>row_type</code> — <code>vec&lt;C, value_type&gt;</code>: the corresponding row vector type.</li>
+<li><code>from_columns</code> — factory method that takes <code>C</code> arguments of this type.</li>
+</ul>
+<!-- ink:api-end name="column_type" -->
+
+<hr />
+<!-- ink:archived id="scan_file_./include/tdm/Mat.h/row_type" name="row_type" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/tdm/Mat.md" -->
+
+<!-- ink:api name="row_type" module="tdm/Mat" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="matr-c-trow_type"><code>mat&lt;R, C, T&gt;::row_type</code></h2>
+<p>Type alias for a single row of a <code>mat&lt;R, C, T&gt;</code> matrix — a <code>vec&lt;C, T&gt;</code> vector with C elements.</p>
+<h3 id="why-this-exists_8">Why this exists</h3>
+<p>Names the concrete row vector type so that generic algorithms and <code>from_rows</code> factory callers can construct row arguments at the correct width without repeating the column dimension. The internal <code>values[R]</code> storage array is an array of <code>row_type</code>, so iterating rows operates directly on this type.</p>
+<h3 id="relationships_15">Relationships</h3>
+<ul>
+<li><code>column_type</code> — <code>vec&lt;R, value_type&gt;</code>: the corresponding column vector type.</li>
+<li><code>from_rows</code> — factory method that takes <code>R</code> arguments of this type.</li>
+</ul>
+<!-- ink:api-end name="row_type" -->
+
+<hr />
+<!-- ink:archived id="scan_file_./include/tdm/Mat.h/value_type" name="value_type" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/tdm/Mat.md" -->
+
+<!-- ink:api name="value_type" module="tdm/Mat" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="matr-c-tvalue_type"><code>mat&lt;R, C, T&gt;::value_type</code></h2>
+<p>Type alias for the scalar element type <code>T</code> of a <code>mat&lt;R, C, T&gt;</code> matrix.</p>
+<h3 id="why-this-exists_9">Why this exists</h3>
+<p>Follows the C++ standard container convention so that generic code can write <code>typename Mat::value_type</code> to recover the element type without knowing the concrete instantiation. This enables template utilities to operate uniformly on <code>mat</code>, <code>vec</code>, and standard containers.</p>
+<h3 id="relationships_16">Relationships</h3>
+<ul>
+<li><code>row_type</code> — <code>vec&lt;C, value_type&gt;</code>: each row stores elements of this type.</li>
+<li><code>column_type</code> — <code>vec&lt;R, value_type&gt;</code>: each column stores elements of this type.</li>
+</ul>
+<!-- ink:api-end name="value_type" -->
+
+<hr />
+<!-- ink:archived id="api_scan" name="value_type" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/tdm/Quat.md" -->
+
+<!-- ink:api name="value_type" module="tdm/Quat" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="quattvalue_type"><code>quat&lt;T&gt;::value_type</code></h2>
+<p>Type alias that exposes the scalar component type of a <code>quat&lt;T&gt;</code> specialization.</p>
+<h3 id="why-this-exists_10">Why this exists</h3>
+<p>Following the C++ named requirement convention for numeric types, <code>value_type</code> lets generic code query the underlying scalar type of a <code>quat</code> without repeating the template argument. Use <code>quat&lt;T&gt;::value_type</code> in template contexts where you have a <code>quat</code> type but not the original <code>T</code>.</p>
+<h3 id="fields_10">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>value_type</code></td>
+<td><code>T</code></td>
+<td>required — aliases the template parameter <code>T</code> of the enclosing <code>quat&lt;T&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_17">Relationships</h3>
+<ul>
+<li><code>quat&lt;T&gt;</code> — the enclosing type that declares this alias</li>
+</ul>
+<!-- ink:api-end name="value_type" -->
+
+<hr />
+<!-- ink:archived id="scan_file_./include/tdm/Vec.h/value_type" name="value_type" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/tdm/Vec.md" -->
+
+<!-- ink:api name="value_type" module="tdm/Vec" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="value_type_2"><code>value_type</code></h2>
+<p>Member type alias that exposes the element type <code>T</code> of a <code>vec&lt;L, T&gt;</code> instantiation for use in generic template code.</p>
+<h3 id="why-this-exists_11">Why this exists</h3>
+<p><code>value_type</code> follows the standard C++ named-requirement convention (same as <code>std::vector&lt;T&gt;::value_type</code>), allowing generic algorithms and traits to query the scalar element type of any <code>vec&lt;L, T&gt;</code> without knowing the full specialization. This makes <code>vec</code> compatible with standard type-trait patterns such as <code>std::is_same&lt;typename SomeVec::value_type, float&gt;</code> and template deduction helpers.</p>
+<h3 id="fields_11">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>value_type</code></td>
+<td><code>T</code></td>
+<td>The scalar element type of this <code>vec</code> instantiation (e.g., <code>float</code> for <code>vec&lt;3, float&gt;</code>)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_18">Relationships</h3>
+<ul>
+<li><code>vec&lt;L, T&gt;</code> — the enclosing struct that declares this alias</li>
+<li><code>values[L]</code> — the underlying storage array whose element type is <code>value_type</code></li>
+</ul>
+<!-- ink:api-end name="value_type" -->
+
+<hr />
+<!-- ink:archived id="scan_file_./include/trio/streams/MemoryMappedFileStream.h/type" name="type" archived="2026-07-31" reason="not_api_surface" was="docs/wiki/api/trio/streams/MemoryMappedFileStream.md" -->
+
+<!-- ink:api name="type" module="trio/streams/MemoryMappedFileStream" last_commit="api_scan" confidence="__CONFIDENCE__" updated="2026-06-10" api_kind="data_shape" -->
+
+<h2 id="type-pma-traits-alias"><code>type</code> (pma traits alias)</h2>
+<p>The resolved factory or destroyer policy type carried by <code>DefaultInstanceCreator</code> and <code>DefaultInstanceDestroyer</code> trait specializations for <code>MemoryMappedFileStream</code>.</p>
+<h3 id="why-this-exists_12">Why this exists</h3>
+<p>In the <code>pma</code> traits system, the member alias <code>using type = ...</code> is the conventional way to expose the selected policy to generic code (e.g., <code>typename DefaultInstanceCreator&lt;T&gt;::type</code>). For <code>MemoryMappedFileStream</code>, this resolves to <code>FactoryCreate&lt;trio::MemoryMappedFileStream&gt;</code> (in the creator) or <code>FactoryDestroy&lt;trio::MemoryMappedFileStream&gt;</code> (in the destroyer). Client code that accesses <code>::type</code> receives the concrete factory or destructor functor without needing to name it explicitly.</p>
+<h3 id="relationships_19">Relationships</h3>
+<ul>
+<li><code>DefaultInstanceCreator&lt;trio::MemoryMappedFileStream&gt;</code> — the creator trait that holds <code>type = FactoryCreate&lt;...&gt;</code></li>
+<li><code>DefaultInstanceDestroyer&lt;trio::MemoryMappedFileStream&gt;</code> — the destroyer trait that holds <code>type = FactoryDestroy&lt;...&gt;</code></li>
+</ul>
+<!-- ink:api-end name="type" -->
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

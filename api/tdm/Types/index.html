@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://epicgames.github.io/OpenRigLogic/api/tdm/Types/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Types - OpenRigLogic</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Types";
+        var mkdocs_page_input_path = "api/tdm/Types.md";
+        var mkdocs_page_url = "/OpenRigLogic/api/tdm/Types/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> OpenRigLogic
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../release_notes/">Release Notes</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >arrayview</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/ArrayView/">ArrayView</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/StringView/">StringView</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >dna</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/BinaryStreamReader/">BinaryStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/BinaryStreamWriter/">BinaryStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/JSONStreamReader/">JSONStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/JSONStreamWriter/">JSONStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Reader/">Reader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/StreamReader/">StreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/StreamWriter/">StreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Writer/">Writer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/BehaviorReader/">BehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/BehaviorWriter/">BehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DefinitionReader/">DefinitionReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DefinitionWriter/">DefinitionWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Descriptor/">Descriptor</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DescriptorReader/">DescriptorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DescriptorWriter/">DescriptorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Geometry/">Geometry</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/GeometryReader/">GeometryReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/GeometryWriter/">GeometryWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/HeaderReader/">HeaderReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/HeaderWriter/">HeaderWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadata/">JointBehaviorMetadata</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadataReader/">JointBehaviorMetadataReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadataWriter/">JointBehaviorMetadataWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehavior/">MachineLearnedBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorExt</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExtReader/">MachineLearnedBehaviorExtReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExtWriter/">MachineLearnedBehaviorExtWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorReader/">MachineLearnedBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorWriter/">MachineLearnedBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehavior/">RBFBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehaviorReader/">RBFBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehaviorWriter/">RBFBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Twist/">Twist</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/TwistSwingBehaviorReader/">TwistSwingBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/TwistSwingBehaviorWriter/">TwistSwingBehaviorWriter</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/types/Vector3/">Vector3</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >pma</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/MemoryResource/">MemoryResource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/PolyAllocator/">PolyAllocator</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/ScopedPtr/">ScopedPtr</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/TypeDefs/">TypeDefs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >resources</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/AlignedMemoryResource/">AlignedMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/ArenaMemoryResource/">ArenaMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/DefaultMemoryResource/">DefaultMemoryResource</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/utils/ManagedInstance/">ManagedInstance</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >riglogic</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigInstance/">RigInstance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigLogic/">RigLogic</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Stats/">Stats</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/types/Aliases/">Aliases</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >status</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/Provider/">Provider</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/Status/">Status</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/StatusCode/">StatusCode</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >tdm</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Ang/">Ang</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Computations/">Computations</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../CoordSys/">CoordSys</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Mat/">Mat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Quat/">Quat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Transforms/">Transforms</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Types</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#ang">ang</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#axis_dir">axis_dir</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_1">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_1">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#chirality">chirality</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_2">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields_1">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_2">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#coord_sys">coord_sys</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_3">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_3">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#deg">deg</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#construction">Construction</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_4">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#deg3">deg3</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#construction_1">Construction</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_5">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#impldegrees">impl::degrees</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_4">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_6">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dim_t">dim_t</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_5">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_7">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fdeg">fdeg</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_6">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_8">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fdeg3">fdeg3</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_7">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_9">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fmat">fmat</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_8">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_10">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fmat2">fmat2</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_11">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fmat3">fmat3</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_12">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fmat4">fmat4</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_13">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fquat">fquat</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_9">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_14">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#frad">frad</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_10">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_15">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#frad3">frad3</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_11">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_16">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fvec">fvec</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_12">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_17">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fvec2">fvec2</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#construction_2">Construction</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_18">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fvec3">fvec3</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#construction_3">Construction</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_19">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fvec4">fvec4</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#construction_4">Construction</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_20">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#imat">imat</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_13">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_21">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#imat2">imat2</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_22">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#imat3">imat3</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_23">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#imat4">imat4</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_24">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#ivec">ivec</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_14">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_25">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#ivec2">ivec2</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#construction_5">Construction</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_26">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#ivec3">ivec3</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#construction_6">Construction</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_27">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#ivec4">ivec4</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#construction_7">Construction</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_28">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#mat">mat</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_15">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_29">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#mat2">mat2</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_30">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#mat3">mat3</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_31">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#mat4">mat4</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_32">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#quat">quat</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_16">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_33">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#rad">rad</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#construction_8">Construction</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_34">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#rad3">rad3</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#construction_9">Construction</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_35">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#implradians">impl::radians</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_17">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_36">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#rot_dir">rot_dir</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_18">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields_2">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_37">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#rot_seq">rot_seq</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_19">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields_3">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_38">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#rot_sign">rot_sign</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_20">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields_4">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_39">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#vecdim_t-l-typename-t">vec&lt;dim_t L, typename T&gt;</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_21">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_40">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#vec2t-vec2-t">vec2&lt;T&gt; = vec&lt;2, T&gt;</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_41">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#vec3t-vec3-t">vec3&lt;T&gt; = vec&lt;3, T&gt;</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_42">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#vec4t-vec4-t">vec4&lt;T&gt; = vec&lt;4, T&gt;</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_43">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Vec/">Vec</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >trio</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/Concepts/">Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/Stream/">Stream</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >streams</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/FileStream/">FileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/MemoryMappedFileStream/">MemoryMappedFileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/MemoryStream/">MemoryStream</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/types/Parameters/">Parameters</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/utils/StreamScope/">StreamScope</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">OpenRigLogic</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+          <li class="breadcrumb-item">tdm</li>
+      <li class="breadcrumb-item active">Types</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="api-reference-tdmtypes">API Reference — <code>tdm/Types</code></h1>
+<hr />
+<!-- ink:api name="ang" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="ang"><code>ang</code></h2>
+<p>Generic angle type parameterized by numeric type and angle unit (radians or degrees).</p>
+<h3 id="why-this-exists">Why this exists</h3>
+<p><code>ang</code> exists to make the angle unit part of the type system instead of a raw float that
+could silently be radians in one place and degrees in another. Its second template
+parameter, <code>TUnit</code> (<code>impl::radians</code> or <code>impl::degrees</code>), enforces that a value's unit is
+explicit at the type level, preventing unit-mismatch bugs at call sites.</p>
+<h3 id="relationships">Relationships</h3>
+<ul>
+<li><code>deg</code>, <code>rad</code> — <em>the degree- and radian-unit specializations of this template</em></li>
+<li><code>impl::radians</code>, <code>impl::degrees</code> — <em>the tag types used as <code>TUnit</code></em></li>
+</ul>
+<!-- ink:api-end name="ang" -->
+
+<!-- ink:api name="axis_dir" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="axis_dir"><code>axis_dir</code></h2>
+<p>Enumerates the six named spatial directions (left, right, up, down, front, back) used to describe how a coordinate system's axes map onto real-world directions.</p>
+<h3 id="why-this-exists_1">Why this exists</h3>
+<p>Different engines and tools disagree on which axis points "up" or "forward." <code>axis_dir</code> gives a coordinate system definition (<code>coord_sys</code>) a way to state, per axis, which real-world direction it points in, so conversions between coordinate conventions (e.g., Maya vs. Unreal) can be done mechanically instead of by convention memorized in code comments.</p>
+<h3 id="fields">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>left</code>, <code>right</code>, <code>up</code>, <code>down</code>, <code>front</code>, <code>back</code></td>
+<td>enumerators</td>
+<td>Named spatial directions an axis can be mapped to.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_1">Relationships</h3>
+<ul>
+<li><code>coord_sys</code> — <em>coordinate system definition built from <code>axis_dir</code> mappings</em></li>
+<li><code>chirality</code> — <em>handedness implied by a combination of <code>axis_dir</code> values</em></li>
+</ul>
+<!-- ink:api-end name="axis_dir" -->
+
+<!-- ink:api name="chirality" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="chirality"><code>chirality</code></h2>
+<p>Enumerates the handedness (left- or right-handed) of a coordinate system.</p>
+<h3 id="why-this-exists_2">Why this exists</h3>
+<p>Coordinate-system handedness affects the sign of cross products and rotation direction, and silently assuming the wrong handedness is a common source of mirrored or inverted transforms. <code>chirality</code> makes this an explicit, checkable property rather than an implicit convention.</p>
+<h3 id="fields_1">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>left</code></td>
+<td>enumerator (<code>-1</code>)</td>
+<td>Left-handed coordinate system.</td>
+</tr>
+<tr>
+<td><code>right</code></td>
+<td>enumerator (<code>1</code>)</td>
+<td>Right-handed coordinate system.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_2">Relationships</h3>
+<ul>
+<li><code>coord_sys</code> — <em>coordinate system definition that carries a <code>chirality</code> value</em></li>
+<li><code>axis_dir</code> — <em>axis directions whose combination determines a system's chirality</em></li>
+</ul>
+<!-- ink:api-end name="chirality" -->
+
+<!-- ink:api name="coord_sys" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="coord_sys"><code>coord_sys</code></h2>
+<p>Forward-declared type describing a coordinate system's axis directions, handedness, and rotation conventions as a single value.</p>
+<h3 id="why-this-exists_3">Why this exists</h3>
+<p><code>coord_sys</code> exists to bundle the pieces that define a coordinate convention — <code>axis_dir</code> mappings, <code>chirality</code>, and <code>rot_sign</code> — into one describable value, rather than requiring code to reason about several independent enums whenever it needs to convert data between two coordinate conventions (e.g., different DCC tools or game engines).</p>
+<h3 id="relationships_3">Relationships</h3>
+<ul>
+<li><code>axis_dir</code> — <em>per-axis direction mapping used to build a <code>coord_sys</code></em></li>
+<li><code>chirality</code> — <em>handedness component of a <code>coord_sys</code></em></li>
+<li><code>rot_sign</code> — <em>rotation sign convention component of a <code>coord_sys</code></em></li>
+</ul>
+<!-- ink:api-end name="coord_sys" -->
+
+<!-- ink:api name="deg" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="deg"><code>deg</code></h2>
+<p>Alias for an angle value held in degrees, <code>ang&lt;T, impl::degrees&gt;</code>.</p>
+<h3 id="construction">Construction</h3>
+<pre><code class="language-cpp">fdeg heading{ 90.0f };
+</code></pre>
+<h3 id="relationships_4">Relationships</h3>
+<ul>
+<li><code>ang</code> — <em>the underlying generic angle template this alias specializes</em></li>
+<li><code>rad</code> — <em>the radian-unit counterpart of this alias</em></li>
+<li><code>deg3</code>, <code>fdeg</code>, <code>fdeg3</code> — <em>vector and float-specialized forms built on this alias</em></li>
+</ul>
+<!-- ink:api-end name="deg" -->
+
+<!-- ink:api name="deg3" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="deg3"><code>deg3</code></h2>
+<p>A 3-component vector of degree-unit angles, used for Euler rotations expressed in degrees.</p>
+<h3 id="construction_1">Construction</h3>
+<pre><code class="language-cpp">fdeg3 euler{ fdeg{0.0f}, fdeg{45.0f}, fdeg{90.0f} };
+</code></pre>
+<h3 id="relationships_5">Relationships</h3>
+<ul>
+<li><code>deg</code> — <em>the scalar angle type this vector is built from</em></li>
+<li><code>rad3</code> — <em>the radian-unit counterpart of this vector alias</em></li>
+<li><code>fdeg3</code> — <em>the float-specialized instantiation of this alias</em></li>
+</ul>
+<!-- ink:api-end name="deg3" -->
+
+<!-- ink:api name="degrees" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="impldegrees"><code>impl::degrees</code></h2>
+<p>Internal tag type used to mark an <code>ang&lt;T, TUnit&gt;</code> instantiation as holding a degree value.</p>
+<h3 id="why-this-exists_4">Why this exists</h3>
+<p><code>degrees</code> carries no data — it exists purely so the compiler can distinguish <code>deg&lt;T&gt;</code>
+from <code>rad&lt;T&gt;</code> at the type level, the counterpart to <code>impl::radians</code>.</p>
+<h3 id="relationships_6">Relationships</h3>
+<ul>
+<li><code>ang</code> — <em>the template this tag type parameterizes as <code>TUnit</code></em></li>
+<li><code>deg</code> — <em>the public alias built by pairing <code>ang&lt;T, impl::degrees&gt;</code></em></li>
+<li><code>radians</code> — <em>the sibling tag type for radian-unit values</em></li>
+</ul>
+<!-- ink:api-end name="degrees" -->
+
+<!-- ink:api name="dim_t" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="dim_t"><code>dim_t</code></h2>
+<p>An alias for <code>std::size_t</code>, used as the dimension/index type for <code>vec</code> and <code>mat</code> templates.</p>
+<h3 id="why-this-exists_5">Why this exists</h3>
+<p><code>dim_t</code> exists so that vector and matrix dimensions (<code>L</code>, <code>R</code>, <code>C</code>) and indices are expressed with one consistent, semantically named type across the library instead of scattering raw <code>std::size_t</code> or <code>int</code> through template parameters. This keeps <code>vec&lt;L, T&gt;</code> and <code>mat&lt;R, C, T&gt;</code> signatures self-documenting.</p>
+<h3 id="relationships_7">Relationships</h3>
+<ul>
+<li><code>vec</code> — <em>templated on <code>dim_t L</code> for its component count.</em></li>
+<li><code>mat</code> — <em>templated on <code>dim_t R, dim_t C</code> for its row/column counts.</em></li>
+</ul>
+<!-- ink:api-end name="dim_t" -->
+
+<!-- ink:api name="fdeg" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="fdeg"><code>fdeg</code></h2>
+<p>Single-precision degree-based angle alias, used wherever rotations are expressed in degrees instead of radians.</p>
+<h3 id="why-this-exists_6">Why this exists</h3>
+<p><code>fdeg</code> exists to keep unit semantics explicit at the type level — <code>deg&lt;float&gt;</code> self-documents that a value is an angle in degrees rather than an unadorned <code>float</code>, preventing accidental mixing of degree and radian values in arithmetic. It's the float-precision instantiation of the generic <code>deg&lt;T&gt;</code> template, mirroring the split between <code>fvec</code>/<code>fmat</code> and their generic counterparts elsewhere in <code>tdm::Types</code>.</p>
+<h3 id="relationships_8">Relationships</h3>
+<ul>
+<li><code>deg&lt;T&gt;</code> — <em>generic template <code>fdeg</code> instantiates for <code>float</code></em></li>
+<li><code>frad</code> — <em>radian counterpart; convert between the two rather than mixing units</em></li>
+<li><code>fdeg3</code> — <em>3-component vector of <code>fdeg</code> angles (e.g., Euler angles)</em></li>
+</ul>
+<!-- ink:api-end name="fdeg" -->
+
+<!-- ink:api name="fdeg3" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="fdeg3"><code>fdeg3</code></h2>
+<p>A 3-component vector of single-precision degree angles, typically used to represent Euler-angle rotations (pitch/yaw/roll) in degrees.</p>
+<h3 id="why-this-exists_7">Why this exists</h3>
+<p><code>fdeg3</code> exists so a triple of Euler angles carries its unit (degrees) and precision (float) in the type itself, rather than being a bare <code>vec3&lt;float&gt;</code> that could be mistaken for radians or a position. It is <code>vec3&lt;deg&lt;float&gt;&gt;</code> under the hood, reusing the generic <code>vec3</code> container instead of a bespoke struct.</p>
+<h3 id="relationships_9">Relationships</h3>
+<ul>
+<li><code>deg3&lt;T&gt;</code> — <em>generic template <code>fdeg3</code> instantiates for <code>float</code></em></li>
+<li><code>frad3</code> — <em>radian counterpart for the same 3-component rotation representation</em></li>
+<li><code>fdeg</code> — <em>scalar angle type that composes into <code>fdeg3</code></em></li>
+</ul>
+<!-- ink:api-end name="fdeg3" -->
+
+<!-- ink:api name="fmat" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="fmat"><code>fmat</code></h2>
+<p>Generic alias template for a floating-point matrix of given row and column counts.</p>
+<h3 id="why-this-exists_8">Why this exists</h3>
+<p><code>fmat</code> exists so floating-point matrices of different shapes share one alias template
+rather than being independently defined, specializing <code>mat&lt;R, C, T&gt;</code> with <code>T = float</code>
+for transforms and other continuous-valued matrices.</p>
+<h3 id="relationships_10">Relationships</h3>
+<ul>
+<li><code>mat</code> — <em>the underlying generic template <code>fmat</code> specializes with <code>T = float</code></em></li>
+<li><code>fmat2</code>, <code>fmat3</code>, <code>fmat4</code> — <em>fixed-shape aliases built from this template</em></li>
+<li><code>imat</code> — <em>the integer counterpart of this alias family</em></li>
+</ul>
+<!-- ink:api-end name="fmat" -->
+
+<!-- ink:api name="fmat2" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="fmat2"><code>fmat2</code></h2>
+<p>A 2x2 floating-point matrix.</p>
+<h3 id="relationships_11">Relationships</h3>
+<ul>
+<li><code>fmat</code> — <em>the shape-parameterized template this alias fixes to 2x2</em></li>
+<li><code>fmat3</code>, <code>fmat4</code> — <em>sibling fixed-shape float matrix aliases</em></li>
+</ul>
+<!-- ink:api-end name="fmat2" -->
+
+<!-- ink:api name="fmat3" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="fmat3"><code>fmat3</code></h2>
+<p>A 3x3 floating-point matrix.</p>
+<h3 id="relationships_12">Relationships</h3>
+<ul>
+<li><code>fmat</code> — <em>the shape-parameterized template this alias fixes to 3x3</em></li>
+<li><code>fmat2</code>, <code>fmat4</code> — <em>sibling fixed-shape float matrix aliases</em></li>
+<li><code>coord_sys</code> — <em>a coordinate frame type commonly represented with a <code>fmat3</code>-like orientation</em></li>
+</ul>
+<!-- ink:api-end name="fmat3" -->
+
+<!-- ink:api name="fmat4" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="fmat4"><code>fmat4</code></h2>
+<p>A 4x4 floating-point matrix, the standard type for affine transforms.</p>
+<h3 id="relationships_13">Relationships</h3>
+<ul>
+<li><code>fmat</code> — <em>the shape-parameterized template this alias fixes to 4x4</em></li>
+<li><code>fmat2</code>, <code>fmat3</code> — <em>sibling fixed-shape float matrix aliases</em></li>
+</ul>
+<!-- ink:api-end name="fmat4" -->
+
+<!-- ink:api name="fquat" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="fquat"><code>fquat</code></h2>
+<p>Single-precision quaternion type, the standard rotation representation used throughout <code>tdm</code> for 3D orientation.</p>
+<h3 id="why-this-exists_9">Why this exists</h3>
+<p><code>fquat</code> is the float-precision instantiation of the generic <code>quat&lt;T&gt;</code> template. Using a dedicated alias keeps rotation code readable and consistent with the rest of the library's <code>f</code>-prefixed float-precision aliases (<code>fvec</code>, <code>fmat</code>, <code>fdeg</code>).</p>
+<h3 id="relationships_14">Relationships</h3>
+<ul>
+<li><code>quat&lt;T&gt;</code> — <em>generic template <code>fquat</code> instantiates for <code>float</code></em></li>
+<li><code>fmat</code> — <em>matrix representation that a quaternion can be converted to</em></li>
+</ul>
+<!-- ink:api-end name="fquat" -->
+
+<!-- ink:api name="frad" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="frad"><code>frad</code></h2>
+<p>Single-precision radian-based angle alias, used wherever rotations are expressed in radians instead of degrees.</p>
+<h3 id="why-this-exists_10">Why this exists</h3>
+<p><code>frad</code> exists for the same reason as <code>fdeg</code> — to make the angle unit explicit at the type level and prevent radian/degree mixups in arithmetic. It is the float-precision instantiation of the generic <code>rad&lt;T&gt;</code> template.</p>
+<h3 id="relationships_15">Relationships</h3>
+<ul>
+<li><code>rad&lt;T&gt;</code> — <em>generic template <code>frad</code> instantiates for <code>float</code></em></li>
+<li><code>fdeg</code> — <em>degree counterpart; convert rather than mix units</em></li>
+<li><code>frad3</code> — <em>3-component vector of <code>frad</code> angles</em></li>
+</ul>
+<!-- ink:api-end name="frad" -->
+
+<!-- ink:api name="frad3" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="frad3"><code>frad3</code></h2>
+<p>A 3-component vector of single-precision radian angles, typically used to represent Euler-angle rotations in radians.</p>
+<h3 id="why-this-exists_11">Why this exists</h3>
+<p><code>frad3</code> mirrors <code>fdeg3</code> for radians — it is <code>vec3&lt;rad&lt;float&gt;&gt;</code>, keeping the unit and precision explicit in the type rather than relying on a bare <code>vec3&lt;float&gt;</code>.</p>
+<h3 id="relationships_16">Relationships</h3>
+<ul>
+<li><code>rad3&lt;T&gt;</code> — <em>generic template <code>frad3</code> instantiates for <code>float</code></em></li>
+<li><code>fdeg3</code> — <em>degree counterpart for the same rotation representation</em></li>
+<li><code>frad</code> — <em>scalar angle type that composes into <code>frad3</code></em></li>
+</ul>
+<!-- ink:api-end name="frad3" -->
+
+<!-- ink:api name="fvec" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="fvec"><code>fvec</code></h2>
+<p>Generic alias template for a floating-point vector of a given dimension.</p>
+<h3 id="why-this-exists_12">Why this exists</h3>
+<p><code>fvec</code> exists so floating-point vector types of different lengths share one template
+rather than being independently defined, mirroring <code>ivec</code> but with <code>T = float</code> for
+positions, directions, and other continuous values.</p>
+<h3 id="relationships_17">Relationships</h3>
+<ul>
+<li><code>vec</code> — <em>the underlying generic template <code>fvec</code> specializes with <code>T = float</code></em></li>
+<li><code>fvec2</code>, <code>fvec3</code>, <code>fvec4</code> — <em>fixed-length aliases built from this template</em></li>
+<li><code>ivec</code> — <em>the integer counterpart of this alias family</em></li>
+</ul>
+<!-- ink:api-end name="fvec" -->
+
+<!-- ink:api name="fvec2" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="fvec2"><code>fvec2</code></h2>
+<p>A 2-component floating-point vector.</p>
+<h3 id="construction_2">Construction</h3>
+<pre><code class="language-cpp">fvec2 uv{ 0.5f, 0.25f };
+</code></pre>
+<h3 id="relationships_18">Relationships</h3>
+<ul>
+<li><code>fvec</code> — <em>the length-parameterized template this alias fixes to length 2</em></li>
+<li><code>fvec3</code>, <code>fvec4</code> — <em>sibling fixed-length float vector aliases</em></li>
+</ul>
+<!-- ink:api-end name="fvec2" -->
+
+<!-- ink:api name="fvec3" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="fvec3"><code>fvec3</code></h2>
+<p>A 3-component floating-point vector.</p>
+<h3 id="construction_3">Construction</h3>
+<pre><code class="language-cpp">fvec3 position{ 0.0f, 1.5f, -3.2f };
+</code></pre>
+<h3 id="relationships_19">Relationships</h3>
+<ul>
+<li><code>fvec</code> — <em>the length-parameterized template this alias fixes to length 3</em></li>
+<li><code>fvec2</code>, <code>fvec4</code> — <em>sibling fixed-length float vector aliases</em></li>
+<li><code>rad3</code>, <code>deg3</code> — <em>angle-typed vec3 specializations used for Euler rotations</em></li>
+</ul>
+<!-- ink:api-end name="fvec3" -->
+
+<!-- ink:api name="fvec4" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="fvec4"><code>fvec4</code></h2>
+<p>A 4-component floating-point vector.</p>
+<h3 id="construction_4">Construction</h3>
+<pre><code class="language-cpp">fvec4 color{ 1.0f, 0.0f, 0.0f, 1.0f };
+</code></pre>
+<h3 id="relationships_20">Relationships</h3>
+<ul>
+<li><code>fvec</code> — <em>the length-parameterized template this alias fixes to length 4</em></li>
+<li><code>fvec2</code>, <code>fvec3</code> — <em>sibling fixed-length float vector aliases</em></li>
+</ul>
+<!-- ink:api-end name="fvec4" -->
+
+<!-- ink:api name="imat" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="imat"><code>imat</code></h2>
+<p>Generic alias template for an integer matrix of given row and column counts.</p>
+<h3 id="why-this-exists_13">Why this exists</h3>
+<p><code>imat</code> exists so integer matrices of different shapes share one alias template
+rather than being independently defined, specializing <code>mat&lt;R, C, T&gt;</code> with <code>T = int</code>.</p>
+<h3 id="relationships_21">Relationships</h3>
+<ul>
+<li><code>mat</code> — <em>the underlying generic template <code>imat</code> specializes with <code>T = int</code></em></li>
+<li><code>imat2</code>, <code>imat3</code>, <code>imat4</code> — <em>fixed-shape aliases built from this template</em></li>
+<li><code>fmat</code> — <em>the floating-point counterpart of this alias family</em></li>
+</ul>
+<!-- ink:api-end name="imat" -->
+
+<!-- ink:api name="imat2" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="imat2"><code>imat2</code></h2>
+<p>A 2x2 integer matrix.</p>
+<h3 id="relationships_22">Relationships</h3>
+<ul>
+<li><code>imat</code> — <em>the shape-parameterized template this alias fixes to 2x2</em></li>
+<li><code>imat3</code>, <code>imat4</code> — <em>sibling fixed-shape integer matrix aliases</em></li>
+</ul>
+<!-- ink:api-end name="imat2" -->
+
+<!-- ink:api name="imat3" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="imat3"><code>imat3</code></h2>
+<p>A 3x3 integer matrix.</p>
+<h3 id="relationships_23">Relationships</h3>
+<ul>
+<li><code>imat</code> — <em>the shape-parameterized template this alias fixes to 3x3</em></li>
+<li><code>imat2</code>, <code>imat4</code> — <em>sibling fixed-shape integer matrix aliases</em></li>
+</ul>
+<!-- ink:api-end name="imat3" -->
+
+<!-- ink:api name="imat4" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="imat4"><code>imat4</code></h2>
+<p>A 4x4 integer matrix.</p>
+<h3 id="relationships_24">Relationships</h3>
+<ul>
+<li><code>imat</code> — <em>the shape-parameterized template this alias fixes to 4x4</em></li>
+<li><code>imat2</code>, <code>imat3</code> — <em>sibling fixed-shape integer matrix aliases</em></li>
+</ul>
+<!-- ink:api-end name="imat4" -->
+
+<!-- ink:api name="ivec" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="ivec"><code>ivec</code></h2>
+<p>Generic alias template for an integer vector of a given dimension.</p>
+<h3 id="why-this-exists_14">Why this exists</h3>
+<p><code>ivec</code> exists so integer vector types of different lengths (2, 3, 4) share one template
+rather than being independently defined. It separates the "integer" element type from the
+generic <code>vec&lt;L, T&gt;</code> template used for all vector element types.</p>
+<h3 id="relationships_25">Relationships</h3>
+<ul>
+<li><code>vec</code> — <em>the underlying generic template <code>ivec</code> specializes with <code>T = int</code></em></li>
+<li><code>ivec2</code>, <code>ivec3</code>, <code>ivec4</code> — <em>fixed-length aliases built from this template</em></li>
+<li><code>fvec</code> — <em>the floating-point counterpart of this alias family</em></li>
+</ul>
+<!-- ink:api-end name="ivec" -->
+
+<!-- ink:api name="ivec2" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="ivec2"><code>ivec2</code></h2>
+<p>A 2-component integer vector.</p>
+<h3 id="construction_5">Construction</h3>
+<pre><code class="language-cpp">ivec2 pixel_coord{ 12, 34 };
+</code></pre>
+<h3 id="relationships_26">Relationships</h3>
+<ul>
+<li><code>ivec</code> — <em>the length-parameterized template this alias fixes to length 2</em></li>
+<li><code>ivec3</code>, <code>ivec4</code> — <em>sibling fixed-length integer vector aliases</em></li>
+</ul>
+<!-- ink:api-end name="ivec2" -->
+
+<!-- ink:api name="ivec3" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="ivec3"><code>ivec3</code></h2>
+<p>A 3-component integer vector.</p>
+<h3 id="construction_6">Construction</h3>
+<pre><code class="language-cpp">ivec3 voxel_coord{ 1, 2, 3 };
+</code></pre>
+<h3 id="relationships_27">Relationships</h3>
+<ul>
+<li><code>ivec</code> — <em>the length-parameterized template this alias fixes to length 3</em></li>
+<li><code>ivec2</code>, <code>ivec4</code> — <em>sibling fixed-length integer vector aliases</em></li>
+</ul>
+<!-- ink:api-end name="ivec3" -->
+
+<!-- ink:api name="ivec4" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="ivec4"><code>ivec4</code></h2>
+<p>A 4-component integer vector.</p>
+<h3 id="construction_7">Construction</h3>
+<pre><code class="language-cpp">ivec4 rect{ 0, 0, 128, 128 };
+</code></pre>
+<h3 id="relationships_28">Relationships</h3>
+<ul>
+<li><code>ivec</code> — <em>the length-parameterized template this alias fixes to length 4</em></li>
+<li><code>ivec2</code>, <code>ivec3</code> — <em>sibling fixed-length integer vector aliases</em></li>
+</ul>
+<!-- ink:api-end name="ivec4" -->
+
+<!-- ink:api name="mat" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="mat"><code>mat</code></h2>
+<p>Generic matrix template parameterized by row count, column count, and element type.</p>
+<h3 id="why-this-exists_15">Why this exists</h3>
+<p><code>mat</code> exists as the single generic definition backing every fixed-size matrix alias
+(<code>mat2</code>, <code>mat3</code>, <code>mat4</code>, and their <code>int</code>/<code>float</code> specializations <code>imat*</code>/<code>fmat*</code>).
+Keeping row/column/element-type as template parameters avoids duplicating matrix
+logic per size or type.</p>
+<h3 id="relationships_29">Relationships</h3>
+<ul>
+<li><code>mat2</code>, <code>mat3</code>, <code>mat4</code> — <em>square-matrix aliases built from this template</em></li>
+<li><code>imat</code>, <code>fmat</code> — <em>element-type-specialized alias templates built on <code>mat</code></em></li>
+</ul>
+<!-- ink:api-end name="mat" -->
+
+<!-- ink:api name="mat2" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="mat2"><code>mat2</code></h2>
+<p>A generic 2x2 matrix, parameterized only by element type <code>T</code>.</p>
+<h3 id="relationships_30">Relationships</h3>
+<ul>
+<li><code>mat</code> — <em>the underlying template this alias fixes to a 2x2 shape</em></li>
+<li><code>mat3</code>, <code>mat4</code> — <em>sibling square matrix aliases</em></li>
+<li><code>imat2</code>, <code>fmat2</code> — <em>fully-specialized int/float versions of this alias</em></li>
+</ul>
+<!-- ink:api-end name="mat2" -->
+
+<!-- ink:api name="mat3" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="mat3"><code>mat3</code></h2>
+<p>A generic 3x3 matrix, parameterized only by element type <code>T</code>.</p>
+<h3 id="relationships_31">Relationships</h3>
+<ul>
+<li><code>mat</code> — <em>the underlying template this alias fixes to a 3x3 shape</em></li>
+<li><code>mat2</code>, <code>mat4</code> — <em>sibling square matrix aliases</em></li>
+<li><code>imat3</code>, <code>fmat3</code> — <em>fully-specialized int/float versions of this alias</em></li>
+</ul>
+<!-- ink:api-end name="mat3" -->
+
+<!-- ink:api name="mat4" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="mat4"><code>mat4</code></h2>
+<p>A generic 4x4 matrix, parameterized only by element type <code>T</code>.</p>
+<h3 id="relationships_32">Relationships</h3>
+<ul>
+<li><code>mat</code> — <em>the underlying template this alias fixes to a 4x4 shape</em></li>
+<li><code>mat2</code>, <code>mat3</code> — <em>sibling square matrix aliases</em></li>
+<li><code>imat4</code>, <code>fmat4</code> — <em>fully-specialized int/float versions of this alias, commonly used for transforms</em></li>
+</ul>
+<!-- ink:api-end name="mat4" -->
+
+<!-- ink:api name="quat" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="quat"><code>quat</code></h2>
+<p>Generic quaternion template used to represent 3D rotations without the gimbal-lock and interpolation problems of Euler angles.</p>
+<h3 id="why-this-exists_16">Why this exists</h3>
+<p><code>quat</code> exists because Euler-angle triples (<code>deg3</code>/<code>rad3</code>) are unsuitable for interpolation and composition — quaternions give stable, commutative-friendly rotation composition and smooth interpolation (e.g., slerp). It is declared here as a forward declaration; the float specialization <code>fquat</code> is the commonly used instantiation.</p>
+<h3 id="relationships_33">Relationships</h3>
+<ul>
+<li><code>fquat</code> — <em>float-precision instantiation of this template</em></li>
+<li><code>fdeg3</code> / <code>frad3</code> — <em>Euler-angle representations that quaternions are often converted from/to</em></li>
+</ul>
+<!-- ink:api-end name="quat" -->
+
+<!-- ink:api name="rad" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="rad"><code>rad</code></h2>
+<p>Alias for an angle value held in radians, <code>ang&lt;T, impl::radians&gt;</code>.</p>
+<h3 id="construction_8">Construction</h3>
+<pre><code class="language-cpp">frad rotation{ 1.5708f };
+</code></pre>
+<h3 id="relationships_34">Relationships</h3>
+<ul>
+<li><code>ang</code> — <em>the underlying generic angle template this alias specializes</em></li>
+<li><code>deg</code> — <em>the degree-unit counterpart of this alias</em></li>
+<li><code>rad3</code>, <code>frad</code>, <code>frad3</code> — <em>vector and float-specialized forms built on this alias</em></li>
+</ul>
+<!-- ink:api-end name="rad" -->
+
+<!-- ink:api name="rad3" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="rad3"><code>rad3</code></h2>
+<p>A 3-component vector of radian-unit angles, used for Euler rotations expressed in radians.</p>
+<h3 id="construction_9">Construction</h3>
+<pre><code class="language-cpp">frad3 euler{ frad{0.0f}, frad{0.785f}, frad{1.571f} };
+</code></pre>
+<h3 id="relationships_35">Relationships</h3>
+<ul>
+<li><code>rad</code> — <em>the scalar angle type this vector is built from</em></li>
+<li><code>deg3</code> — <em>the degree-unit counterpart of this vector alias</em></li>
+<li><code>frad3</code> — <em>the float-specialized instantiation of this alias</em></li>
+</ul>
+<!-- ink:api-end name="rad3" -->
+
+<!-- ink:api name="radians" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="implradians"><code>impl::radians</code></h2>
+<p>Internal tag type used to mark an <code>ang&lt;T, TUnit&gt;</code> instantiation as holding a radian value.</p>
+<h3 id="why-this-exists_17">Why this exists</h3>
+<p><code>radians</code> carries no data — it exists purely so the compiler can distinguish <code>rad&lt;T&gt;</code>
+from <code>deg&lt;T&gt;</code> at the type level. This is what lets <code>ang</code> catch unit mismatches (e.g.
+passing degrees where radians are expected) as compile errors rather than runtime bugs.</p>
+<h3 id="relationships_36">Relationships</h3>
+<ul>
+<li><code>ang</code> — <em>the template this tag type parameterizes as <code>TUnit</code></em></li>
+<li><code>rad</code> — <em>the public alias built by pairing <code>ang&lt;T, impl::radians&gt;</code></em></li>
+<li><code>degrees</code> — <em>the sibling tag type for degree-unit values</em></li>
+</ul>
+<!-- ink:api-end name="radians" -->
+
+<!-- ink:api name="rot_dir" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="rot_dir"><code>rot_dir</code></h2>
+<p>Enumerates whether a rotation is applied in the positive or negative direction around an axis.</p>
+<h3 id="why-this-exists_18">Why this exists</h3>
+<p>Rotation sign convention (clockwise vs. counterclockwise) is another implicit assumption that varies between coordinate systems and tools; <code>rot_dir</code> makes it explicit per-axis rather than assumed globally.</p>
+<h3 id="fields_2">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>negative</code></td>
+<td>enumerator (<code>-1</code>)</td>
+<td>Rotation applied in the negative direction.</td>
+</tr>
+<tr>
+<td><code>positive</code></td>
+<td>enumerator (<code>1</code>)</td>
+<td>Rotation applied in the positive direction.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_37">Relationships</h3>
+<ul>
+<li><code>rot_sign</code> — <em>bundles a <code>rot_dir</code> value per axis (x, y, z)</em></li>
+<li><code>rot_seq</code> — <em>specifies the axis order that <code>rot_dir</code> signs apply to</em></li>
+</ul>
+<!-- ink:api-end name="rot_dir" -->
+
+<!-- ink:api name="rot_seq" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="rot_seq"><code>rot_seq</code></h2>
+<p>Enumerates the six orderings in which Euler-angle rotations around the X, Y, and Z axes can be composed.</p>
+<h3 id="why-this-exists_19">Why this exists</h3>
+<p>Euler-angle rotations are not commutative — the result differs depending on the order the axis rotations are applied in. <code>rot_seq</code> makes that order an explicit, checkable parameter instead of an implicit convention baked into calling code, so conversions between Euler angles and other representations (quaternions, matrices) can be done unambiguously.</p>
+<h3 id="fields_3">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>xyz</code>, <code>xzy</code>, <code>yxz</code>, <code>yzx</code>, <code>zxy</code>, <code>zyx</code></td>
+<td>enumerators</td>
+<td>The six possible axis-rotation application orders.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_38">Relationships</h3>
+<ul>
+<li><code>fdeg3</code> / <code>frad3</code> — <em>Euler-angle triples whose composition order this enum specifies</em></li>
+<li><code>rot_dir</code> — <em>direction convention applied alongside the rotation sequence</em></li>
+</ul>
+<!-- ink:api-end name="rot_seq" -->
+
+<!-- ink:api name="rot_sign" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="rot_sign"><code>rot_sign</code></h2>
+<p>Bundles the rotation direction convention for all three axes (x, y, z) of a coordinate system.</p>
+<h3 id="why-this-exists_20">Why this exists</h3>
+<p>Rather than tracking three separate <code>rot_dir</code> values, <code>rot_sign</code> groups them into one value representing a coordinate system's complete sign convention, which can then be passed around and compared as a unit alongside <code>rot_seq</code> and <code>chirality</code>.</p>
+<h3 id="fields_4">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x</code></td>
+<td><code>rot_dir</code></td>
+<td>Rotation direction convention for the X axis.</td>
+</tr>
+<tr>
+<td><code>y</code></td>
+<td><code>rot_dir</code></td>
+<td>Rotation direction convention for the Y axis.</td>
+</tr>
+<tr>
+<td><code>z</code></td>
+<td><code>rot_dir</code></td>
+<td>Rotation direction convention for the Z axis.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_39">Relationships</h3>
+<ul>
+<li><code>rot_dir</code> — <em>the per-axis value this struct bundles</em></li>
+<li><code>coord_sys</code> — <em>coordinate system definition that likely carries a <code>rot_sign</code></em></li>
+</ul>
+<!-- ink:api-end name="rot_sign" -->
+
+<!-- ink:api name="vec" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="vecdim_t-l-typename-t"><code>vec&lt;dim_t L, typename T&gt;</code></h2>
+<p>The base fixed-size vector template, parameterized on component count <code>L</code> and scalar type <code>T</code>.</p>
+<h3 id="why-this-exists_21">Why this exists</h3>
+<p><code>vec</code> exists to give fixed-size numeric arrays (positions, directions, colors) a single generic implementation instead of writing separate <code>vec2</code>/<code>vec3</code>/<code>vec4</code> structs by hand. <code>vec2</code>, <code>vec3</code>, and <code>vec4</code> are just convenience aliases (<code>vec&lt;2, T&gt;</code>, <code>vec&lt;3, T&gt;</code>, <code>vec&lt;4, T&gt;</code>) over this one template, so all dimensions share the same operations.</p>
+<h3 id="relationships_40">Relationships</h3>
+<ul>
+<li><code>vec2</code> — <em>alias for <code>vec&lt;2, T&gt;</code>.</em></li>
+<li><code>vec3</code> — <em>alias for <code>vec&lt;3, T&gt;</code>.</em></li>
+<li><code>vec4</code> — <em>alias for <code>vec&lt;4, T&gt;</code>.</em></li>
+<li><code>dim_t</code> — <em>the type used for the <code>L</code> template parameter.</em></li>
+</ul>
+<!-- ink:api-end name="vec" -->
+
+<!-- ink:api name="vec2" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="vec2t-vec2-t"><code>vec2&lt;T&gt; = vec&lt;2, T&gt;</code></h2>
+<p>A 2-component vector, for values like 2D coordinates or UVs.</p>
+<h3 id="relationships_41">Relationships</h3>
+<ul>
+<li><code>vec</code> — <em>the underlying generic template <code>vec2</code> aliases.</em></li>
+<li><code>ivec2</code>, <code>fvec2</code> — <em>common <code>vec2</code> instantiations for <code>int</code> and <code>float</code>.</em></li>
+</ul>
+<!-- ink:api-end name="vec2" -->
+
+<!-- ink:api name="vec3" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="vec3t-vec3-t"><code>vec3&lt;T&gt; = vec&lt;3, T&gt;</code></h2>
+<p>A 3-component vector, used throughout <code>tdm</code> for positions, directions, and scale factors.</p>
+<h3 id="relationships_42">Relationships</h3>
+<ul>
+<li><code>vec</code> — <em>the underlying generic template <code>vec3</code> aliases.</em></li>
+<li><code>ivec3</code>, <code>fvec3</code> — <em>common <code>vec3</code> instantiations for <code>int</code> and <code>float</code>.</em></li>
+<li><code>rad3</code>, <code>deg3</code> — <em>3-component vectors of angle types, built on <code>vec3</code>.</em></li>
+</ul>
+<!-- ink:api-end name="vec3" -->
+
+<!-- ink:api name="vec4" module="tdm/Types" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="vec4t-vec4-t"><code>vec4&lt;T&gt; = vec&lt;4, T&gt;</code></h2>
+<p>A 4-component vector, used for homogeneous coordinates (e.g. <code>[x, y, z, w]</code>) and quaternion-adjacent storage.</p>
+<h3 id="relationships_43">Relationships</h3>
+<ul>
+<li><code>vec</code> — <em>the underlying generic template <code>vec4</code> aliases.</em></li>
+<li><code>ivec4</code>, <code>fvec4</code> — <em>common <code>vec4</code> instantiations for <code>int</code> and <code>float</code>.</em></li>
+</ul>
+<!-- ink:api-end name="vec4" -->
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../Transforms/" class="btn btn-neutral float-left" title="Transforms"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../Vec/" class="btn btn-neutral float-right" title="Vec">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../Transforms/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../Vec/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

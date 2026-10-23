@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://epicgames.github.io/OpenRigLogic/api/tdm/Ang/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Ang - OpenRigLogic</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Ang";
+        var mkdocs_page_input_path = "api/tdm/Ang.md";
+        var mkdocs_page_url = "/OpenRigLogic/api/tdm/Ang/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> OpenRigLogic
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../release_notes/">Release Notes</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >arrayview</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/ArrayView/">ArrayView</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/StringView/">StringView</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >dna</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/BinaryStreamReader/">BinaryStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/BinaryStreamWriter/">BinaryStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/JSONStreamReader/">JSONStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/JSONStreamWriter/">JSONStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Reader/">Reader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/StreamReader/">StreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/StreamWriter/">StreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Writer/">Writer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/BehaviorReader/">BehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/BehaviorWriter/">BehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DefinitionReader/">DefinitionReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DefinitionWriter/">DefinitionWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Descriptor/">Descriptor</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DescriptorReader/">DescriptorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DescriptorWriter/">DescriptorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Geometry/">Geometry</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/GeometryReader/">GeometryReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/GeometryWriter/">GeometryWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/HeaderReader/">HeaderReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/HeaderWriter/">HeaderWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadata/">JointBehaviorMetadata</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadataReader/">JointBehaviorMetadataReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadataWriter/">JointBehaviorMetadataWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehavior/">MachineLearnedBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorExt</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExtReader/">MachineLearnedBehaviorExtReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExtWriter/">MachineLearnedBehaviorExtWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorReader/">MachineLearnedBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorWriter/">MachineLearnedBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehavior/">RBFBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehaviorReader/">RBFBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehaviorWriter/">RBFBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Twist/">Twist</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/TwistSwingBehaviorReader/">TwistSwingBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/TwistSwingBehaviorWriter/">TwistSwingBehaviorWriter</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/types/Vector3/">Vector3</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >pma</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/MemoryResource/">MemoryResource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/PolyAllocator/">PolyAllocator</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/ScopedPtr/">ScopedPtr</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/TypeDefs/">TypeDefs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >resources</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/AlignedMemoryResource/">AlignedMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/ArenaMemoryResource/">ArenaMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/DefaultMemoryResource/">DefaultMemoryResource</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/utils/ManagedInstance/">ManagedInstance</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >riglogic</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigInstance/">RigInstance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigLogic/">RigLogic</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Stats/">Stats</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/types/Aliases/">Aliases</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >status</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/Provider/">Provider</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/Status/">Status</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/StatusCode/">StatusCode</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >tdm</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Ang</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#ang">ang</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#construction">Construction</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships">Relationships</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#constraints">Constraints</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templatetypename-t-t-degreest-radians">template&lt;typename T&gt; T degrees(T radians)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns">Returns</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for">Watch out for</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#constexpr-double-pi">constexpr double pi()</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_1">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_1">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_1">Returns</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#constraints_1">Constraints</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templatetypename-t-t-radianst-degrees">template&lt;typename T&gt; T radians(T degrees)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_2">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_2">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_1">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_2">Returns</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for_1">Watch out for</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Computations/">Computations</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../CoordSys/">CoordSys</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Mat/">Mat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Quat/">Quat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Transforms/">Transforms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Types/">Types</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Vec/">Vec</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >trio</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/Concepts/">Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/Stream/">Stream</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >streams</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/FileStream/">FileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/MemoryMappedFileStream/">MemoryMappedFileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/MemoryStream/">MemoryStream</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/types/Parameters/">Parameters</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/utils/StreamScope/">StreamScope</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">OpenRigLogic</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+          <li class="breadcrumb-item">tdm</li>
+      <li class="breadcrumb-item active">Ang</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="api-reference-tdmang">API Reference — <code>tdm/Ang</code></h1>
+<hr />
+<!-- ink:api name="ang" module="tdm/Ang" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="ang"><code>ang</code></h2>
+<p>A strongly-typed angle value tagged with its unit (degrees or radians) at compile time.</p>
+<h3 id="why-this-exists">Why this exists</h3>
+<p><code>ang</code> exists so that angle values carry their unit as part of the type, preventing the common bug of mixing degrees and radians in the same expression. Converting between <code>ang&lt;T, impl::degrees&gt;</code> and <code>ang&lt;T, impl::radians&gt;</code> is done through an explicit converting constructor, so unit conversion becomes visible in code rather than an implicit, easy-to-miss detail.</p>
+<h3 id="fields">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>value</code></td>
+<td><code>value_type</code> (alias for <code>T</code>)</td>
+<td>required — the raw numeric angle value in the unit denoted by <code>TUnit</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="construction">Construction</h3>
+<pre><code class="language-cpp">tdm::ang&lt;double, tdm::impl::degrees&gt; heading{45.0};
+tdm::ang&lt;double, tdm::impl::radians&gt; headingRad{heading};  // converts degrees -&gt; radians
+</code></pre>
+<h3 id="relationships">Relationships</h3>
+<ul>
+<li><code>pi</code> — <em>used internally to convert between the <code>degrees</code> and <code>radians</code> unit tags</em></li>
+<li><code>degrees</code> / <code>radians</code> — <em>free-function equivalents for converting raw (untyped) values</em></li>
+</ul>
+<h3 id="constraints">Constraints</h3>
+<ul>
+<li>Supports <code>+=</code>, <code>-=</code>, <code>*= value_type</code>, <code>/= value_type</code>, unary <code>-</code>, <code>==</code>, <code>!=</code>.</li>
+</ul>
+<!-- ink:api-end name="ang" -->
+
+<!-- ink:api name="degrees" module="tdm/Ang" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatetypename-t-t-degreest-radians"><code>template&lt;typename T&gt; T degrees(T radians)</code></h2>
+<p>Convert an angle expressed in radians to degrees.</p>
+<h3 id="when-to-use-this">When to use this</h3>
+<p>Use this when you have a raw floating-point radian value (not wrapped in an <code>ang&lt;T, TUnit&gt;</code>) and need it in degrees for display, logging, or interop with APIs that expect degrees. For strongly-typed angle values, prefer converting via the <code>ang</code> constructor instead, which tracks units at compile time.</p>
+<h3 id="example">Example</h3>
+<pre><code class="language-cpp">double deg = tdm::degrees(1.5707963267948966);
+// deg is approximately 90.0
+</code></pre>
+<h3 id="parameters">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>radians</code></td>
+<td><code>T</code></td>
+<td>required — angle value in radians; <code>T</code> must be a floating-point type</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns">Returns</h3>
+<p><code>T</code> — the equivalent angle expressed in degrees.</p>
+<h3 id="watch-out-for">Watch out for</h3>
+<ul>
+<li>Passing an integer literal (e.g., <code>tdm::degrees(3)</code>) triggers a SFINAE substitution failure at compile time. Cast to <code>float</code> or <code>double</code> first.</li>
+</ul>
+<!-- ink:api-end name="degrees" -->
+
+<!-- ink:api name="pi" module="tdm/Ang" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="constexpr-double-pi"><code>constexpr double pi()</code></h2>
+<p>Get the value of π as a compile-time constant for use in angle conversions and trigonometric calculations.</p>
+<h3 id="when-to-use-this_1">When to use this</h3>
+<p>Use this instead of hardcoding a π literal so that all angle-unit conversions in the codebase (<code>degrees</code>, <code>radians</code>) stay consistent with a single source of truth.</p>
+<h3 id="example_1">Example</h3>
+<pre><code class="language-cpp">constexpr double circumference = 2.0 * tdm::pi() * radius;
+// circumference computed using the library's canonical pi value
+</code></pre>
+<h3 id="returns_1">Returns</h3>
+<p><code>double</code> — the mathematical constant π (3.14159265358979323846).</p>
+<h3 id="constraints_1">Constraints</h3>
+<ul>
+<li><code>constexpr</code> — always evaluated at compile time; zero runtime overhead.</li>
+</ul>
+<!-- ink:api-end name="pi" -->
+
+<!-- ink:api name="radians" module="tdm/Ang" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templatetypename-t-t-radianst-degrees"><code>template&lt;typename T&gt; T radians(T degrees)</code></h2>
+<p>Convert an angle expressed in degrees to radians.</p>
+<h3 id="when-to-use-this_2">When to use this</h3>
+<p>Use this when you have a raw floating-point degree value and need it in radians for trigonometric functions (<code>std::sin</code>, <code>std::cos</code>, etc.), which expect radians. For strongly-typed angle values, prefer the <code>ang</code> constructor instead.</p>
+<h3 id="example_2">Example</h3>
+<pre><code class="language-cpp">double rad = tdm::radians(90.0);
+// rad is approximately 1.5707963267948966
+</code></pre>
+<h3 id="parameters_1">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>degrees</code></td>
+<td><code>T</code></td>
+<td>required — angle value in degrees; <code>T</code> must be a floating-point type</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_2">Returns</h3>
+<p><code>T</code> — the equivalent angle expressed in radians.</p>
+<h3 id="watch-out-for_1">Watch out for</h3>
+<ul>
+<li>Like <code>degrees()</code>, integer inputs cause a compile-time SFINAE failure. Cast to a floating-point type before calling.</li>
+</ul>
+<!-- ink:api-end name="radians" -->
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../" class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../Computations/" class="btn btn-neutral float-right" title="Computations">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../Computations/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

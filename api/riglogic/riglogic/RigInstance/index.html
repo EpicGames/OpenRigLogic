@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://epicgames.github.io/OpenRigLogic/api/riglogic/riglogic/RigInstance/" />
+      <link rel="shortcut icon" href="../../../../img/favicon.ico" />
+    <title>RigInstance - OpenRigLogic</title>
+    <link rel="stylesheet" href="../../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "RigInstance";
+        var mkdocs_page_input_path = "api/riglogic/riglogic/RigInstance.md";
+        var mkdocs_page_url = "/OpenRigLogic/api/riglogic/riglogic/RigInstance/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../../.." class="icon icon-home"> OpenRigLogic
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../../release_notes/">Release Notes</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >arrayview</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../arrayview/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../arrayview/ArrayView/">ArrayView</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../arrayview/StringView/">StringView</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >dna</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/BinaryStreamReader/">BinaryStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/BinaryStreamWriter/">BinaryStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/JSONStreamReader/">JSONStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/JSONStreamWriter/">JSONStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/Reader/">Reader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/StreamReader/">StreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/StreamWriter/">StreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../dna/Writer/">Writer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/BehaviorReader/">BehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/BehaviorWriter/">BehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/DefinitionReader/">DefinitionReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/DefinitionWriter/">DefinitionWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/Descriptor/">Descriptor</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/DescriptorReader/">DescriptorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/DescriptorWriter/">DescriptorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/Geometry/">Geometry</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/GeometryReader/">GeometryReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/GeometryWriter/">GeometryWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/HeaderReader/">HeaderReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/HeaderWriter/">HeaderWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/JointBehaviorMetadata/">JointBehaviorMetadata</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/JointBehaviorMetadataReader/">JointBehaviorMetadataReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/JointBehaviorMetadataWriter/">JointBehaviorMetadataWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/MachineLearnedBehavior/">MachineLearnedBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorExt</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/MachineLearnedBehaviorExtReader/">MachineLearnedBehaviorExtReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/MachineLearnedBehaviorExtWriter/">MachineLearnedBehaviorExtWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/MachineLearnedBehaviorReader/">MachineLearnedBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/MachineLearnedBehaviorWriter/">MachineLearnedBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/RBFBehavior/">RBFBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/RBFBehaviorReader/">RBFBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/RBFBehaviorWriter/">RBFBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/Twist/">Twist</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/TwistSwingBehaviorReader/">TwistSwingBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/layers/TwistSwingBehaviorWriter/">TwistSwingBehaviorWriter</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/types/Vector3/">Vector3</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../dna/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >pma</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../pma/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../pma/MemoryResource/">MemoryResource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../pma/PolyAllocator/">PolyAllocator</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../pma/ScopedPtr/">ScopedPtr</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../pma/TypeDefs/">TypeDefs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >resources</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../pma/resources/AlignedMemoryResource/">AlignedMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../pma/resources/ArenaMemoryResource/">ArenaMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../pma/resources/DefaultMemoryResource/">DefaultMemoryResource</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../pma/utils/ManagedInstance/">ManagedInstance</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >riglogic</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">RigInstance</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#defaultinstancecreator">DefaultInstanceCreator</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#defaultinstancedestroyer">DefaultInstanceDestroyer</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_1">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_1">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#class-rlapi-riginstance">class RLAPI RigInstance</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#method-groups">Method groups</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#raises">Raises</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for">Watch out for</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#class-rl4riglogic">class rl4::RigLogic</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_1">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for_1">Watch out for</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../RigLogic/">RigLogic</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Stats/">Stats</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../types/Aliases/">Aliases</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >status</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../status/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../status/Provider/">Provider</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../status/Status/">Status</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../status/StatusCode/">StatusCode</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >tdm</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/Ang/">Ang</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/Computations/">Computations</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/CoordSys/">CoordSys</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/Mat/">Mat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/Quat/">Quat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/Transforms/">Transforms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/Types/">Types</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../tdm/Vec/">Vec</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >trio</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../trio/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../trio/Concepts/">Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../trio/Stream/">Stream</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >streams</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../trio/streams/FileStream/">FileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../trio/streams/MemoryMappedFileStream/">MemoryMappedFileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../trio/streams/MemoryStream/">MemoryStream</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../trio/types/Parameters/">Parameters</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../trio/utils/StreamScope/">StreamScope</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../..">OpenRigLogic</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+          <li class="breadcrumb-item">riglogic</li>
+      <li class="breadcrumb-item active">RigInstance</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="api-reference-riglogicriglogicriginstance">API Reference — <code>riglogic/riglogic/RigInstance</code></h1>
+<hr />
+<!-- ink:api name="DefaultInstanceCreator" module="riglogic/riglogic/RigInstance" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="defaultinstancecreator"><code>DefaultInstanceCreator</code></h2>
+<p>A <code>pma</code> trait specialization that tells the memory management utilities how to construct a <code>RigInstance</code> by default.</p>
+<h3 id="why-this-exists">Why this exists</h3>
+<p><code>pma</code>'s managed-instance utilities need a uniform way to create and destroy instances of arbitrary types without every caller specifying the creation strategy explicitly. Specializing <code>DefaultInstanceCreator&lt;rl4::RigInstance&gt;</code> to use <code>FactoryCreate&lt;rl4::RigInstance&gt;</code> routes construction through <code>RigInstance</code>'s own factory method instead of a raw constructor call, respecting its custom allocation and lifetime rules.</p>
+<h3 id="relationships">Relationships</h3>
+<ul>
+<li><code>RigInstance</code> — <em>the type this specialization creates, via <code>RigInstance::create</code>.</em></li>
+<li><code>DefaultInstanceDestroyer</code> — <em>the paired trait that destroys the same type.</em></li>
+</ul>
+<!-- ink:api-end name="DefaultInstanceCreator" -->
+
+<!-- ink:api name="DefaultInstanceDestroyer" module="riglogic/riglogic/RigInstance" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="defaultinstancedestroyer"><code>DefaultInstanceDestroyer</code></h2>
+<p>A <code>pma</code> trait specialization that tells the memory management utilities how to destroy a <code>RigInstance</code> by default.</p>
+<h3 id="why-this-exists_1">Why this exists</h3>
+<p>Pairing with <code>DefaultInstanceCreator</code>, this specialization routes destruction of a <code>RigInstance</code> through <code>FactoryDestroy&lt;rl4::RigInstance&gt;</code>, which calls <code>RigInstance::destroy</code> rather than a raw <code>delete</code>, since the destructor is protected and lifetime is factory-managed.</p>
+<h3 id="relationships_1">Relationships</h3>
+<ul>
+<li><code>RigInstance</code> — <em>the type this specialization destroys, via <code>RigInstance::destroy</code>.</em></li>
+<li><code>DefaultInstanceCreator</code> — <em>the paired trait that creates the same type.</em></li>
+</ul>
+<!-- ink:api-end name="DefaultInstanceDestroyer" -->
+
+<!-- ink:api name="RigInstance" module="riglogic/riglogic/RigInstance" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="class-rlapi-riginstance"><code>class RLAPI RigInstance</code></h2>
+<p>Holds the instance-specific input and output buffers for evaluating one instance of a rig, including level-of-detail and control values.</p>
+<h3 id="when-to-use-this">When to use this</h3>
+<p>Create a <code>RigInstance</code> whenever you need to drive and evaluate a specific instance of a rig — for example, one character on screen. Multiple <code>RigInstance</code> objects can be created from the same <code>RigLogic</code> instance, since <code>RigLogic</code> itself is stateless, but a <code>RigInstance</code> created through one <code>RigLogic</code> instance cannot be evaluated by a different <code>RigLogic</code> instance.</p>
+<h3 id="method-groups">Method groups</h3>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Methods</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lifecycle</td>
+<td>create, destroy</td>
+</tr>
+<tr>
+<td>GUI controls</td>
+<td>getGUIControlCount, getGUIControl, setGUIControl, getGUIControlValues</td>
+</tr>
+<tr>
+<td>Raw controls</td>
+<td>getRawControlCount, getRawControl, setRawControl, getRawControlValues</td>
+</tr>
+<tr>
+<td>PSD controls</td>
+<td>getPSDControlCount, getPSDControl, getPSDControlValues</td>
+</tr>
+<tr>
+<td>ML controls</td>
+<td>getMLControlCount, getMLControl, getMLControlValues, getMLTypeCount, getMLOperationSetCount, getMLOperationCount, getMLMaskValues</td>
+</tr>
+<tr>
+<td>RBF controls</td>
+<td>getRBFControlCount, getRBFControl, getRBFControlValues</td>
+</tr>
+<tr>
+<td>Outputs</td>
+<td>getJointOutputs, getBlendShapeOutputs</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example">Example</h3>
+<pre><code class="language-cpp">rl4::RigInstance* instance = rl4::RigInstance::create(rigLogic);
+instance-&gt;setGUIControl(0, 0.75f);
+auto joints = instance-&gt;getJointOutputs();
+rl4::RigInstance::destroy(instance);
+</code></pre>
+<h3 id="raises">Raises</h3>
+<ul>
+<li>Passing a <code>RigInstance</code> created from one <code>RigLogic</code> instance to another <code>RigLogic</code> instance for evaluation is unsupported — keep each <code>RigInstance</code> paired with the <code>RigLogic</code> instance that created it.</li>
+</ul>
+<h3 id="watch-out-for">Watch out for</h3>
+<ul>
+<li>The destructor is protected — instances must be released through <code>RigInstance::destroy</code>, not <code>delete</code>.</li>
+<li>You are responsible for calling <code>destroy(instance)</code> when the instance is no longer needed. Skipping <code>destroy</code> leaks the instance's memory.</li>
+<li><code>getJointOutputs()</code> returns a flat packed array of floats covering all joints across all LODs. The stride and offset per joint are determined by the DNA.</li>
+</ul>
+<!-- ink:api-end name="RigInstance" -->
+
+<!-- ink:api name="RigLogic" module="riglogic/riglogic/RigInstance" last_commit="api_scan" updated="2026-06-10" api_kind="callable" -->
+
+<h2 id="class-rl4riglogic"><code>class rl4::RigLogic</code></h2>
+<p>Evaluates a <code>RigInstance</code> to produce joint, blend shape, and animated map output values. Pass a <code>RigInstance</code> to <code>RigLogic::calculate</code> to drive the rig for a given frame.</p>
+<h3 id="when-to-use-this_1">When to use this</h3>
+<p>Reach for <code>RigLogic</code> when you need to apply rig evaluation to an instance — it is the computation engine that consumes input control values set on a <code>RigInstance</code> and writes calculated outputs back to that instance. A <code>RigInstance</code> cannot evaluate itself; it must be paired with the <code>RigLogic</code> it was created from.</p>
+<h3 id="watch-out-for_1">Watch out for</h3>
+<ul>
+<li>A <code>RigInstance</code> created through one <code>RigLogic</code> object cannot be evaluated by a different <code>RigLogic</code> object. The binding between an instance and its parent evaluator is established at creation time via <code>RigInstance::create</code>.</li>
+</ul>
+<!-- ink:api-end name="RigLogic" -->
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../Configuration/" class="btn btn-neutral float-left" title="Configuration"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../RigLogic/" class="btn btn-neutral float-right" title="RigLogic">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../Configuration/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../RigLogic/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../../..";</script>
+    <script src="../../../../js/theme_extra.js"></script>
+    <script src="../../../../js/theme.js"></script>
+      <script src="../../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

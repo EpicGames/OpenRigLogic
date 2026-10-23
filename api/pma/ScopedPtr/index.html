@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://epicgames.github.io/OpenRigLogic/api/pma/ScopedPtr/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>ScopedPtr - OpenRigLogic</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "ScopedPtr";
+        var mkdocs_page_input_path = "api/pma/ScopedPtr.md";
+        var mkdocs_page_url = "/OpenRigLogic/api/pma/ScopedPtr/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> OpenRigLogic
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../release_notes/">Release Notes</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >arrayview</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/ArrayView/">ArrayView</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/StringView/">StringView</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >dna</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/BinaryStreamReader/">BinaryStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/BinaryStreamWriter/">BinaryStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/JSONStreamReader/">JSONStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/JSONStreamWriter/">JSONStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Reader/">Reader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/StreamReader/">StreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/StreamWriter/">StreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../dna/Writer/">Writer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/BehaviorReader/">BehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/BehaviorWriter/">BehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DefinitionReader/">DefinitionReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DefinitionWriter/">DefinitionWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Descriptor/">Descriptor</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DescriptorReader/">DescriptorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/DescriptorWriter/">DescriptorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Geometry/">Geometry</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/GeometryReader/">GeometryReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/GeometryWriter/">GeometryWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/HeaderReader/">HeaderReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/HeaderWriter/">HeaderWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadata/">JointBehaviorMetadata</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadataReader/">JointBehaviorMetadataReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/JointBehaviorMetadataWriter/">JointBehaviorMetadataWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehavior/">MachineLearnedBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorExt</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExtReader/">MachineLearnedBehaviorExtReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorExtWriter/">MachineLearnedBehaviorExtWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorReader/">MachineLearnedBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/MachineLearnedBehaviorWriter/">MachineLearnedBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehavior/">RBFBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehaviorReader/">RBFBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/RBFBehaviorWriter/">RBFBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/Twist/">Twist</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/TwistSwingBehaviorReader/">TwistSwingBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/layers/TwistSwingBehaviorWriter/">TwistSwingBehaviorWriter</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/types/Vector3/">Vector3</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../dna/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >pma</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../MemoryResource/">MemoryResource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../PolyAllocator/">PolyAllocator</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">ScopedPtr</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#complete_type_checker-local-alias-inside-deleteoperator">complete_type_checker (local alias inside Delete::operator())</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists">Why this exists</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templateclass-t-struct-defaultinstancecreator-using-type-newt">template&lt;class T&gt; struct DefaultInstanceCreator { using type = New&lt;T&gt;; }</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns">Returns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templateclass-t-struct-defaultinstancedestroyer-using-type-deletet">template&lt;class T&gt; struct DefaultInstanceDestroyer { using type = Delete&lt;T&gt;; }</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_1">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_1">Returns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templateclass-t-class-b-t-struct-delete">template&lt;class T, class B = T&gt; struct Delete</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_2">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#method-groups">Method groups</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#raises">Raises</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for">Watch out for</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#using-destroyer_type-tdestroyer">using destroyer_type = TDestroyer;</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_1">Why this exists</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templateclass-t-class-b-t-struct-factorycreate-b-operatorargs-args">template&lt;class T, class B = T&gt; struct FactoryCreate { B* operator()(Args&amp;&amp;... args); }</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_3">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_1">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_1">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_2">Returns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templateclass-t-class-b-t-struct-factorydestroy-void-operatorb-ptr">template&lt;class T, class B = T&gt; struct FactoryDestroy { void operator()(B* ptr); }</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_4">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_2">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_2">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for_1">Watch out for</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templatetypename-u-struct-inspect-using-element_type-u-using-pointer_type-element_type-using-is_array-stdfalse_type-with-a-u-specialization">template&lt;typename U&gt; struct inspect { using element_type = U; using pointer_type = element_type*; using is_array = std::false_type; } (with a U[] specialization)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_2">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields">Fields</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#using-is_array-stdfalse_type-or-stdtrue_type-for-the-u-specialization">using is_array = std::false_type; (or std::true_type for the U[] specialization)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_3">Why this exists</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pmamakescopedtargs-pmamakescopedt-tcreator-tdestroyerargs">pma::makeScoped&lt;T&gt;(args...) / pma::makeScoped&lt;T, TCreator, TDestroyer&gt;(args...)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_5">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_3">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_3">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_3">Returns</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for_2">Watch out for</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templateclass-t-class-b-t-struct-new">template&lt;class T, class B = T&gt; struct New</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_6">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#method-groups_1">Method groups</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example_4">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_4">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns_4">Returns</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_1">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#using-pointer_type-element_type">using pointer_type = element_type*;</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_4">Why this exists</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templateclass-t-class-tdestroyer-typename-defaultinstancedestroyerttype-class-scopedptr-private-tdestroyer">template&lt;class T, class TDestroyer = typename DefaultInstanceDestroyer&lt;T&gt;::type&gt; class ScopedPtr : private TDestroyer</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_5">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#construction">Construction</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_2">Relationships</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#constraints">Constraints</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for_3">Watch out for</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templateclass-t-class-tcreator-class-tdestroyer-typename-args-scopedptrbase-tdestroyer-makescopedargs-args">template&lt;class T, class TCreator, class TDestroyer, typename... Args&gt; ScopedPtr&lt;Base, TDestroyer&gt; makeScoped(Args&amp;&amp;... args)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_6">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_5">Parameters</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templateclass-t-templateclass-class-tcreatortemplate-templateclass-class-tdestroyertemplate-typename-args-scopedptrt-tdestroyertemplatet-makescopedargs-args">template&lt;class T, template&lt;class...&gt; class TCreatorTemplate, template&lt;class...&gt; class TDestroyerTemplate, typename... Args&gt; ScopedPtr&lt;T, TDestroyerTemplate&lt;T&gt;&gt; makeScoped(Args&amp;&amp;... args)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this_7">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_6">Parameters</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#templateclass-t-class-tcreator-class-tdestroyer-typename-args-scopedptrbase-tdestroyer-makescopedargs-args_1">template&lt;class T, class TCreator, class TDestroyer, typename... Args&gt; ScopedPtr&lt;Base, TDestroyer&gt; makeScoped(Args&amp;&amp;... args)</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_7">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters_7">Parameters</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../TypeDefs/">TypeDefs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >resources</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../resources/AlignedMemoryResource/">AlignedMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../resources/ArenaMemoryResource/">ArenaMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../resources/DefaultMemoryResource/">DefaultMemoryResource</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../utils/ManagedInstance/">ManagedInstance</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >riglogic</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigInstance/">RigInstance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigLogic/">RigLogic</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Stats/">Stats</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/types/Aliases/">Aliases</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >status</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/Provider/">Provider</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/Status/">Status</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/StatusCode/">StatusCode</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >tdm</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Ang/">Ang</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Computations/">Computations</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/CoordSys/">CoordSys</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Mat/">Mat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Quat/">Quat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Transforms/">Transforms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Types/">Types</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Vec/">Vec</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >trio</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/Concepts/">Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/Stream/">Stream</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >streams</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/FileStream/">FileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/MemoryMappedFileStream/">MemoryMappedFileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/MemoryStream/">MemoryStream</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/types/Parameters/">Parameters</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/utils/StreamScope/">StreamScope</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">OpenRigLogic</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+          <li class="breadcrumb-item">pma</li>
+      <li class="breadcrumb-item active">ScopedPtr</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="api-reference-pmascopedptr">API Reference — <code>pma/ScopedPtr</code></h1>
+<hr />
+<!-- ink:api name="complete_type_checker" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="complete_type_checker-local-alias-inside-deleteoperator"><code>complete_type_checker</code> (local alias inside <code>Delete::operator()</code>)</h2>
+<p>A local array-type alias (<code>char[sizeof(T) ? 1 : -1]</code>) used purely to force a compile-time error when <code>T</code> is incomplete at the point <code>Delete&lt;T&gt;</code> deletes it.</p>
+<h3 id="why-this-exists">Why this exists</h3>
+<p>Calling <code>delete</code> on an incomplete type is undefined behavior and compilers often accept it silently; <code>complete_type_checker</code> forces <code>sizeof(T)</code> to be evaluated, which fails to compile for an incomplete <code>T</code>, turning a silent UB risk into a hard compile error. It has no runtime effect — <code>static_cast&lt;void&gt;(sizeof(complete_type_checker))</code> discards the value, keeping only the compile-time check.</p>
+<!-- ink:api-end name="complete_type_checker" -->
+
+<!-- ink:api name="DefaultInstanceCreator" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="templateclass-t-struct-defaultinstancecreator-using-type-newt"><code>template&lt;class T&gt; struct DefaultInstanceCreator { using type = New&lt;T&gt;; }</code></h2>
+<p>Select <code>New&lt;T&gt;</code> as the default creator policy when no custom creator is specified for <code>ScopedPtr</code>/<code>makeScoped</code>.</p>
+<h3 id="when-to-use-this">When to use this</h3>
+<p>You don't call this directly — <code>makeScoped&lt;T&gt;(args...)</code> uses it internally to pick <code>New&lt;T&gt;</code> as the creator when the type has an ordinary constructor. Provide a custom creator (e.g., <code>FactoryCreate</code>) only when <code>T</code> needs factory-based construction instead.</p>
+<h3 id="returns">Returns</h3>
+<p><code>type</code> — alias for <code>New&lt;T&gt;</code>, the creator used by <code>makeScoped</code> unless a custom creator template is supplied.</p>
+<!-- ink:api-end name="DefaultInstanceCreator" -->
+
+<!-- ink:api name="DefaultInstanceDestroyer" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="templateclass-t-struct-defaultinstancedestroyer-using-type-deletet"><code>template&lt;class T&gt; struct DefaultInstanceDestroyer { using type = Delete&lt;T&gt;; }</code></h2>
+<p>Select <code>Delete&lt;T&gt;</code> as the default destroyer policy when no custom destroyer is specified for <code>ScopedPtr</code>/<code>makeScoped</code>.</p>
+<h3 id="when-to-use-this_1">When to use this</h3>
+<p>Used internally as <code>ScopedPtr</code>'s default <code>TDestroyer</code> template argument, so a plain <code>ScopedPtr&lt;T&gt;</code> calls <code>delete</code> on destruction without any extra typing. Override it only when <code>T</code> requires factory-based or array destruction (<code>FactoryDestroy</code>, <code>Delete&lt;T[]&gt;</code>).</p>
+<h3 id="returns_1">Returns</h3>
+<p><code>type</code> — alias for <code>Delete&lt;T&gt;</code>, the destroyer <code>ScopedPtr</code> inherits from by default.</p>
+<!-- ink:api-end name="DefaultInstanceDestroyer" -->
+
+<!-- ink:api name="Delete" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templateclass-t-class-b-t-struct-delete"><code>template&lt;class T, class B = T&gt; struct Delete</code></h2>
+<p>The default destruction policy for <code>ScopedPtr</code>, releasing a pointer allocated by <code>New</code> via <code>delete</code>.</p>
+<h3 id="when-to-use-this_2">When to use this</h3>
+<p>Use this as the destroyer policy paired with <code>New</code> whenever <code>ScopedPtr</code> owns a heap object allocated with plain <code>new</code>. It guards against deleting an incomplete type at compile time rather than allowing undefined behavior at runtime.</p>
+<h3 id="method-groups">Method groups</h3>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Methods</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Destruction</td>
+<td>operator() (calls <code>delete ptr</code> after a completeness check)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example">Example</h3>
+<pre><code class="language-cpp">pma::Delete&lt;dna::VersionInfo&gt; destroyer;
+destroyer(obj); // equivalent to delete obj, with a compile-time completeness guard
+</code></pre>
+<h3 id="parameters">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ptr</code></td>
+<td><code>B*</code></td>
+<td>required — pointer to the object to delete.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="raises">Raises</h3>
+<ul>
+<li>Compile error via <code>complete_type_checker</code> — triggered if <code>T</code> is an incomplete type at the point of deletion, since calling <code>delete</code> on an incomplete type is undefined behavior. Ensure <code>T</code>'s full definition is visible wherever <code>Delete&lt;T&gt;</code> is instantiated.</li>
+</ul>
+<h3 id="watch-out-for">Watch out for</h3>
+<ul>
+<li><code>Delete&lt;T[]&gt;</code> is a separate specialization that calls <code>delete[]</code> instead — using the non-array <code>Delete</code> on an array-allocated pointer is incorrect.</li>
+<li><code>Delete&lt;T&gt;::operator()</code> must be instantiated in a translation unit where <code>T</code> is fully defined. If <code>T</code> is forward-declared in the header that owns <code>ScopedPtr&lt;T&gt;</code>, move the <code>ScopedPtr</code> destructor definition to a <code>.cpp</code> where <code>T</code> is complete. The compile error from <code>complete_type_checker</code> signals exactly this problem.</li>
+</ul>
+<h3 id="relationships">Relationships</h3>
+<ul>
+<li><code>New</code> — <em>the matching creator policy.</em></li>
+<li><code>complete_type_checker</code> — <em>the compile-time completeness guard used internally.</em></li>
+</ul>
+<!-- ink:api-end name="Delete" -->
+
+<!-- ink:api name="destroyer_type" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="using-destroyer_type-tdestroyer"><code>using destroyer_type = TDestroyer;</code></h2>
+<p>Public alias on <code>ScopedPtr</code> for its <code>TDestroyer</code> template parameter — the policy type invoked to release the owned pointer.</p>
+<h3 id="why-this-exists_1">Why this exists</h3>
+<p>Exposing <code>destroyer_type</code> lets calling code (and <code>ScopedPtr</code>'s own converting move constructor) refer to the exact destroyer policy in use without re-specifying <code>TDestroyer</code>, which matters when moving between <code>ScopedPtr</code> instances with related but distinct destroyer types.</p>
+<!-- ink:api-end name="destroyer_type" -->
+
+<!-- ink:api name="FactoryCreate" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templateclass-t-class-b-t-struct-factorycreate-b-operatorargs-args"><code>template&lt;class T, class B = T&gt; struct FactoryCreate { B* operator()(Args&amp;&amp;... args); }</code></h2>
+<p>Create an object through a type's static <code>create</code> factory method instead of <code>new</code>, for types that manage their own construction.</p>
+<h3 id="when-to-use-this_3">When to use this</h3>
+<p>Use <code>FactoryCreate</code> as the creator policy for <code>ScopedPtr</code>/<code>makeScoped</code> when <code>T</code> exposes a static <code>create(...)</code> factory instead of a public constructor — common for types that need to control allocation or return a base-class pointer. Pair it with <code>FactoryDestroy</code> so lifetime is handled through the same factory interface, not <code>delete</code>.</p>
+<h3 id="example_1">Example</h3>
+<pre><code class="language-cpp">// Impl exposes static Impl* create(Args...) / static void destroy(Impl*)
+pma::ScopedPtr&lt;Impl, FactoryDestroy&lt;Impl&gt;&gt; instance{FactoryCreate&lt;Impl&gt;{}(regionSize, upstream)};
+</code></pre>
+<h3 id="parameters_1">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>args</code></td>
+<td><code>Args&amp;&amp;...</code></td>
+<td>required — forwarded verbatim to <code>T::create</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_2">Returns</h3>
+<p><code>B*</code> — pointer returned by <code>T::create</code>, typed as the base <code>B</code> (defaults to <code>T</code>).</p>
+<!-- ink:api-end name="FactoryCreate" -->
+
+<!-- ink:api name="FactoryDestroy" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templateclass-t-class-b-t-struct-factorydestroy-void-operatorb-ptr"><code>template&lt;class T, class B = T&gt; struct FactoryDestroy { void operator()(B* ptr); }</code></h2>
+<p>Destroy an object through a type's static <code>destroy</code> method instead of <code>delete</code>, matching a <code>FactoryCreate</code>-constructed instance.</p>
+<h3 id="when-to-use-this_4">When to use this</h3>
+<p>Use this as the destroyer policy for <code>ScopedPtr</code>/<code>makeScoped</code> whenever the owned type was built with <code>FactoryCreate</code> — the two must be paired so the object is torn down through the same factory API it was created with, not a raw <code>delete</code>.</p>
+<h3 id="example_2">Example</h3>
+<pre><code class="language-cpp">// Impl exposes static Impl* create(Args...) / static void destroy(Impl*)
+pma::ScopedPtr&lt;Impl, FactoryDestroy&lt;Impl&gt;&gt; instance{FactoryCreate&lt;Impl&gt;{}(regionSize, upstream)};
+// destructor calls FactoryDestroy&lt;Impl&gt;{}(ptr) -&gt; Impl::destroy(ptr)
+</code></pre>
+<h3 id="parameters_2">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ptr</code></td>
+<td><code>B*</code></td>
+<td>required — pointer to destroy; cast to <code>T*</code> before calling <code>T::destroy</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="watch-out-for_1">Watch out for</h3>
+<ul>
+<li>The <code>static_cast&lt;T*&gt;(ptr)</code> in <code>operator()</code> means <code>B*</code> must be safely downcasted to <code>T*</code>. If <code>B</code> is a virtual base or an unrelated type, the cast produces undefined behavior. Ensure the pointer was originally a <code>T*</code> before assigning it to a <code>ScopedPtr&lt;B, FactoryDestroy&lt;T, B&gt;&gt;</code>.</li>
+</ul>
+<!-- ink:api-end name="FactoryDestroy" -->
+
+<!-- ink:api name="inspect" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="templatetypename-u-struct-inspect-using-element_type-u-using-pointer_type-element_type-using-is_array-stdfalse_type-with-a-u-specialization"><code>template&lt;typename U&gt; struct inspect { using element_type = U; using pointer_type = element_type*; using is_array = std::false_type; }</code> (with a <code>U[]</code> specialization)</h2>
+<p>A private trait used by <code>ScopedPtr</code> to derive its <code>pointer</code>, <code>element_type</code>, and <code>is_array</code> members from the template argument <code>T</code>.</p>
+<h3 id="why-this-exists_2">Why this exists</h3>
+<p>Because <code>ScopedPtr&lt;T&gt;</code> can be instantiated with either a scalar type or an array type (<code>T[]</code>), <code>inspect</code> centralizes the logic for picking the right pointer/element types and whether array-specific operations (like <code>operator[]</code>) should be enabled, via its <code>U[]</code> partial specialization.</p>
+<h3 id="fields">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>element_type</code></td>
+<td><code>U</code></td>
+<td>The underlying element type — <code>U</code> for scalars, or the array element type for <code>U[]</code>.</td>
+</tr>
+<tr>
+<td><code>pointer_type</code></td>
+<td><code>element_type*</code></td>
+<td>The pointer type <code>ScopedPtr::pointer</code> is defined as.</td>
+</tr>
+<tr>
+<td><code>is_array</code></td>
+<td><code>std::false_type</code> / <code>std::true_type</code></td>
+<td>Tag type used with <code>std::enable_if</code> to select array (<code>operator[]</code>) vs. scalar (<code>operator*</code>) access.</td>
+</tr>
+</tbody>
+</table>
+<!-- ink:api-end name="inspect" -->
+
+<!-- ink:api name="is_array" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="using-is_array-stdfalse_type-or-stdtrue_type-for-the-u-specialization"><code>using is_array = std::false_type;</code> (or <code>std::true_type</code> for the <code>U[]</code> specialization)</h2>
+<p>Compile-time tag member of <code>inspect&lt;U&gt;</code> indicating whether <code>T</code> is an array type.</p>
+<h3 id="why-this-exists_3">Why this exists</h3>
+<p><code>ScopedPtr</code> uses <code>is_array</code> with <code>std::enable_if</code> to enable <code>operator[]</code> only for array-typed instantiations and <code>operator*</code> only for scalar instantiations, so calling the wrong accessor is a compile error rather than a runtime bug.</p>
+<!-- ink:api-end name="is_array" -->
+
+<!-- ink:api name="makeScoped" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-06-10" api_kind="callable" -->
+
+<h2 id="pmamakescopedtargs-pmamakescopedt-tcreator-tdestroyerargs"><code>pma::makeScoped&lt;T&gt;(args...)</code> / <code>pma::makeScoped&lt;T, TCreator, TDestroyer&gt;(args...)</code></h2>
+<p>Construct a <code>ScopedPtr&lt;T&gt;</code> by invoking a creator policy and binding its matched destroyer — the preferred way to create any <code>ScopedPtr</code>.</p>
+<h3 id="when-to-use-this_5">When to use this</h3>
+<p>Use <code>makeScoped</code> instead of constructing <code>ScopedPtr</code> directly; it deduces the policy types, checks type compatibility via <code>static_assert</code>, and keeps call sites concise. Provide explicit <code>TCreator</code>/<code>TDestroyer</code> template-template arguments when the type uses a static factory (<code>FactoryCreate</code> / <code>FactoryDestroy</code>); omit them entirely when <code>new</code>/<code>delete</code> suffices.</p>
+<h3 id="example_3">Example</h3>
+<pre><code class="language-cpp">// Simplest form — uses DefaultInstanceCreator/DefaultInstanceDestroyer
+auto mesh = pma::makeScoped&lt;RigMesh&gt;(numVertices, numFaces);
+// mesh is ScopedPtr&lt;RigMesh, Delete&lt;RigMesh&gt;&gt;
+
+// Factory-managed type
+auto reader = pma::makeScoped&lt;dna::StreamReader,
+                              pma::FactoryCreate,
+                              pma::FactoryDestroy&gt;(stream, layer);
+// calls dna::StreamReader::create(stream, layer)
+// destroyed via dna::StreamReader::destroy()
+
+// Explicit creator/destroyer types (non-template-template form)
+using Creator  = pma::FactoryCreate&lt;dna::StreamReader, dna::Reader&gt;;
+using Destroyer = pma::FactoryDestroy&lt;dna::StreamReader, dna::Reader&gt;;
+auto reader2 = pma::makeScoped&lt;dna::StreamReader, Creator, Destroyer&gt;(stream, layer);
+</code></pre>
+<h3 id="parameters_3">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>T</code></td>
+<td>template type param</td>
+<td>The concrete type to create.</td>
+</tr>
+<tr>
+<td><code>TCreator</code></td>
+<td>template type param</td>
+<td>optional — Creator policy or template-template arg; defaults to <code>DefaultInstanceCreator&lt;T&gt;::type</code>.</td>
+</tr>
+<tr>
+<td><code>TDestroyer</code></td>
+<td>template type param</td>
+<td>optional — Destroyer policy or template-template arg; defaults to <code>DefaultInstanceDestroyer&lt;T&gt;::type</code>.</td>
+</tr>
+<tr>
+<td><code>args</code></td>
+<td><code>Args&amp;&amp;...</code></td>
+<td>Arguments forwarded to the creator's <code>operator()</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_3">Returns</h3>
+<p><code>ScopedPtr&lt;Base, TDestroyer&gt;</code> — an owning smart pointer whose <code>Base</code> type is deduced from the creator's return type. For the simplest overload, <code>Base == T</code>.</p>
+<h3 id="watch-out-for_2">Watch out for</h3>
+<ul>
+<li>The full-explicit overload (<code>&lt;T, TCreator, TDestroyer&gt;</code>) fires a <code>static_assert</code> if <code>T</code> is not the same as, a base of, or pointer-convertible to <code>Base</code> (the type the creator actually returns). The error message is "Incompatible types." — check that <code>TCreator{}(args...)</code> returns a pointer convertible to <code>Base*</code>.</li>
+<li>When using template-template arguments (<code>makeScoped&lt;T, FactoryCreate, FactoryDestroy&gt;</code>), both templates must accept a single type parameter. Custom policy templates with additional parameters require the explicit <code>&lt;T, Creator, Destroyer&gt;</code> form.</li>
+</ul>
+<!-- ink:api-end name="makeScoped" -->
+
+<!-- ink:api name="New" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="templateclass-t-class-b-t-struct-new"><code>template&lt;class T, class B = T&gt; struct New</code></h2>
+<p>A default construction policy for <code>ScopedPtr</code> that allocates an instance with <code>new</code> and forwards constructor arguments.</p>
+<h3 id="when-to-use-this_6">When to use this</h3>
+<p>Use this as the default (or explicit) creator policy for <code>ScopedPtr</code> when the pointee should be heap-allocated with plain <code>new</code>. Pair it with <code>Delete</code> as the matching destroyer so the pointer is released with <code>delete</code>, not some other deallocation strategy.</p>
+<h3 id="method-groups_1">Method groups</h3>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Methods</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Construction</td>
+<td>operator() (variadic, forwards args to <code>new T{...}</code>)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example_4">Example</h3>
+<pre><code class="language-cpp">pma::New&lt;dna::VersionInfo&gt; creator;
+auto* obj = creator(); // equivalent to new dna::VersionInfo{}
+</code></pre>
+<h3 id="parameters_4">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>args</code></td>
+<td><code>Args&amp;&amp;...</code></td>
+<td>optional — forwarded to <code>T</code>'s constructor.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns_4">Returns</h3>
+<p><code>B*</code> — pointer to the newly constructed <code>T</code>, returned as base type <code>B</code>.</p>
+<h3 id="relationships_1">Relationships</h3>
+<ul>
+<li><code>Delete</code> — <em>the matching destroyer policy that releases what <code>New</code> allocates.</em></li>
+<li><code>New&lt;T[]&gt;</code> — <em>the array specialization, using <code>new T[size]{}</code> instead.</em></li>
+<li><code>ScopedPtr</code> — <em>the primary consumer of this creator policy.</em></li>
+</ul>
+<!-- ink:api-end name="New" -->
+
+<!-- ink:api name="pointer_type" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="using-pointer_type-element_type"><code>using pointer_type = element_type*;</code></h2>
+<p>Member typedef of the private <code>inspect&lt;U&gt;</code> trait struct, used internally by <code>ScopedPtr</code> to derive its public <code>pointer</code> alias.</p>
+<h3 id="why-this-exists_4">Why this exists</h3>
+<p>Separating <code>pointer_type</code> from <code>element_type</code> inside <code>inspect</code> lets <code>ScopedPtr</code> compute the correct pointer type uniformly whether <code>T</code> is a scalar or an array element, without repeating the <code>*</code>-decoration logic at the <code>ScopedPtr</code> level.</p>
+<!-- ink:api-end name="pointer_type" -->
+
+<!-- ink:api name="ScopedPtr" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="templateclass-t-class-tdestroyer-typename-defaultinstancedestroyerttype-class-scopedptr-private-tdestroyer"><code>template&lt;class T, class TDestroyer = typename DefaultInstanceDestroyer&lt;T&gt;::type&gt; class ScopedPtr : private TDestroyer</code></h2>
+<p>Takes ownership over a given pointer and handles its lifetime, similar in spirit to <code>std::unique_ptr</code> but with pluggable, stateful or stateless destroyer policies.</p>
+<h3 id="why-this-exists_5">Why this exists</h3>
+<p><code>ScopedPtr</code> inherits its destroyer type rather than storing it as a member, so stateless lifetime managers (like <code>Delete&lt;T&gt;</code> or <code>FactoryDestroy&lt;T&gt;</code>) add zero size overhead. A dedicated constructor also accepts a destroyer <em>instance</em>, so stateful destroyers — lambdas with captures, or anything holding extra state — work too, which a plain <code>unique_ptr</code>-style design using only a type parameter would not support as cleanly.</p>
+<h3 id="construction">Construction</h3>
+<pre><code class="language-cpp">// Default destroyer (delete)
+pma::ScopedPtr&lt;Impl&gt; owned{new Impl{}};
+
+// Custom destroyer via makeScoped
+auto arena = pma::makeScoped&lt;ArenaMemoryResource, FactoryCreate&lt;ArenaMemoryResource&gt;, FactoryDestroy&lt;ArenaMemoryResource&gt;&gt;(regionSize, growthFactor, upstream);
+</code></pre>
+<h3 id="relationships_2">Relationships</h3>
+<ul>
+<li><code>makeScoped</code> — <em>factory function that constructs a <code>ScopedPtr</code> with the right creator/destroyer pair.</em></li>
+<li><code>FactoryCreate</code> / <code>FactoryDestroy</code> — <em>destroyer/creator policies for factory-managed types.</em></li>
+<li><code>DefaultInstanceCreator</code> / <code>DefaultInstanceDestroyer</code> — <em>default <code>New</code>/<code>Delete</code> policies used when none are specified.</em></li>
+</ul>
+<h3 id="constraints">Constraints</h3>
+<ul>
+<li>Not copyable — copy constructor and copy assignment are deleted.</li>
+<li>Move-only: supports move construction/assignment, including converting moves between compatible <code>T</code>/<code>TDestroyer</code> pairs.</li>
+</ul>
+<h3 id="watch-out-for_3">Watch out for</h3>
+<ul>
+<li><code>ScopedPtr</code> inherits <code>TDestroyer</code> privately, so the destroyer is invoked directly — do not pass a destroyer type whose <code>operator()</code> has preconditions that require it to be initialized after construction.</li>
+<li>Moving from a <code>ScopedPtr&lt;U, UDestroyer&gt;</code> to <code>ScopedPtr&lt;T, TDestroyer&gt;</code> requires that <code>U*</code> is implicitly convertible to <code>T*</code>. The static assertion in <code>makeScoped</code> checks this; the cross-type move constructor does not independently verify it.</li>
+<li>After <code>release()</code> the caller owns the pointer and is responsible for its destruction — the <code>ScopedPtr</code> no longer manages it.</li>
+</ul>
+<!-- ink:api-end name="ScopedPtr" -->
+
+<!-- ink:api name="TCreator" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="templateclass-t-class-tcreator-class-tdestroyer-typename-args-scopedptrbase-tdestroyer-makescopedargs-args"><code>template&lt;class T, class TCreator, class TDestroyer, typename... Args&gt; ScopedPtr&lt;Base, TDestroyer&gt; makeScoped(Args&amp;&amp;... args)</code></h2>
+<p><code>TCreator</code> is the template parameter of <code>makeScoped</code> naming the callable invoked as <code>TCreator{}(args...)</code> to construct the object that ends up owned by the returned <code>ScopedPtr</code>.</p>
+<h3 id="why-this-exists_6">Why this exists</h3>
+<p>Making the creator a separate template parameter from the destroyer lets <code>makeScoped</code> pair any construction strategy (a plain <code>new</code>-based <code>New&lt;T&gt;</code>, or a factory-based <code>FactoryCreate&lt;T&gt;</code>) with any matching cleanup strategy, and lets <code>makeScoped</code> deduce the constructed <code>Base</code> type from <code>TCreator</code>'s return type via <code>decltype</code>.</p>
+<h3 id="parameters_5">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TCreator</code></td>
+<td>template type parameter</td>
+<td>required — callable type; <code>TCreator{}(args...)</code> must return a pointer convertible to <code>Base*</code>.</td>
+</tr>
+</tbody>
+</table>
+<!-- ink:api-end name="TCreator" -->
+
+<!-- ink:api name="TCreatorTemplate" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="templateclass-t-templateclass-class-tcreatortemplate-templateclass-class-tdestroyertemplate-typename-args-scopedptrt-tdestroyertemplatet-makescopedargs-args"><code>template&lt;class T, template&lt;class...&gt; class TCreatorTemplate, template&lt;class...&gt; class TDestroyerTemplate, typename... Args&gt; ScopedPtr&lt;T, TDestroyerTemplate&lt;T&gt;&gt; makeScoped(Args&amp;&amp;... args)</code></h2>
+<p><code>TCreatorTemplate</code> is a template-template parameter — a template like <code>DefaultInstanceCreator</code> — that this <code>makeScoped</code> overload instantiates with <code>T</code> to obtain the concrete creator type.</p>
+<h3 id="when-to-use-this_7">When to use this</h3>
+<p>This overload is selected when you want to pick creator/destroyer <em>templates</em> (e.g., <code>DefaultInstanceCreator</code>, a custom factory-template) rather than already-instantiated creator/destroyer types, letting <code>makeScoped&lt;T&gt;(args...)</code> derive both from <code>T</code> in one step.</p>
+<h3 id="parameters_6">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TCreatorTemplate</code></td>
+<td>template-template parameter</td>
+<td>required — instantiated as <code>TCreatorTemplate&lt;T&gt;</code> to obtain the creator type.</td>
+</tr>
+</tbody>
+</table>
+<!-- ink:api-end name="TCreatorTemplate" -->
+
+<!-- ink:api name="TDestroyer" module="pma/ScopedPtr" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="templateclass-t-class-tcreator-class-tdestroyer-typename-args-scopedptrbase-tdestroyer-makescopedargs-args_1"><code>template&lt;class T, class TCreator, class TDestroyer, typename... Args&gt; ScopedPtr&lt;Base, TDestroyer&gt; makeScoped(Args&amp;&amp;... args)</code></h2>
+<p><code>TDestroyer</code> is the template parameter naming the destroyer policy that <code>makeScoped</code> bakes into the returned <code>ScopedPtr&lt;Base, TDestroyer&gt;</code>'s type.</p>
+<h3 id="why-this-exists_7">Why this exists</h3>
+<p>Keeping <code>TDestroyer</code> as an explicit template parameter (rather than deriving it) lets <code>makeScoped</code> be called with any creator/destroyer pair — including mismatched ones for advanced cases — while still producing a <code>ScopedPtr</code> whose static type correctly reflects the destroyer that will run.</p>
+<h3 id="parameters_7">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TDestroyer</code></td>
+<td>template type parameter</td>
+<td>required — destroyer policy; becomes the second template argument of the returned <code>ScopedPtr</code>.</td>
+</tr>
+</tbody>
+</table>
+<!-- ink:api-end name="TDestroyer" -->
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../PolyAllocator/" class="btn btn-neutral float-left" title="PolyAllocator"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../TypeDefs/" class="btn btn-neutral float-right" title="TypeDefs">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../PolyAllocator/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../TypeDefs/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

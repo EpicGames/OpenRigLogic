@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://epicgames.github.io/OpenRigLogic/api/dna/BinaryStreamReader/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>BinaryStreamReader - OpenRigLogic</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "BinaryStreamReader";
+        var mkdocs_page_input_path = "api/dna/BinaryStreamReader.md";
+        var mkdocs_page_url = "/OpenRigLogic/api/dna/BinaryStreamReader/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> OpenRigLogic
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../release_notes/">Release Notes</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >arrayview</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/ArrayView/">ArrayView</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../arrayview/StringView/">StringView</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >dna</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">BinaryStreamReader</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#class-dnaapi-binarystreamreader-public-streamreader">class DNAAPI BinaryStreamReader : public StreamReader</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#when-to-use-this">When to use this</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#method-groups">Method groups</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example">Example</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#returns">Returns</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#watch-out-for">Watch out for</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#template-struct-defaultinstancecreatordnabinarystreamreader">template&lt;&gt; struct DefaultInstanceCreator&lt;dna::BinaryStreamReader&gt;</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#template-struct-defaultinstancedestroyerdnabinarystreamreader">template&lt;&gt; struct DefaultInstanceDestroyer&lt;dna::BinaryStreamReader&gt;</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#why-this-exists_1">Why this exists</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fields_1">Fields</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#relationships_1">Relationships</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../BinaryStreamWriter/">BinaryStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../JSONStreamReader/">JSONStreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../JSONStreamWriter/">JSONStreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Reader/">Reader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../StreamReader/">StreamReader</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../StreamWriter/">StreamWriter</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../Writer/">Writer</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >layers</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/BehaviorReader/">BehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/BehaviorWriter/">BehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/DefinitionReader/">DefinitionReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/DefinitionWriter/">DefinitionWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/Descriptor/">Descriptor</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/DescriptorReader/">DescriptorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/DescriptorWriter/">DescriptorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/Geometry/">Geometry</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/GeometryReader/">GeometryReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/GeometryWriter/">GeometryWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/HeaderReader/">HeaderReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/HeaderWriter/">HeaderWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/JointBehaviorMetadata/">JointBehaviorMetadata</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/JointBehaviorMetadataReader/">JointBehaviorMetadataReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/JointBehaviorMetadataWriter/">JointBehaviorMetadataWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/MachineLearnedBehavior/">MachineLearnedBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/MachineLearnedBehaviorExt/">MachineLearnedBehaviorExt</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/MachineLearnedBehaviorExtReader/">MachineLearnedBehaviorExtReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/MachineLearnedBehaviorExtWriter/">MachineLearnedBehaviorExtWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/MachineLearnedBehaviorReader/">MachineLearnedBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/MachineLearnedBehaviorWriter/">MachineLearnedBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/RBFBehavior/">RBFBehavior</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/RBFBehaviorReader/">RBFBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/RBFBehaviorWriter/">RBFBehaviorWriter</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/Twist/">Twist</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/TwistSwingBehaviorReader/">TwistSwingBehaviorReader</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../layers/TwistSwingBehaviorWriter/">TwistSwingBehaviorWriter</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../types/Vector3/">Vector3</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >pma</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/MemoryResource/">MemoryResource</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/PolyAllocator/">PolyAllocator</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/ScopedPtr/">ScopedPtr</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../pma/TypeDefs/">TypeDefs</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >resources</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/AlignedMemoryResource/">AlignedMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/ArenaMemoryResource/">ArenaMemoryResource</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/resources/DefaultMemoryResource/">DefaultMemoryResource</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../pma/utils/ManagedInstance/">ManagedInstance</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >riglogic</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Configuration/">Configuration</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigInstance/">RigInstance</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/RigLogic/">RigLogic</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../riglogic/riglogic/Stats/">Stats</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/types/Aliases/">Aliases</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >version</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../riglogic/version/VersionInfo/">VersionInfo</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >status</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/Provider/">Provider</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/Status/">Status</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../status/StatusCode/">StatusCode</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >tdm</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Ang/">Ang</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Computations/">Computations</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/CoordSys/">CoordSys</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Mat/">Mat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Quat/">Quat</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Transforms/">Transforms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Types/">Types</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../tdm/Vec/">Vec</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >trio</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/Concepts/">Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../trio/Stream/">Stream</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >streams</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/FileStream/">FileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/MemoryMappedFileStream/">MemoryMappedFileStream</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/streams/MemoryStream/">MemoryStream</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >types</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/types/Parameters/">Parameters</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >utils</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../trio/utils/StreamScope/">StreamScope</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">OpenRigLogic</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">API Reference</li>
+          <li class="breadcrumb-item">dna</li>
+      <li class="breadcrumb-item active">BinaryStreamReader</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="api-reference-dnabinarystreamreader">API Reference — <code>dna/BinaryStreamReader</code></h1>
+<hr />
+<!-- ink:api name="BinaryStreamReader" module="dna/BinaryStreamReader" last_commit="api_scan" updated="2026-09-09" api_kind="callable" -->
+
+<h2 id="class-dnaapi-binarystreamreader-public-streamreader"><code>class DNAAPI BinaryStreamReader : public StreamReader</code></h2>
+<p>Reads DNA rig data from a binary stream, with factory methods that let callers control which data layers and levels of detail get loaded.</p>
+<h3 id="when-to-use-this">When to use this</h3>
+<p>Use <code>BinaryStreamReader::create</code> when you need to load a <code>.dna</code> file (or any <code>BoundedIOStream</code> of DNA binary data) and either want the full dataset, or want to limit loading to a specific <code>DataLayer</code> and LOD range to reduce memory and load time. Loading a later layer (e.g. <code>Behavior</code>) implicitly loads its dependencies (<code>Definition</code>, which in turn depends on <code>Descriptor</code>), so callers don't need to request each layer manually.</p>
+<h3 id="method-groups">Method groups</h3>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Methods</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Creation</td>
+<td>create (stream + config), create (stream + layer + policy + maxLOD), create (stream + layer + policy + maxLOD + minLOD)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example">Example</h3>
+<pre><code class="language-cpp">dna::BoundedIOStream* stream = /* opened .dna file stream */;
+dna::BinaryStreamReader* reader = dna::BinaryStreamReader::create(
+    stream,
+    dna::DataLayer::Behavior,
+    dna::UnknownLayerPolicy::Preserve,
+    /*maxLOD=*/0u);
+// reader now owns the Behavior layer and its Definition/Descriptor dependencies
+</code></pre>
+<h3 id="parameters">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stream</code></td>
+<td><code>BoundedIOStream*</code></td>
+<td>required — source stream from which data is going to be read</td>
+</tr>
+<tr>
+<td><code>config</code></td>
+<td><code>const Configuration&amp;</code></td>
+<td>optional — filtering and adaptation parameters</td>
+</tr>
+<tr>
+<td><code>layer</code></td>
+<td><code>DataLayer</code></td>
+<td>required (in layer-based overloads) — the layer up to which data needs to be loaded</td>
+</tr>
+<tr>
+<td><code>policy</code></td>
+<td><code>UnknownLayerPolicy</code></td>
+<td>optional — whether unknown layers are preserved or ignored; defaults to <code>Preserve</code></td>
+</tr>
+<tr>
+<td><code>maxLOD</code></td>
+<td><code>std::uint16_t</code></td>
+<td>optional — maximum level of detail to load; 0 loads all LODs; must be less than <code>getLODCount()</code></td>
+</tr>
+<tr>
+<td><code>minLOD</code></td>
+<td><code>std::uint16_t</code></td>
+<td>optional — minimum level of detail to load, paired with <code>maxLOD</code></td>
+</tr>
+<tr>
+<td><code>memRes</code></td>
+<td><code>MemoryResource*</code></td>
+<td>optional — memory resource used for allocations; a default mechanism is used if omitted</td>
+</tr>
+</tbody>
+</table>
+<h3 id="returns">Returns</h3>
+<p><code>BinaryStreamReader*</code> — a newly created reader instance. The caller is responsible for releasing it by calling <code>destroy</code>.</p>
+<h3 id="watch-out-for">Watch out for</h3>
+<ul>
+<li>The caller owns the returned pointer and must release it via <code>destroy</code> — <code>create</code> does not return a smart pointer.</li>
+<li><code>maxLOD</code> (and <code>minLOD</code>, where applicable) must be less than the value returned by <code>getLODCount()</code>, or behavior is undefined.</li>
+<li>The returned pointer is caller-owned. Failing to call <code>destroy</code> leaks memory. Do not call <code>delete</code> directly — use <code>destroy</code>.</li>
+<li><code>Geometry</code> and <code>Behavior</code> layers are independent — loading <code>Geometry</code> does not load <code>Behavior</code> data and vice versa. Both depend on and implicitly load <code>Definition</code>.</li>
+</ul>
+<!-- ink:api-end name="BinaryStreamReader" -->
+
+<!-- ink:api name="DefaultInstanceCreator" module="dna/BinaryStreamReader" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="template-struct-defaultinstancecreatordnabinarystreamreader"><code>template&lt;&gt; struct DefaultInstanceCreator&lt;dna::BinaryStreamReader&gt;</code></h2>
+<p>A <code>pma</code> framework specialization that tells the generic instance-creation machinery how to construct a <code>BinaryStreamReader</code> by default.</p>
+<h3 id="why-this-exists">Why this exists</h3>
+<p>Generic <code>pma</code> code that creates instances of arbitrary types by template parameter needs a per-type hook for construction. This specialization routes <code>BinaryStreamReader</code> creation through <code>pma::FactoryCreate&lt;dna::BinaryStreamReader&gt;</code>, matching the factory-based <code>create()</code> methods <code>BinaryStreamReader</code> actually exposes, rather than a plain constructor call.</p>
+<h3 id="fields">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td>typedef</td>
+<td><code>pma::FactoryCreate&lt;dna::BinaryStreamReader&gt;</code> — the creation strategy used for this type.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships">Relationships</h3>
+<ul>
+<li><code>BinaryStreamReader</code> — <em>the type this specialization knows how to create</em></li>
+<li><code>DefaultInstanceDestroyer&lt;dna::BinaryStreamReader&gt;</code> — <em>the paired specialization for destruction</em></li>
+</ul>
+<!-- ink:api-end name="DefaultInstanceCreator" -->
+
+<!-- ink:api name="DefaultInstanceDestroyer" module="dna/BinaryStreamReader" last_commit="api_scan" updated="2026-09-09" api_kind="data_shape" -->
+
+<h2 id="template-struct-defaultinstancedestroyerdnabinarystreamreader"><code>template&lt;&gt; struct DefaultInstanceDestroyer&lt;dna::BinaryStreamReader&gt;</code></h2>
+<p>A <code>pma</code> framework specialization that tells the generic instance-destruction machinery how to release a <code>BinaryStreamReader</code> created via the factory pattern.</p>
+<h3 id="why-this-exists_1">Why this exists</h3>
+<p>Because <code>BinaryStreamReader</code> is created through <code>pma::FactoryCreate</code> rather than <code>new</code>, it must also be destroyed through the matching <code>pma::FactoryDestroy</code> rather than <code>delete</code>. This specialization ensures generic <code>pma</code> cleanup code calls the correct destruction path automatically instead of requiring every call site to know this detail.</p>
+<h3 id="fields_1">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td>typedef</td>
+<td><code>pma::FactoryDestroy&lt;dna::BinaryStreamReader&gt;</code> — the destruction strategy used for this type.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="relationships_1">Relationships</h3>
+<ul>
+<li><code>BinaryStreamReader</code> — <em>the type this specialization knows how to destroy</em></li>
+<li><code>DefaultInstanceCreator&lt;dna::BinaryStreamReader&gt;</code> — <em>the paired specialization for creation</em></li>
+</ul>
+<!-- ink:api-end name="DefaultInstanceDestroyer" -->
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../" class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../BinaryStreamWriter/" class="btn btn-neutral float-right" title="BinaryStreamWriter">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../BinaryStreamWriter/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
