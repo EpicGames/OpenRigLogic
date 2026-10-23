@@ -346,3 +346,32 @@ This release spans twelve modules, with the bulk of the work in riglogic (118 fi
 
 **Tags**: release, v13.5.0, riglogic, dna, trio, trimd, terse, python
 <!-- ink:end id=f3d074e9 -->
+
+<!-- ink:start id=35e9582c type=release_notes conflict_score=1.0 last_confirmed=2026-10-23 created=2026-10-23 -->
+## Release v13.5.2
+
+This patch release spans five modules, with the functional work concentrated in trimd (CPU feature detection), dna (malformed-input rejection), and riglogic (serialization memory hygiene). It contains five bug fixes and the version bump to 13.5.2; single upstream snapshot import, no new public APIs and no breaking changes.
+
+### Highlights
+
+- **trimd**: AVX-family feature detection now also requires OS register-state support (OSXSAVE + XCR0 bits), so hosts where the OS has not enabled YMM/ZMM state no longer fault on AVX instructions
+- **dna**: Skin-weight data with mismatched `weights`/`jointIndices` array lengths is rejected as malformed at load time instead of being caught only by a debug assert
+- **riglogic**: Half-float `FloatArray` dump/restore no longer retains a dead fp32 staging buffer twice the size of the live fp16 data
+- **(root)**: RigLogic 13.5.0 → 13.5.2, DNA 10.4.1 → 10.4.2, trimd 2.6.3 → 2.6.4
+
+### Bug Fixes
+
+- **dna**: `FilteredBinaryInputArchive::process(RawVertexSkinWeights&)` now marks the archive malformed and returns when `weights.size() != jointIndices.size()` — the two are parallel arrays with independent length prefixes that `JointFilter::apply` walks in lockstep; previously this was only a debug-build `assert`
+- **python**: The `insert_copyright.py` scripts for dna and riglogic open files with an explicit `encoding='utf-8'` instead of the platform default
+- **riglogic**: `FloatArray` half-float serializer and deserializer release the fp32 staging buffer by reassigning a fresh `AlignedVector` rather than calling `clear()`, which kept the capacity allocated
+- **riglogic**: `RBFSolver::normalizeAndCutOff` loop index widened from `std::uint16_t` to `std::size_t` to match `outputWeights.size()`
+- **trimd**: `getCPUFeatures()` gates `AVX`, `F16C`, `FMA3`, and `AVX2` on OSXSAVE and the SSE|YMM bits of XCR0 (read via a new `xgetbv` helper for both MSVC and GCC/Clang), and `AVX512F` additionally on the opmask/ZMM state bits — CPUID alone reports hardware support, but the instructions `#UD` unless the OS saves and restores the wider register state, which hypervisor guests or `xsavedisable` may leave off. On Darwin the ZMM check is relaxed to the YMM bits because XNU enables ZMM state lazily
+
+### Infrastructure
+
+- **(root)**: Bumped `RL_VERSION` from 13.5.0 to 13.5.2 in CMakeLists.txt
+- **cmake**: Registered the new `tests/rltests/types/bpcm/TestFloatArray.cpp` suite in RLDependencies.cmake and tests/CMakeLists.txt
+- **include**: Updated `RL_VERSION_STRING` to 13.5.2 and `DNA_VERSION_STRING` to 10.4.2; trimd `TRIMD_VERSION_STRING` to 2.6.4
+
+**Tags**: release, v13.5.2, riglogic, dna, trimd, python, cmake
+<!-- ink:end id=35e9582c -->
