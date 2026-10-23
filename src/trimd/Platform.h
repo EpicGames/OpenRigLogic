@@ -167,12 +167,23 @@ namespace trimd {
 static void cpuidex(int info[4], int functionid, int subfunctionid) {
     __cpuidex(info, functionid, subfunctionid);
 }
+
+static unsigned long long xgetbv(unsigned int xcr) {
+    return _xgetbv(xcr);
+}
         #else
 // Based on https://github.com/ispc/ispc/blob/main/builtins/dispatch.c
 static void cpuidex(int info[4], int functionid, int subfunctionid) {
     __asm__ __volatile__("cpuid"
                          : "=a"(info[0]), "=b"(info[1]), "=c"(info[2]), "=d"(info[3])
                          : "0"(functionid), "2"(subfunctionid));
+}
+
+static unsigned long long xgetbv(unsigned int xcr) {
+    unsigned int eax = {};
+    unsigned int edx = {};
+    __asm__ __volatile__("xgetbv" : "=a"(eax), "=d"(edx) : "c"(xcr));
+    return (static_cast<unsigned long long>(edx) << 32) | eax;
 }
         #endif
 
@@ -186,14 +197,27 @@ inline CPUFeatures getCPUFeatures() {
     flags.SSSE3 = (info[2] & (1 << 9)) != 0;
     flags.SSE41 = (info[2] & (1 << 19)) != 0;
     flags.SSE42 = (info[2] & (1 << 20)) != 0;
-    flags.AVX = (info[2] & (1 << 28)) != 0;
-    flags.F16C = (info[2] & (1 << 29)) != 0;
-    flags.FMA3 = (info[2] & (1 << 12)) != 0;
+    // CPUID reports hardware support only; AVX-family instructions #UD unless the OS also saves/restores the
+    // wider register state (XCR0 bits), which hypervisor guests or `xsavedisable` may leave off.
+    // xgetbv itself faults without OSXSAVE.
+    const bool osxsave = (info[2] & (1 << 27)) != 0;
+    const unsigned long long xcr0 = osxsave ? xgetbv(0) : 0ull;
+    const bool ymmEnabled = (xcr0 & 0x6ull) == 0x6ull;  // SSE | YMM
+    flags.AVX = ymmEnabled && (info[2] & (1 << 28)) != 0;
+    flags.F16C = ymmEnabled && (info[2] & (1 << 29)) != 0;
+    flags.FMA3 = ymmEnabled && (info[2] & (1 << 12)) != 0;
     // AVX2 and AVX-512F live in CPUID leaf 7, subleaf 0 (EBX bits)
     int info7[4] = {};
     cpuidex(info7, 7, 0);
-    flags.AVX2 = (info7[1] & (1 << 5)) != 0;
-    flags.AVX512F = (info7[1] & (1 << 16)) != 0;
+    flags.AVX2 = ymmEnabled && (info7[1] & (1 << 5)) != 0;
+        #if defined(__APPLE__)
+    // XNU enables ZMM state lazily (XCR0 bits 5-7 stay clear until a thread's first AVX-512 instruction traps),
+    // so the XCR0 check would deny AVX-512 on every Intel Mac; compiler-rt skips it on Darwin for the same reason.
+    const bool zmmEnabled = ymmEnabled;
+        #else
+    const bool zmmEnabled = (xcr0 & 0xE6ull) == 0xE6ull;  // SSE | YMM | opmask | ZMM_Hi256 | Hi16_ZMM
+        #endif
+    flags.AVX512F = zmmEnabled && (info7[1] & (1 << 16)) != 0;
     return flags;
 }
     #endif  // TRIMD_PLATFORM_X86

@@ -526,8 +526,7 @@ void RBFSolver::normalizeAndCutOff(ArrayView<float> outputWeights) const {
     if ((sumWeight > 1.0f) || (normalizeMethod == RBFNormalizeMethod::AlwaysNormalize)) {
         normalizationRatio = 1.0f / sumWeight;
     }
-    // vectorize TODO
-    for (std::uint16_t i = 0u; i < outputWeights.size(); i++) {
+    for (std::size_t i = 0u; i < outputWeights.size(); i++) {
         float weight = outputWeights[i] * normalizationRatio * targetScale[i];
         if (weight > weightThreshold) {
             outputWeights[i] = weight;

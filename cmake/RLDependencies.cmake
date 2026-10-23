@@ -506,6 +506,7 @@ set(TESTS
     tests/rltests/riglogic/TestRigLogic.cpp
     tests/rltests/riglogic/TestRigMetadata.cpp
     tests/rltests/riglogic/TestSyntheticDNACoverage.cpp
+    tests/rltests/types/bpcm/TestFloatArray.cpp
     tests/sctests/Defs.h
     tests/sctests/TestStatusProviderIntegration.cpp
     tests/tdmtests/Defs.h

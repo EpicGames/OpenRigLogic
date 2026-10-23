@@ -14,8 +14,8 @@ namespace dna {
 // A minimal synthetic rig whose data activates every RigLogic subsystem (all nine evaluator kinds build Concrete)
 // under both the EulerAngles and Quaternions configurations.
 //
-// Control input buffer layout (getControlInputCount() == 16):
-//   raw [0,4) | psd [4,6) | ml [6,14) | rbf [14,16)
+// Control input buffer layout (getControlInputCount() == 22):
+//   raw [0,8) | psd [8,10) | ml [10,18) | rbf [18,22)
 class SyntheticFullReader : public FakeReader {
 public:
     ~SyntheticFullReader();
@@ -35,7 +35,7 @@ public:
     }
 
     StringView getName() const override {
-        return sv("SampleRig");
+        return sv("Synthetic");
     }
 
     CoordinateSystem getCoordinateSystem() const override {
@@ -53,32 +53,37 @@ public:
     }
 
     std::uint16_t getGUIControlCount() const override {
-        return 2u;
+        return 3u;
     }
 
     StringView getGUIControlName(std::uint16_t index) const override {
-        static const char* names[] = {"gui0", "gui1"};
-        return (index < 2u) ? sv(names[index]) : StringView{};
+        static const char* names[] = {"gui0", "gui1", "gui2"};
+        return (index < 3u) ? sv(names[index]) : StringView{};
     }
 
     std::uint16_t getRawControlCount() const override {
-        return 4u;
+        return 8u;
     }
 
-    // The .qx/.qy/.qz/.qw suffixes matter: raw3 is referenced by the RBF solvers and the twist/swing
-    // input quad, so its .qw name gives it an initial value of 1.0 (createInitialControlValues).
+    // raw[4,8) is the driver quad of the RBF solvers and the twist/swing setup, read by nothing else. Its names pair
+    // it with joint4 (the DNA3 conversion resolves a driver joint from the "<joint>.q*" control names), and the .qw
+    // suffix gives raw7 an initial value of 1.0 (createInitialControlValues), so the neutral driver is the identity.
     StringView getRawControlName(std::uint16_t index) const override {
-        static const char* names[] = {"ctrl.qx", "ctrl.qy", "ctrl.qz", "ctrl.qw"};
-        return (index < 4u) ? sv(names[index]) : StringView{};
+        static const char* names[] = {"ctrl0", "ctrl1", "ctrl2", "ctrl3", "joint4.qx", "joint4.qy", "joint4.qz", "joint4.qw"};
+        return (index < 8u) ? sv(names[index]) : StringView{};
     }
 
+    // joint0-2 are joint group / ML joints outputs, joint3 the twist output, joint4 the driver no evaluator writes,
+    // joint5-8 the rows of the wide joint group, joint9 the swing output. The twist and the swing output to different
+    // joints: on a shared one the evaluator's later write would replace the earlier.
     std::uint16_t getJointCount() const override {
-        return 4u;
+        return 10u;
     }
 
     StringView getJointName(std::uint16_t index) const override {
-        static const char* names[] = {"joint0", "joint1", "joint2", "joint3"};
-        return (index < 4u) ? sv(names[index]) : StringView{};
+        static const char* names[] =
+            {"joint0", "joint1", "joint2", "joint3", "joint4", "joint5", "joint6", "joint7", "joint8", "joint9"};
+        return (index < 10u) ? sv(names[index]) : StringView{};
     }
 
     std::uint16_t getJointIndexListCount() const override {
@@ -86,14 +91,14 @@ public:
     }
 
     ConstArrayView<std::uint16_t> getJointIndicesForLOD(std::uint16_t lod) const override {
-        static const std::uint16_t full[] = {0u, 1u, 2u, 3u};
-        static const std::uint16_t coarse[] = {0u, 1u, 2u};
-        return (lod < 3u) ? ConstArrayView<std::uint16_t>{full, 4ul} : ConstArrayView<std::uint16_t>{coarse, 3ul};
+        static const std::uint16_t full[] = {0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u};
+        static const std::uint16_t coarse[] = {0u, 1u, 2u, 4u, 5u};
+        return (lod < 3u) ? ConstArrayView<std::uint16_t>{full, 10ul} : ConstArrayView<std::uint16_t>{coarse, 5ul};
     }
 
     std::uint16_t getJointParentIndex(std::uint16_t index) const override {
-        static const std::uint16_t parents[] = {0u, 0u, 1u, 2u};
-        return (index < 4u) ? parents[index] : std::uint16_t{};
+        static const std::uint16_t parents[] = {0u, 0u, 1u, 2u, 0u, 0u, 0u, 0u, 0u, 0u};
+        return (index < 10u) ? parents[index] : std::uint16_t{};
     }
 
     std::uint16_t getBlendShapeChannelCount() const override {
@@ -153,74 +158,76 @@ public:
 
     // Neutral joint values: SoA, jointCount floats each; rotations in degrees.
     ConstArrayView<float> getNeutralJointTranslationXs() const override {
-        static const float v[] = {0.0f, 1.0f, 2.0f, 3.0f};
-        return {v, 4ul};
+        static const float v[] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f};
+        return {v, 10ul};
     }
 
     ConstArrayView<float> getNeutralJointTranslationYs() const override {
-        static const float v[] = {0.0f, 0.0f, 0.0f, 0.0f};
-        return {v, 4ul};
+        static const float v[] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+        return {v, 10ul};
     }
 
     ConstArrayView<float> getNeutralJointTranslationZs() const override {
-        static const float v[] = {0.0f, 0.0f, 0.0f, 0.0f};
-        return {v, 4ul};
+        static const float v[] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+        return {v, 10ul};
     }
 
     ConstArrayView<float> getNeutralJointRotationXs() const override {
-        static const float v[] = {0.0f, 10.0f, 0.0f, 5.0f};
-        return {v, 4ul};
+        static const float v[] = {0.0f, 10.0f, 0.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+        return {v, 10ul};
     }
 
     ConstArrayView<float> getNeutralJointRotationYs() const override {
-        static const float v[] = {0.0f, 0.0f, 15.0f, 0.0f};
-        return {v, 4ul};
+        static const float v[] = {0.0f, 0.0f, 15.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+        return {v, 10ul};
     }
 
     ConstArrayView<float> getNeutralJointRotationZs() const override {
-        static const float v[] = {0.0f, 0.0f, 0.0f, 20.0f};
-        return {v, 4ul};
+        static const float v[] = {0.0f, 0.0f, 0.0f, 20.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+        return {v, 10ul};
     }
 
-    // Identity mapping gui i -> raw i, plus a constant row pinning raw3 (the w of the quaternion quad raw[0,4)) to 1
-    // across the whole GUI range, so the neutral pose is the identity quaternion rather than the zero quaternion (NaN).
+    // Identity mapping gui i -> raw i, plus constant rows pinning raw3 and raw7 to 1 across the GUI range, since the
+    // mapping zero-fills every raw control it does not write and a zero quaternion normalizes to NaN: raw7 is the w
+    // of the driver quad raw[4,8); raw3 reaches ML control 13, the qx of the ML-joints quad, through net0's
+    // out[i] = in[i % 6].
     ConstArrayView<std::uint16_t> getGUIToRawInputIndices() const override {
-        static const std::uint16_t v[] = {0u, 1u, 0u};
-        return {v, 3ul};
+        static const std::uint16_t v[] = {0u, 1u, 2u, 0u, 0u};
+        return {v, 5ul};
     }
 
     ConstArrayView<std::uint16_t> getGUIToRawOutputIndices() const override {
-        static const std::uint16_t v[] = {0u, 1u, 3u};
-        return {v, 3ul};
+        static const std::uint16_t v[] = {0u, 1u, 2u, 3u, 7u};
+        return {v, 5ul};
     }
 
     ConstArrayView<float> getGUIToRawFromValues() const override {
-        static const float v[] = {0.0f, 0.0f, -1.0f};
-        return {v, 3ul};
+        static const float v[] = {0.0f, 0.0f, 0.0f, -1.0f, -1.0f};
+        return {v, 5ul};
     }
 
     ConstArrayView<float> getGUIToRawToValues() const override {
-        static const float v[] = {1.0f, 1.0f, 1.0f};
-        return {v, 3ul};
+        static const float v[] = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+        return {v, 5ul};
     }
 
     ConstArrayView<float> getGUIToRawSlopeValues() const override {
-        static const float v[] = {1.0f, 1.0f, 0.0f};
-        return {v, 3ul};
+        static const float v[] = {1.0f, 1.0f, 1.0f, 0.0f, 0.0f};
+        return {v, 5ul};
     }
 
     ConstArrayView<float> getGUIToRawCutValues() const override {
-        static const float v[] = {0.0f, 0.0f, 1.0f};
-        return {v, 3ul};
+        static const float v[] = {0.0f, 0.0f, 0.0f, 1.0f, 1.0f};
+        return {v, 5ul};
     }
 
-    // psd4 = raw0*raw1, psd5 = raw2*raw3; row indices are absolute.
+    // psd8 = raw0*raw1, psd9 = raw2*raw3; row indices are absolute.
     std::uint16_t getPSDCount() const override {
         return 2u;
     }
 
     ConstArrayView<std::uint16_t> getPSDRowIndices() const override {
-        static const std::uint16_t v[] = {4u, 4u, 5u, 5u};
+        static const std::uint16_t v[] = {8u, 8u, 9u, 9u};
         return {v, 4ul};
     }
 
@@ -236,53 +243,134 @@ public:
 
     // Attr space is 9 per joint (tx..sz); variable attrs are the union of driven attrs per LOD.
     ConstArrayView<std::uint16_t> getJointVariableAttributeIndices(std::uint16_t lod) const override {
-        static const std::uint16_t lod01[] = {3u, 4u, 5u, 9u, 12u, 13u, 14u, 18u, 19u, 20u, 21u, 22u, 23u, 30u, 31u, 32u};
-        static const std::uint16_t lod2[] = {3u, 4u, 5u, 9u, 12u, 13u, 14u, 18u, 19u, 20u, 21u, 22u, 23u};
-        static const std::uint16_t lod3[] = {3u, 4u, 5u, 9u, 12u, 13u, 14u};
+        static std::uint16_t lod01[19 + 36];
+        static std::uint16_t lod2[19 + 32];
+        static std::uint16_t lod3[7 + 8];
+        static bool initialized = false;
+        if (!initialized) {
+            const std::uint16_t head[] =
+                {3u, 4u, 5u, 9u, 12u, 13u, 14u, 18u, 19u, 20u, 21u, 22u, 23u, 30u, 31u, 32u, 84u, 85u, 86u};
+            for (std::size_t i = {}; i < 19ul; ++i) {
+                lod01[i] = head[i];
+                lod2[i] = head[i];
+                if (i < 7ul) {
+                    lod3[i] = head[i];
+                }
+            }
+            // Joint group 2's rows: joints 5-8, attribute indices 45-80, cut to 32 then 8 rows at the coarse LODs.
+            for (std::size_t i = {}; i < 36ul; ++i) {
+                const auto attr = static_cast<std::uint16_t>(45ul + i);
+                lod01[19ul + i] = attr;
+                if (i < 32ul) {
+                    lod2[19ul + i] = attr;
+                }
+                if (i < 8ul) {
+                    lod3[7ul + i] = attr;
+                }
+            }
+            initialized = true;
+        }
         if (lod < 2u) {
-            return {lod01, 16ul};
+            return {lod01, 55ul};
         }
         if (lod == 2u) {
-            return {lod2, 13ul};
+            return {lod2, 51ul};
         }
-        return {lod3, 7ul};
+        return {lod3, 15ul};
     }
 
     std::uint16_t getJointGroupCount() const override {
-        return 2u;
+        return 3u;
     }
 
     // Group 0: euler joint0 rotation rows (BPCM only). Group 1: quaternion joint1, one translation row (BPCM) plus a
-    // contiguous rx,ry,rz triple (quaternion evaluator); row counts shrink at coarse LODs to hit unaligned block walks.
+    // contiguous rx,ry,rz triple (quaternion evaluator). Group 2: every attribute of euler joints 5-8, 36 rows x 5
+    // columns, the one group wide enough for kernels that tile 32 rows at a time. Row counts shrink at coarse LODs to
+    // hit unaligned block walks.
     ConstArrayView<std::uint16_t> getJointGroupLODs(std::uint16_t jointGroupIndex) const override {
         static const std::uint16_t g0[] = {3u, 3u, 2u, 2u};
         static const std::uint16_t g1[] = {4u, 4u, 4u, 1u};
-        return (jointGroupIndex == 0u) ? ConstArrayView<std::uint16_t>{g0, 4ul} : ConstArrayView<std::uint16_t>{g1, 4ul};
+        static const std::uint16_t g2[] = {36u, 36u, 32u, 8u};
+        switch (jointGroupIndex) {
+        case 0u:
+            return {g0, 4ul};
+        case 1u:
+            return {g1, 4ul};
+        default:
+            return {g2, 4ul};
+        }
     }
 
     ConstArrayView<std::uint16_t> getJointGroupInputIndices(std::uint16_t jointGroupIndex) const override {
         static const std::uint16_t g0[] = {0u, 1u};
-        static const std::uint16_t g1[] = {1u, 4u};
-        return (jointGroupIndex == 0u) ? ConstArrayView<std::uint16_t>{g0, 2ul} : ConstArrayView<std::uint16_t>{g1, 2ul};
+        static const std::uint16_t g1[] = {1u, 8u};
+        static const std::uint16_t g2[] = {0u, 1u, 2u, 3u, 9u};
+        switch (jointGroupIndex) {
+        case 0u:
+            return {g0, 2ul};
+        case 1u:
+            return {g1, 2ul};
+        default:
+            return {g2, 5ul};
+        }
     }
 
     ConstArrayView<std::uint16_t> getJointGroupOutputIndices(std::uint16_t jointGroupIndex) const override {
         static const std::uint16_t g0[] = {3u, 4u, 5u};
         static const std::uint16_t g1[] = {9u, 12u, 13u, 14u};
-        return (jointGroupIndex == 0u) ? ConstArrayView<std::uint16_t>{g0, 3ul} : ConstArrayView<std::uint16_t>{g1, 4ul};
+        static std::uint16_t g2[36];
+        static bool initialized = false;
+        if (!initialized) {
+            for (std::size_t i = {}; i < 36ul; ++i) {
+                g2[i] = static_cast<std::uint16_t>(45ul + i);
+            }
+            initialized = true;
+        }
+        switch (jointGroupIndex) {
+        case 0u:
+            return {g0, 3ul};
+        case 1u:
+            return {g1, 4ul};
+        default:
+            return {g2, 36ul};
+        }
     }
 
-    // rows * cols, row-major; every row and column holds a non-zero value so nothing is pruned.
+    // rows * cols, row-major; every row and column holds a non-zero value so nothing is pruned. Group 2's values cycle
+    // through 13 distinct multiples of 1/8, so no two adjacent rows or columns repeat.
     ConstArrayView<float> getJointGroupValues(std::uint16_t jointGroupIndex) const override {
         static const float g0[] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f};
         static const float g1[] = {0.5f, 1.5f, 2.5f, 3.5f, 4.5f, 5.5f, 6.5f, 7.5f};
-        return (jointGroupIndex == 0u) ? ConstArrayView<float>{g0, 6ul} : ConstArrayView<float>{g1, 8ul};
+        static float g2[36 * 5];
+        static bool initialized = false;
+        if (!initialized) {
+            for (std::size_t i = {}; i < 180ul; ++i) {
+                g2[i] = 0.125f * static_cast<float>((i % 13ul) + 1ul);
+            }
+            initialized = true;
+        }
+        switch (jointGroupIndex) {
+        case 0u:
+            return {g0, 6ul};
+        case 1u:
+            return {g1, 8ul};
+        default:
+            return {g2, 180ul};
+        }
     }
 
     ConstArrayView<std::uint16_t> getJointGroupJointIndices(std::uint16_t jointGroupIndex) const override {
         static const std::uint16_t g0[] = {0u};
         static const std::uint16_t g1[] = {1u};
-        return (jointGroupIndex == 0u) ? ConstArrayView<std::uint16_t>{g0, 1ul} : ConstArrayView<std::uint16_t>{g1, 1ul};
+        static const std::uint16_t g2[] = {5u, 6u, 7u, 8u};
+        switch (jointGroupIndex) {
+        case 0u:
+            return {g0, 1ul};
+        case 1u:
+            return {g1, 1ul};
+        default:
+            return {g2, 4ul};
+        }
     }
 
     // Inputs are the PSD outputs, which also makes PSDNet's per-LOD registered-control lists non-empty.
@@ -292,7 +380,7 @@ public:
     }
 
     ConstArrayView<std::uint16_t> getBlendShapeChannelInputIndices() const override {
-        static const std::uint16_t v[] = {4u, 5u};
+        static const std::uint16_t v[] = {8u, 9u};
         return {v, 2ul};
     }
 
@@ -341,7 +429,7 @@ public:
         return 8u;
     }
 
-    // ml6 ("jnt2.qw", buffer index 12) is the qw of the ML-joints rotation quad, so it both gets an
+    // ml6 ("jnt2.qw", buffer index 16) is the qw of the ML-joints rotation quad, so it both gets an
     // initial value of 1.0 and exercises getDefaultValues' quaternion-qw defaulting.
     StringView getMLControlName(std::uint16_t index) const override {
         static const char* names[] = {"ml.tx", "ml.ty", "ml.tz", "jnt2.qx", "jnt2.qy", "jnt2.qz", "jnt2.qw", "ml.extra"};
@@ -389,13 +477,13 @@ public:
     }
 
     ConstArrayView<std::uint16_t> getNeuralNetworkInputIndices(std::uint16_t neuralNetIndex) const override {
-        static const std::uint16_t net0[] = {0u, 1u, 2u, 3u, 4u, 5u};
-        static const std::uint16_t net1[] = {0u, 1u, 2u, 3u, 4u, 5u, 4u, 5u};
+        static const std::uint16_t net0[] = {0u, 1u, 2u, 3u, 8u, 9u};
+        static const std::uint16_t net1[] = {0u, 1u, 2u, 3u, 8u, 9u, 8u, 9u};
         return (neuralNetIndex == 0u) ? ConstArrayView<std::uint16_t>{net0, 6ul} : ConstArrayView<std::uint16_t>{net1, 8ul};
     }
 
     ConstArrayView<std::uint16_t> getNeuralNetworkOutputIndices(std::uint16_t /*unused*/) const override {
-        static const std::uint16_t v[] = {6u, 7u, 8u, 9u, 10u, 11u, 12u, 13u};
+        static const std::uint16_t v[] = {10u, 11u, 12u, 13u, 14u, 15u, 16u, 17u};
         return {v, 8ul};
     }
 
@@ -475,8 +563,8 @@ public:
     ConstArrayView<std::uint32_t> getMLOperationParameters(std::uint16_t mlTypeIndex,
                                                            std::uint16_t mlOperationSetIndex,
                                                            std::uint16_t mlOperationIndex) const override {
-        // Gather params: absolute control-buffer indices to read (raw + psd).
-        static const std::uint32_t gather[] = {0u, 1u, 2u, 3u, 4u, 5u};
+        // Gather params: absolute control-buffer indices to read (raw[0,4) + psd).
+        static const std::uint32_t gather[] = {0u, 1u, 2u, 3u, 8u, 9u};
         // MLP params: {netIndex}; net1 additionally carries per-LOD row counts (layerCount * lodCount
         // tail): layer0 full-width at every LOD, layer1 limited to 4 rows at LODs 2-3.
         static const std::uint32_t mlp0[] = {0u};
@@ -484,7 +572,7 @@ public:
         // WeightedSum params: {outputCount, per-dependency float weight as IEEE-754 bits (1.0f)}.
         static const std::uint32_t wsum[] = {8u, 0x3F800000u};
         // Scatter params: absolute control-buffer indices to write (the ML section).
-        static const std::uint32_t scatter[] = {6u, 7u, 8u, 9u, 10u, 11u, 12u, 13u};
+        static const std::uint32_t scatter[] = {10u, 11u, 12u, 13u, 14u, 15u, 16u, 17u};
         if ((mlTypeIndex != 0u) || (mlOperationIndex != 0u)) {
             return {};
         }
@@ -539,9 +627,9 @@ public:
     }
 
     // ML joints drive joint2. Inputs are ML-section control indices; outputs index the ML model's 10-attrs-per-joint
-    // space (tx,ty,tz at 20-22, qx..qw at 23-26). The rotation quad's control indices (9-12) must be consecutive (span-4).
+    // space (tx,ty,tz at 20-22, qx..qw at 23-26). The rotation quad's control indices (13-16) must be consecutive (span-4).
     ConstArrayView<std::uint16_t> getMLJointsInputIndices() const override {
-        static const std::uint16_t v[] = {6u, 7u, 8u, 9u, 10u, 11u, 12u};
+        static const std::uint16_t v[] = {10u, 11u, 12u, 13u, 14u, 15u, 16u};
         return {v, 7ul};
     }
 
@@ -574,7 +662,8 @@ public:
         return ScaleRepresentation::Vector;
     }
 
-    // Identical input quads, so twist and swing merge into one setup carrying both halves.
+    // Identical input quads (the driver), so twist and swing merge into one setup carrying both halves; the twist
+    // outputs onto joint3, the swing onto joint9.
     std::uint16_t getTwistCount() const override {
         return 1u;
     }
@@ -584,7 +673,7 @@ public:
     }
 
     ConstArrayView<std::uint16_t> getTwistInputControlIndices(std::uint16_t /*unused*/) const override {
-        static const std::uint16_t v[] = {0u, 1u, 2u, 3u};
+        static const std::uint16_t v[] = {4u, 5u, 6u, 7u};
         return {v, 4ul};
     }
 
@@ -607,12 +696,12 @@ public:
     }
 
     ConstArrayView<std::uint16_t> getSwingInputControlIndices(std::uint16_t /*unused*/) const override {
-        static const std::uint16_t v[] = {0u, 1u, 2u, 3u};
+        static const std::uint16_t v[] = {4u, 5u, 6u, 7u};
         return {v, 4ul};
     }
 
     ConstArrayView<std::uint16_t> getSwingOutputJointIndices(std::uint16_t /*unused*/) const override {
-        static const std::uint16_t v[] = {3u};
+        static const std::uint16_t v[] = {9u};
         return {v, 1ul};
     }
 
@@ -621,14 +710,15 @@ public:
         return {v, 1ul};
     }
 
-    // Two solvers over the same two poses: Additive/Euclidean/fixed radius and Interpolative/Quaternion/automatic radius.
+    // Two solvers over the same two targets (the identity and a turn about X) with poses of their own:
+    // Additive/Euclidean/fixed radius and Interpolative/Quaternion/automatic radius.
     std::uint16_t getRBFPoseCount() const override {
-        return 2u;
+        return 4u;
     }
 
     StringView getRBFPoseName(std::uint16_t poseIndex) const override {
-        static const char* names[] = {"poseA", "poseB"};
-        return (poseIndex < 2u) ? sv(names[poseIndex]) : StringView{};
+        static const char* names[] = {"poseA", "poseB", "poseC", "poseD"};
+        return (poseIndex < 4u) ? sv(names[poseIndex]) : StringView{};
     }
 
     float getRBFPoseScale(std::uint16_t /*unused*/) const override {
@@ -636,19 +726,19 @@ public:
     }
 
     std::uint16_t getRBFPoseControlCount() const override {
-        return 2u;
+        return 4u;
     }
 
     StringView getRBFPoseControlName(std::uint16_t poseControlIndex) const override {
-        static const char* names[] = {"rbf0", "rbf1"};
-        return (poseControlIndex < 2u) ? sv(names[poseControlIndex]) : StringView{};
+        static const char* names[] = {"rbf0", "rbf1", "rbf2", "rbf3"};
+        return (poseControlIndex < 4u) ? sv(names[poseControlIndex]) : StringView{};
     }
 
-    // Pose outputs live in the RBF section of the control buffer: [14, 16).
+    // Pose outputs live in the RBF section of the control buffer, [18, 22), pose i at 18 + i: each solver's weights
+    // land in controls of their own, so both stay observable at the LODs where both solvers run.
     ConstArrayView<std::uint16_t> getRBFPoseOutputControlIndices(std::uint16_t poseIndex) const override {
-        static const std::uint16_t p0[] = {14u};
-        static const std::uint16_t p1[] = {15u};
-        return (poseIndex == 0u) ? ConstArrayView<std::uint16_t>{p0, 1ul} : ConstArrayView<std::uint16_t>{p1, 1ul};
+        static const std::uint16_t v[] = {18u, 19u, 20u, 21u};
+        return (poseIndex < 4u) ? ConstArrayView<std::uint16_t>{v + poseIndex, 1ul} : ConstArrayView<std::uint16_t>{};
     }
 
     ConstArrayView<float> getRBFPoseOutputControlWeights(std::uint16_t /*unused*/) const override {
@@ -675,16 +765,17 @@ public:
         return (index < 2u) ? sv(names[index]) : StringView{};
     }
 
-    // 4 raw controls = one quaternion input, satisfying the multiple-of-4 rule for solver1's
+    // The driver quad = one quaternion input, satisfying the multiple-of-4 rule for solver1's
     // Quaternion distance method.
     ConstArrayView<std::uint16_t> getRBFSolverRawControlIndices(std::uint16_t /*unused*/) const override {
-        static const std::uint16_t v[] = {0u, 1u, 2u, 3u};
+        static const std::uint16_t v[] = {4u, 5u, 6u, 7u};
         return {v, 4ul};
     }
 
-    ConstArrayView<std::uint16_t> getRBFSolverPoseIndices(std::uint16_t /*unused*/) const override {
-        static const std::uint16_t v[] = {0u, 1u};
-        return {v, 2ul};
+    ConstArrayView<std::uint16_t> getRBFSolverPoseIndices(std::uint16_t solverIndex) const override {
+        static const std::uint16_t s0[] = {0u, 1u};
+        static const std::uint16_t s1[] = {2u, 3u};
+        return (solverIndex == 0u) ? ConstArrayView<std::uint16_t>{s0, 2ul} : ConstArrayView<std::uint16_t>{s1, 2ul};
     }
 
     // Exactly poseCount * inputCount floats: two distinct unit-quaternion targets per solver.
@@ -719,8 +810,10 @@ public:
         return (solverIndex == 0u) ? RBFNormalizeMethod::OnlyNormalizeAboveOne : RBFNormalizeMethod::AlwaysNormalize;
     }
 
-    RBFFunctionType getRBFSolverFunctionType(std::uint16_t solverIndex) const override {
-        return (solverIndex == 0u) ? RBFFunctionType::Gaussian : RBFFunctionType::Linear;
+    // Gaussian for both: a linear kernel saturates solver1's interpolated weights to 0 or 1 under most unit-quaternion
+    // drivers, leaving nothing between the targets to compare.
+    RBFFunctionType getRBFSolverFunctionType(std::uint16_t /*unused*/) const override {
+        return RBFFunctionType::Gaussian;
     }
 
     TwistAxis getRBFSolverTwistAxis(std::uint16_t solverIndex) const override {

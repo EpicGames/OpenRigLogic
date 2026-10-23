@@ -6,11 +6,15 @@
 
 #include "dna/BinaryStreamReader.h"
 #include "dna/BinaryStreamWriter.h"
+#include "dna/DNA.h"
+#include "dna/LODConstraint.h"
 #include "dna/StreamReader.h"
+#include "dna/stream/FilteredBinaryInputArchive.h"
 #include "dna/types/Aliases.h"
 
 #include <pma/resources/AlignedMemoryResource.h>
 #include <status/Provider.h>
+#include <terse/archives/binary/OutputArchive.h>
 
 namespace {
 
@@ -583,4 +587,97 @@ TEST_F(MalformedInputTest, AnimatedMapIndexArrayLengthMismatchSetsInvalidDataErr
         crafted.get());
     ASSERT_FALSE(dna::Status::isOk());
     ASSERT_EQ(dna::Status::get().code, dna::StreamReader::InvalidDataError.code);
+}
+
+namespace {
+
+// Loads the v28 fixture into a raw DNA, lets `mutate` edit it below the public writer (which keeps parallel arrays in
+// sync), re-serializes it with the writer's archive type, then reads it back with the given reader configuration.
+template<typename TMutate>
+pma::ScopedPtr<dna::BinaryStreamReader> rewriteRawV28(TMutate mutate,
+                                                      trio::MemoryStream* crafted,
+                                                      pma::MemoryResource* memRes,
+                                                      const dna::Configuration& config = dna::Configuration{}) {
+    const auto bytes = dna::RawV28::getBytes();
+    auto source = pma::makeScoped<trio::MemoryStream>();
+    source->write(bytes.data(), bytes.size());
+    source->seek(0);
+    dna::DNA raw{memRes};
+    dna::LODConstraint unconstrained{0u, static_cast<std::uint16_t>(dna::DecodedV28::lodCount[0] - 1u), memRes};
+    dna::FilteredBinaryInputArchive input{source.get(), dna::DataLayer::All, std::move(unconstrained), memRes};
+    input >> raw;
+    EXPECT_TRUE(input.isOk());
+
+    mutate(raw);
+
+    crafted->open();
+    terse::BinaryOutputArchive<dna::BoundedIOStream> output{crafted};
+    output << raw;
+    output.sync();
+    crafted->close();
+
+    crafted->seek(0);
+    auto reader = dna::makeScoped<dna::BinaryStreamReader>(crafted, config);
+    reader->read();
+    return reader;
+}
+
+// Mesh 2 is the only mesh kept under maxLOD = 1, and joints 0-3 all survive that LOD.
+constexpr std::uint16_t lod1MeshIndex = 2u;
+
+void setMismatchedSkinWeights(dna::DNA& raw) {
+    auto& vertex = raw.geometry.meshes[lod1MeshIndex].skinWeights[0];
+    const float weights[] = {0.5f, 0.5f};
+    const std::uint16_t jointIndices[] = {0u, 1u, 2u, 3u};
+    vertex.weights.assign(weights, weights + 2u);
+    vertex.jointIndices.assign(jointIndices, jointIndices + 4u);
+}
+
+void setMatchedSkinWeights(dna::DNA& raw) {
+    auto& vertex = raw.geometry.meshes[lod1MeshIndex].skinWeights[0];
+    const float weights[] = {0.5f, 0.5f};
+    const std::uint16_t jointIndices[] = {0u, 1u};
+    vertex.weights.assign(weights, weights + 2u);
+    vertex.jointIndices.assign(jointIndices, jointIndices + 2u);
+}
+
+}  // namespace
+
+// Skin weight values and joint indices are parallel arrays with independent length prefixes.
+TEST_F(MalformedInputTest, SkinWeightArrayLengthMismatchSetsInvalidDataError) {
+    pma::AlignedMemoryResource amr;
+    auto crafted = pma::makeScoped<trio::MemoryStream>();
+    auto reader = rewriteRawV28(setMismatchedSkinWeights, crafted.get(), &amr);
+    ASSERT_FALSE(dna::Status::isOk());
+    ASSERT_EQ(dna::Status::get().code, dna::StreamReader::InvalidDataError.code);
+}
+
+// Under a LOD constraint the reader used to hand the mismatched pair to JointFilter::apply, which walks both arrays
+// in lockstep bounded by the joint indices and so read past the shorter weights buffer.
+TEST_F(MalformedInputTest, SkinWeightArrayLengthMismatchUnderLODConstraintSetsInvalidDataError) {
+    pma::AlignedMemoryResource amr;
+    auto crafted = pma::makeScoped<trio::MemoryStream>();
+    dna::Configuration config;
+    config.maxLOD = 1u;
+    auto reader = rewriteRawV28(setMismatchedSkinWeights, crafted.get(), &amr, config);
+    ASSERT_FALSE(dna::Status::isOk());
+    ASSERT_EQ(dna::Status::get().code, dna::StreamReader::InvalidDataError.code);
+}
+
+// The matching valid shape: equal lengths still load, with and without a LOD constraint.
+TEST_F(MalformedInputTest, SkinWeightArraysOfEqualLengthLoad) {
+    pma::AlignedMemoryResource amr;
+    auto crafted = pma::makeScoped<trio::MemoryStream>();
+    auto reader = rewriteRawV28(setMatchedSkinWeights, crafted.get(), &amr);
+    ASSERT_TRUE(dna::Status::isOk());
+    ASSERT_EQ(reader->getSkinWeightsValues(lod1MeshIndex, 0u).size(), 2u);
+    ASSERT_EQ(reader->getSkinWeightsJointIndices(lod1MeshIndex, 0u).size(), 2u);
+
+    auto craftedLOD1 = pma::makeScoped<trio::MemoryStream>();
+    dna::Configuration config;
+    config.maxLOD = 1u;
+    auto readerLOD1 = rewriteRawV28(setMatchedSkinWeights, craftedLOD1.get(), &amr, config);
+    ASSERT_TRUE(dna::Status::isOk());
+    ASSERT_EQ(readerLOD1->getSkinWeightsValues(0u, 0u).size(), 2u);
+    ASSERT_EQ(readerLOD1->getSkinWeightsJointIndices(0u, 0u).size(), 2u);
 }
