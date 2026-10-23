@@ -90,7 +90,8 @@ else()
 
         rltests/riglogic/TestRigLogic.cpp
         rltests/riglogic/TestRigMetadata.cpp
-        rltests/riglogic/TestSyntheticDNACoverage.cpp)
+        rltests/riglogic/TestSyntheticDNACoverage.cpp
+        rltests/types/bpcm/TestFloatArray.cpp)
 endif()
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})

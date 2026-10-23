@@ -335,8 +335,13 @@ void FilteredBinaryInputArchive::process(RawVertexSkinWeights& dest) {
     process(dest.weights);
     process(dest.jointIndices);
 
+    // Parallel arrays with independent length prefixes; JointFilter::apply walks both in lockstep bounded by jointIndices.
+    if (dest.weights.size() != dest.jointIndices.size()) {
+        malformed = true;
+        return;
+    }
+
     if (lodConstraint.hasImpactOn(unconstrainedLODCount)) {
-        assert(dest.weights.size() == dest.jointIndices.size());
         JointFilter::apply(dest);
     }
 }

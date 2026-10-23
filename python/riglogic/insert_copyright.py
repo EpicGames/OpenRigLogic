@@ -14,13 +14,13 @@ def main():
     args = parser.parse_args()
     input_file_path = args.file_path
 
-    with open(input_file_path, 'r') as input_file:
+    with open(input_file_path, 'r', encoding='utf-8') as input_file:
         first_line = input_file.readline()
 
         if copyright_notice not in first_line:
             input_file.seek(0)
             data = input_file.read()
-            with open(input_file_path, 'w') as output_file:
+            with open(input_file_path, 'w', encoding='utf-8') as output_file:
                 output_file.write(copyright_notice + data)
 
 if __name__ == '__main__':
