@@ -80,7 +80,7 @@ public:
             std::copy(start, end, stdext::checked_array_iterator<value_type*>(data(), size()));
     #endif
 #else
-        std::copy(start, end, data());
+            std::copy(start, end, data());
 #endif
         }
     }
@@ -218,15 +218,14 @@ public:
             std::copy(start, end, stdext::checked_array_iterator<value_type*>(data(), size()));
     #endif
 #else
-        std::copy(start, end, data());
+            std::copy(start, end, data());
 #endif
         }
     }
 
 private:
     static pointer_type create(std::size_t size, allocator_type alloc) {
-        if (size == 0ul)
-        {
+        if (size == 0ul) {
             return pointer_type{};
         }
         return pointer_type{alloc.allocate(size), [alloc, size](value_type* p) mutable { alloc.deallocate(p, size); }};
