@@ -51,7 +51,7 @@ public:
     DynArray(std::size_t size, const allocator_type& allocator = allocator_type{}) :
         alloc{allocator},
         sz{size},
-        ptr{size > 0 ? create(sz, alloc) : pointer_type{}} {
+        ptr{create(sz, alloc)} {
     }
 
     DynArray(std::size_t size, const value_type& value, const allocator_type& allocator = allocator_type{}) :
@@ -72,17 +72,17 @@ public:
     DynArray(TIterator start, TIterator end, const allocator_type& allocator = allocator_type{}) :
         DynArray{static_cast<std::size_t>(std::distance(start, end)), allocator} {
 
-#if defined(_MSC_VER) && !defined(__clang__) && (_MSC_VER < 1938)
         if (size() != 0ul) {
+#if defined(_MSC_VER) && !defined(__clang__) && (_MSC_VER < 1938)
     #if (_MSC_VER >= 1900) && (__cplusplus >= 202002L)
             std::copy(start, end, std::span{data(), size()}.begin());
     #else
             std::copy(start, end, stdext::checked_array_iterator<value_type*>(data(), size()));
     #endif
-        }
 #else
         std::copy(start, end, data());
 #endif
+        }
     }
 
     ~DynArray() = default;
@@ -210,21 +210,25 @@ public:
     template<typename TIterator>
     void assign(TIterator start, TIterator end) {
         resize_uninitialized(static_cast<std::size_t>(std::distance(start, end)));
-#if defined(_MSC_VER) && !defined(__clang__) && (_MSC_VER < 1938)
         if (size() != 0ul) {
+#if defined(_MSC_VER) && !defined(__clang__) && (_MSC_VER < 1938)
     #if (_MSC_VER >= 1900) && (__cplusplus >= 202002L)
             std::copy(start, end, std::span{data(), size()}.begin());
     #else
             std::copy(start, end, stdext::checked_array_iterator<value_type*>(data(), size()));
     #endif
-        }
 #else
         std::copy(start, end, data());
 #endif
+        }
     }
 
 private:
     static pointer_type create(std::size_t size, allocator_type alloc) {
+        if (size == 0ul)
+        {
+            return pointer_type{};
+        }
         return pointer_type{alloc.allocate(size), [alloc, size](value_type* p) mutable { alloc.deallocate(p, size); }};
     }
 
